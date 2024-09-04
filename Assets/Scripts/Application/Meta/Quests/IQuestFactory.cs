@@ -1,5 +1,3 @@
-using System;
-
 namespace Application.Meta.Quests
 {
     public interface IQuestFactory

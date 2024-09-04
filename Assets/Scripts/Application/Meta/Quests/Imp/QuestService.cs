@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace Application.Meta.Quests
+namespace Application.Meta.Quests.Imp
 {
-    public class QuestServiceImp : IQuestService, IDisposable
+    public class QuestService : IQuestService, IDisposable
     {
         private readonly List<QuestData> _data;
         private readonly List<QuestConfig> _configs;
@@ -11,7 +11,7 @@ namespace Application.Meta.Quests
 
         private readonly IQuestFactory _questFactory;
 
-        public QuestServiceImp(List<QuestConfig> configs, List<QuestData> data, IQuestFactory questFactory)
+        public QuestService(List<QuestConfig> configs, List<QuestData> data, IQuestFactory questFactory)
         {
             _data = data;
             _configs = configs;

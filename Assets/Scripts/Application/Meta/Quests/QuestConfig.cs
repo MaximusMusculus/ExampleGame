@@ -1,6 +1,5 @@
 namespace Application.Meta.Quests
 {
-    
     /// <summary>
     /// В целом квесты делятся на два вида.
     /// 1. Проверяют условия на готовых счетчиках
@@ -22,6 +21,11 @@ namespace Application.Meta.Quests
         //Квет на квесты?)
         //выполнить квест <- проверка на то, выполнен ли конкретный квест
         //выполнить дейли квест <- счетчик выполнения квеста
+        
+        Resources,
+        Buildings,
+        Quests,
+        //BattleTargets
     }
     
     
