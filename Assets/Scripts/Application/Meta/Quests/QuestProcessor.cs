@@ -2,15 +2,19 @@ using System;
 
 namespace Application.Meta.Quests
 {
-    public abstract class QuestProcessor
+    public abstract class Quest
     {
+        public abstract bool IsCompleted { get; }
+        public abstract bool IsFinish { get; }
     }
     
-    public class TestQuestProcessor : QuestProcessor, IDisposable
+    public class TestQuest : Quest, IDisposable
     {
+        public override bool IsCompleted => false;
+        public override bool IsFinish => false;
+
         public void Dispose()
         {
-            //do nothing
         }
     }
 }

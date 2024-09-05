@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Application.Meta.Quests
 {
     /// <summary>
@@ -6,5 +8,7 @@ namespace Application.Meta.Quests
     public interface IQuestService
     {
         void AddNewQuest(QuestConfig config);
+        void FinishQuest(Quest quest);
+        IEnumerator<Quest> Quests { get; }
     }
 }
