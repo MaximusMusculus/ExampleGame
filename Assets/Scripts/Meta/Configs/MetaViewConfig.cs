@@ -1,0 +1,28 @@
+using System.Collections.Generic;
+using Application;
+
+namespace Meta.Configs
+{
+    public class MetaViewConfig
+    {
+        public int ConfigVersion;
+
+        // Поля для формирования меты можно хранить отдельно, но стоит ли выделять общие элементы?
+        //использовать это будет только вьюха. 
+        public List<LocalizedDescription> DescriptionConfigs = new List<LocalizedDescription>();
+        public List<IconMapping> IconsConfigs = new List<IconMapping>();
+    }
+
+    public class LocalizedDescription
+    {
+        public Id TargetId;
+        public string nameKey;
+        public string descriptionKey;
+    }
+
+    public class IconMapping
+    {
+        public Id TargetId;
+        public string IconPath;
+    }
+}
