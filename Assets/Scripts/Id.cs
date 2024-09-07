@@ -1,12 +1,13 @@
 using System;
 
-namespace Application.Id
+
+namespace Application
 {
     public struct Id : IEquatable<Id>, IFormattable, IComparable<Id>
     {
         private ushort _value;
         public ushort Value => _value;
-        
+
         public Id(ushort value)
         {
             _value = value;
@@ -21,7 +22,7 @@ namespace Application.Id
         {
             return id._value;
         }
-        
+
 
         public override bool Equals(object obj) => obj is Id num && _value == num._value;
 
@@ -30,10 +31,37 @@ namespace Application.Id
         public override int GetHashCode() => _value;
 
         public int CompareTo(Id other) => _value.CompareTo(other._value);
-        
+
         public override string ToString() => _value.ToString();
 
         public string ToString(string format, IFormatProvider formatProvider) => _value.ToString(format, formatProvider);
 
+    }
+    
+    public interface IIdProvider
+    {
+        Id GetNext();
+        //void Return(Id id);
+    }
+
+    [Serializable]
+    public class IdProviderDto
+    {
+        public ushort nextId;
+    }
+
+    public class IdProvider : IIdProvider
+    {
+        private readonly IdProviderDto _dto;
+
+        public IdProvider(IdProviderDto dto)
+        {
+            _dto = dto;
+        }
+
+        public Id GetNext()
+        {
+            return _dto.nextId++;
+        }
     }
 }
