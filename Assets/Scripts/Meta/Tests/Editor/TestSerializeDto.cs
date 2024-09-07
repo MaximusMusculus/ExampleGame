@@ -16,12 +16,7 @@ namespace Application.Editor
                 TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.Indented
             };
-            _settings.Converters.Add(new IdJsonConverter());
+            _settings.Converters.Add(new JsonConverterDtoId());
         }
-        
-
-
-        
-
     }
 }

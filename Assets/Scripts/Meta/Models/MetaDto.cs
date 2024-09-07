@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 
-
-namespace Application.MetaSrc.Models
+namespace Meta.Models
 {
     /*
      //Копилот отжог ) У меня не так много вещей планируется ))
@@ -38,39 +37,12 @@ namespace Application.MetaSrc.Models
         public List<PlayerPaymentItemDto> Payment
     }*/
 
-    public class MetaModel
+    public class MetaDto
     {
         public int ConfigVersion;
-        public List<MetaUnitDto> Units = new List<MetaUnitDto>();
+        public List<UnitDto> Units = new List<UnitDto>();
+        public List<ResourcesDto> Resources = new List<ResourcesDto>();
         
-        public override int GetHashCode() => HashHelper.GetHashCode(ConfigVersion, Units);
-    }
-
-
-    // Есть квесты, которые могут добавить юнитов игроку.
-    // Тут они должны знать, в какой элемнт добавлять юнита.
-    // Так как юниты различаются прогрессией.
-    public class MetaUnitDto 
-    {
-        public Id UnitType;
-        public int Count;
-        public UnitProgressionDto Progression;
-        
-        public override int GetHashCode() => HashHelper.GetHashCode(UnitType, Count, Progression);
-    }
-
-    
-    public class UnitProgressionDto
-    {
-        public int MeleeAttackLevel;
-        public int RangedAttackLevel;
-        public int HealthLevel;
-
-        /*public int MeleeEquipmentLevel { get; set; }
-        public int RangedEquipmentLevel { get; set; }
-        public int DefenseEquipmentLevel { get; set; }*/
-        //?? perks??
-        
-        public override int GetHashCode() => HashHelper.GetHashCode(MeleeAttackLevel, RangedAttackLevel, HealthLevel);
+        public override int GetHashCode() => HashHelper.GetHashCode(ConfigVersion, Units, Resources);
     }
 }
