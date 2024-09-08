@@ -6,10 +6,8 @@ namespace Meta.Models
         public int RangedAttackLevel;
         public int HealthLevel;
 
-        /*public int MeleeEquipmentLevel { get; set; }
-        public int RangedEquipmentLevel { get; set; }
-        public int DefenseEquipmentLevel { get; set; }*/
-        //?? perks??
+        
+        // это может дописывать ИИ или генератор
         public override int GetHashCode() => HashHelper.GetHashCode(MeleeAttackLevel, RangedAttackLevel, HealthLevel);
     }
 }

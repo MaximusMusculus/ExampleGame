@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
+using Application;
 using Newtonsoft.Json;
 
-namespace Application
+namespace Meta.Tests.Editor
 {
     public class JsonConverterDtoId : JsonConverter
     {

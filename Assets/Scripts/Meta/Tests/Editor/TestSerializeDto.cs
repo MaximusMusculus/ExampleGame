@@ -1,8 +1,7 @@
 using Newtonsoft.Json;
 using NUnit.Framework;
 
-
-namespace Application.Editor
+namespace Meta.Tests.Editor
 {
     public class TestSerializeDto
     {

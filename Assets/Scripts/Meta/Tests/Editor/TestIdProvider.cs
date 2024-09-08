@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using Application;
 using NUnit.Framework;
 
-
-namespace Application.Editor
+namespace Meta.Tests.Editor
 {
     public class TestIdProvider
     {
