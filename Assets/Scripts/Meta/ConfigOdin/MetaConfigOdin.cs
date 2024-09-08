@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Meta.Models;
 using Sirenix.OdinInspector;
@@ -9,7 +8,24 @@ using UnityEngine;
 
 namespace Meta.ConfigOdin
 {
-
+    public interface IConfigComponent 
+    {
+    }
+    public class TechInfo : IConfigComponent
+    {
+        public string TechName;
+        public Sprite Icon;
+    }
+    
+    public class ConfigElem
+    {
+        public ulong Id;
+        
+        [SerializeReference][HideReferenceObjectPicker]
+        public List<IConfigComponent> Components = new List<IConfigComponent>();
+    }
+    
+    
 
 
     /// <summary>
@@ -43,11 +59,11 @@ namespace Meta.ConfigOdin
     }
     
 
-    public class ResourceConfigOdin
+    public class ResourceConfigOdin : ConfigElem
     {
         //[ReadOnly] //indexer? + type?
         [ReadOnly]
-        public ulong ResourceType;
+        public ulong ResourceType=>Id;
         
         [HorizontalGroup]
         public string TechName;
@@ -93,10 +109,11 @@ namespace Meta.ConfigOdin
     public class ListRewards : IReward
     {
         [SerializeReference]
+        [HideReferenceObjectPicker]
         public List<IReward> Rewards = new List<IReward>();
         public override int GetHashCode() => HashHelper.GetHashCode(Rewards);
     }
-
+    
     public class AddResource : IReward
     {
         //[ResourceSelectedAttribute
@@ -135,48 +152,19 @@ namespace Meta.ConfigOdin
     [Serializable]
     public class UnitPreset
     {
-        //public Unit
+        public ulong UnitType;
+        [HideReferenceObjectPicker]
         public UnitProgressionDto Progression;
-    }
-
-
-    [Serializable]
-    public class Custon : IReward
-    {
-        public CharacterReward CharacterReward = new CharacterReward();
     }
 
     public class Item : IReward
     {
-        public ConsumableItem ConsumableItem;
-    }
-
-    public class CharacterReward : IReward
-    {
-        [HorizontalGroup("Split", 55, LabelWidth = 70)]
-        [HideLabel, PreviewField(55, ObjectFieldAlignment.Left)]
-        public Texture Icon;
-
-        [VerticalGroup("Split/Meta")]
-        public string Name;
-
-        [VerticalGroup("Split/Meta")]
-        public string Surname;
-
-        [VerticalGroup("Split/Meta"), Range(0, 100)]
-        public int Age;
-
-        [HorizontalGroup("Split", 290), EnumToggleButtons, HideLabel]
-        public CharacterAlignment CharacterAlignment;
-
-        [TabGroup("Starting Inventory")]
-        public ItemSlot[,] Inventory = new ItemSlot[12, 6];
-
-        [TabGroup("Starting Stats"), HideLabel]
-        public CharacterStats Skills = new CharacterStats();
-
         [HideLabel]
-        [TabGroup("Starting Equipment")]
-        public CharacterEquipment StartingEquipment;
+        public ConsumableItem ConsumableItem;
+        
+        [HideLabel]
+        public int count;
     }
+
+  
 }

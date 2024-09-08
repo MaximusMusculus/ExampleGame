@@ -95,7 +95,7 @@ namespace Meta.ConfigOdin
         public void CreateNew()
         {
             var id = _idProvider.GetNext();
-            _resourceConfig.Add(new ResourceConfigOdin {ResourceType = id, TechName = "Resource" + id}); //create instance
+            _resourceConfig.Add(new ResourceConfigOdin {Id = id, TechName = "Resource" + id}); //create instance
             _menuTree.UpdateThree();
         }
         
