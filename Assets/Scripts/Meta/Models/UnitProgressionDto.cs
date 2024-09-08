@@ -1,5 +1,8 @@
+using System;
+
 namespace Meta.Models
 {
+    [Serializable]
     public class UnitProgressionDto
     {
         public int MeleeAttackLevel;

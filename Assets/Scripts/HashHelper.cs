@@ -59,6 +59,7 @@ public static class HashHelper
             return hash;
         }
     }
+    
 
     /// <summary>
     /// Gets a hashcode for a collection for that the order of items 
