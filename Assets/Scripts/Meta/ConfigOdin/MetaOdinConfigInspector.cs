@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities;
@@ -12,60 +13,55 @@ namespace Meta.ConfigOdin
     /// </summary>
     public class MetaOdinConfigInspector : OdinMenuEditorWindow, IMenuTree
     {
-        public static IDropDownElemProvider DropDownElemProvider { get; private set; }
-        
         private MetaConfigOdin _metaConfig;
-        private IIdProvider _idProvider;
         private OdinMenuTree _tree;
         
         public static void Open(MetaConfigOdin configOdin)
         {
             var window = GetWindow<MetaOdinConfigInspector>();
-            Debug.Log("open");
-            
             window._metaConfig = configOdin;
-            window.ReInitialize();
             window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 500);
         }
-        private void ReInitialize()
-        {
-            _idProvider = new IdProvider(_metaConfig.IdProviderData);
-            DropDownElemProvider = new MetaDropDownElemProvider(_metaConfig.IdProviderData, _metaConfig);
-        }
-        
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            if (_metaConfig != null && _idProvider == null)
-            {
-                ReInitialize();
-            }
-        }
+
         
         protected override OdinMenuTree BuildMenuTree()
         {
             _tree = new OdinMenuTree(true);
+            _tree.DefaultMenuStyle.IconSize = 30.00f;
             _tree.Config.DrawSearchToolbar = true;
             
-            _tree.Add("Resources/", new GroupElemCreator(_idProvider, _metaConfig.Resources, this));
+            _tree.Add("Resources/", new GroupElemCreator(_metaConfig.Resources, this));
             foreach (var resource in _metaConfig.Resources)
             {
-                _tree.Add("Resources/" + resource.TechName, resource);
-                //link
-                //Resource.SetDropDownProvider(this);
-                //
+                _tree.Add("Resources/" + resource.name, resource);
+            }
+
+            foreach (var unit in _metaConfig.Units)
+            {
+                _tree.Add("Units/" + unit.name, unit);
             }
 
             foreach (var quest in _metaConfig.Quests)
             {
-                _tree.Add("Quests/" + quest.TechName, quest);
+                _tree.Add("Quests/" + quest.name, quest);
             }
+            
+            
+            // Добавьте к предметам маркеры перетаскивания, чтобы их можно было легко перетаскивать в инвентарь, если персонажи и т. д.
+            _tree.EnumerateTree().Where(x => x.Value as ResourceConfigOdin).ForEach(AddDragHandles);
+            _tree.EnumerateTree().Where(x => x.Value as UnitConfigOdin).ForEach(AddDragHandles);
+            
+            _tree.EnumerateTree().AddIcons<ResourceConfigOdin>(x => x.Icon);
+            _tree.EnumerateTree().AddIcons<UnitConfigOdin>(x => x.Icon);
             
             return _tree;
         }
 
-
-
+        private void AddDragHandles(OdinMenuItem menuItem)
+        {
+            menuItem.OnDrawItem += x => DragAndDropUtilities.DragZone(menuItem.Rect, menuItem.Value, false, false);
+        }
+        
         public void UpdateThree()
         {
             ForceMenuTreeRebuild();
@@ -81,12 +77,10 @@ namespace Meta.ConfigOdin
     public class GroupElemCreator
     {
         private readonly List<ResourceConfigOdin> _resourceConfig;
-        private readonly IIdProvider _idProvider;
         private readonly IMenuTree _menuTree;
 
-        public GroupElemCreator(IIdProvider idProvider, List<ResourceConfigOdin> resourceConfig, IMenuTree menuTree)
+        public GroupElemCreator(List<ResourceConfigOdin> resourceConfig, IMenuTree menuTree)
         {
-            _idProvider = idProvider;
             _resourceConfig = resourceConfig;
             _menuTree = menuTree;
         }
@@ -94,8 +88,6 @@ namespace Meta.ConfigOdin
         [Button]
         public void CreateNew()
         {
-            var id = _idProvider.GetNext();
-            _resourceConfig.Add(new ResourceConfigOdin {Id = id, TechName = "Resource" + id}); //create instance
             _menuTree.UpdateThree();
         }
         

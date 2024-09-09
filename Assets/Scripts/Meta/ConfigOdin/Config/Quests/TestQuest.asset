@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34827e2142fb4e30a3358c367b7c1319, type: 3}
+  m_Name: TestQuest
+  m_EditorClassIdentifier: 
+  Rewards:
+    Changes:
+    - rid: 3391960597496332311
+    - rid: 3391960597496332313
+    - rid: 3391960597496332325
+  references:
+    version: 2
+    RefIds:
+    - rid: 3391960597496332311
+      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+      data:
+        Resource: {fileID: 11400000, guid: d059236f4de3ec140be8befa2e5d91bc, type: 2}
+        Count: 0
+    - rid: 3391960597496332313
+      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+      data:
+        Resource: {fileID: 11400000, guid: 471feb272c845624cb2230dd1f98bbfe, type: 2}
+        Count: 10
+    - rid: 3391960597496332325
+      type: {class: AddUnit, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+      data:
+        Unit: {fileID: 11400000, guid: 8a1ca60c1cc98364aad7ec558f47a937, type: 2}
+        Count: 0
+        Progression:
+          MeleeAttackLevel: 0
+          RangedAttackLevel: 0
+          HealthLevel: 0
