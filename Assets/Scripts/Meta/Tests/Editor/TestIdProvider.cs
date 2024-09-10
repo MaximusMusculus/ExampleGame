@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Application;
+using AppRen;
 using NUnit.Framework;
 
 namespace Meta.Tests.Editor
