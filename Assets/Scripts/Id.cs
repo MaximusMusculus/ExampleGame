@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Application
+namespace AppRen
 {
     public struct Id : IEquatable<Id>, IFormattable, IComparable<Id>
     {

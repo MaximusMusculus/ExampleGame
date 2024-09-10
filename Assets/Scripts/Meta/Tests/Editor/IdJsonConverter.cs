@@ -1,5 +1,5 @@
 using System;
-using Application;
+using AppRen;
 using Newtonsoft.Json;
 
 namespace Meta.Tests.Editor
