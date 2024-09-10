@@ -18,7 +18,7 @@ MonoBehaviour:
     Changes:
     - rid: 3391960597496332311
     - rid: 3391960597496332313
-    - rid: 3391960597496332325
+    - rid: 3391960628275707922
   references:
     version: 2
     RefIds:
@@ -26,18 +26,18 @@ MonoBehaviour:
       type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
       data:
         Resource: {fileID: 11400000, guid: d059236f4de3ec140be8befa2e5d91bc, type: 2}
-        Count: 0
+        Count: 10
     - rid: 3391960597496332313
       type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
       data:
         Resource: {fileID: 11400000, guid: 471feb272c845624cb2230dd1f98bbfe, type: 2}
-        Count: 10
-    - rid: 3391960597496332325
+        Count: 50
+    - rid: 3391960628275707922
       type: {class: AddUnit, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
       data:
-        Unit: {fileID: 11400000, guid: 8a1ca60c1cc98364aad7ec558f47a937, type: 2}
-        Count: 5
+        Unit: {fileID: 11400000, guid: 4accde3023e61ec4680274d2d2ae71d2, type: 2}
+        Count: 10
         Progression:
-          MeleeAttackLevel: 2
-          RangedAttackLevel: 5
-          HealthLevel: 5
+          MeleeAttackLevel: 0
+          RangedAttackLevel: 0
+          HealthLevel: 0

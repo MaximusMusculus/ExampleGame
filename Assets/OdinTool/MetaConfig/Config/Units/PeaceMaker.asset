@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Icon: {fileID: 2800000, guid: aad029f877021464b8f991c64b293582, type: 3}
   Name: PeaceMaker
-  TypeCalculation: 1
+  TypeCalculation: 0
   PowerByFormula:
     Melee: 
     Range: 
