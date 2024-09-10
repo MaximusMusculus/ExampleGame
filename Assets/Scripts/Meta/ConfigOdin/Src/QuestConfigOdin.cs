@@ -6,5 +6,6 @@ namespace Meta.ConfigOdin
     public class QuestConfigOdin : ScriptableObject
     {
         public StateChange Rewards = new StateChange();
+
     }
 }

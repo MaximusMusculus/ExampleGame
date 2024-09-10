@@ -16,6 +16,7 @@ namespace Meta.ConfigOdin
         
         [ShowIf("TypeCalculation", TypeUnitCalculation.Table)]
         [SerializeField, HideLabel] public UnitPowerByTable PowerByTable = new UnitPowerByTable();
+
     }
 
     
