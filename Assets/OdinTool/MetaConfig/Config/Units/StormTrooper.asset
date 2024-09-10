@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd3e286bb4864ad887261886e83a877d, type: 3}
-  m_Name: UnitArchyType
+  m_Name: StormTrooper
   m_EditorClassIdentifier: 
   Icon: {fileID: 2800000, guid: c56134410bc484995844669d7ba0b098, type: 3}
-  Name: Gunner
+  Name: StormTrooper
   TypeCalculation: 1
   PowerByFormula:
     Melee: =level*5

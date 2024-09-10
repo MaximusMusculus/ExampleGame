@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using Sirenix.OdinInspector;
 using Sirenix.OdinInspector.Editor;
@@ -13,112 +13,104 @@ namespace Meta.ConfigOdin
     /// Открытия и работа с существующим конфигом
     /// OdinTool/MetaConfig/Config/
     /// </summary>
-    public class MetaOdinConfigInspector : OdinMenuEditorWindow, IMenuTree
+    public class MetaConfigInspector : OdinMenuEditorWindow, IMenuTree
     {
         private MetaConfigOdin _metaConfig;
         private OdinMenuTree _tree;
-        
+
         public static void Open(MetaConfigOdin configOdin)
         {
-            var window = GetWindow<MetaOdinConfigInspector>();
+            var window = GetWindow<MetaConfigInspector>();
             window._metaConfig = configOdin;
             window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 500);
         }
 
-        
+
         protected override OdinMenuTree BuildMenuTree()
         {
             _tree = new OdinMenuTree(true);
             _tree.DefaultMenuStyle.IconSize = 30.00f;
             _tree.Config.DrawSearchToolbar = true;
-            
-            _tree.Add("Resources/", new GroupElemCreator(_metaConfig.Resources, this));
+
+            _tree.Add("Resources/", new ElemCreator<ResourceConfigOdin>(this, x => _metaConfig.Resources.Add(x)));
             foreach (var resource in _metaConfig.Resources)
             {
                 _tree.Add("Resources/" + resource.name, resource);
             }
 
+            _tree.Add("Units/", new ElemCreator<UnitConfigOdin>(this, x => _metaConfig.Units.Add(x)));
             foreach (var unit in _metaConfig.Units)
             {
                 _tree.Add("Units/" + unit.name, unit);
             }
 
+            _tree.Add("Quests/", new ElemCreator<QuestConfigOdin>(this, x => _metaConfig.Quests.Add(x)));
             foreach (var quest in _metaConfig.Quests)
             {
                 _tree.Add("Quests/" + quest.name, quest);
             }
-            
-            
+
+
             // Добавьте к предметам маркеры перетаскивания, чтобы их можно было легко перетаскивать в инвентарь, если персонажи и т. д.
             _tree.EnumerateTree().Where(x => x.Value as ResourceConfigOdin).ForEach(AddDragHandles);
             _tree.EnumerateTree().Where(x => x.Value as UnitConfigOdin).ForEach(AddDragHandles);
-            
+            _tree.EnumerateTree().Where(x => x.Value as QuestConfigOdin).ForEach(AddDragHandles);
+
             _tree.EnumerateTree().AddIcons<ResourceConfigOdin>(x => x.Icon);
             _tree.EnumerateTree().AddIcons<UnitConfigOdin>(x => x.Icon);
-            
+            _tree.EnumerateTree().AddIcons<QuestConfigOdin>(x => x.Icon);
+
             return _tree;
         }
         
-        protected override void OnBeginDrawEditors()
-        {
-            var selected = this.MenuTree.Selection.FirstOrDefault();
-            var toolbarHeight = this.MenuTree.Config.SearchToolbarHeight;
-
-            // Draws a toolbar with the name of the currently selected menu item.
-            SirenixEditorGUI.BeginHorizontalToolbar(toolbarHeight);
-            {
-                if (selected != null)
-                {
-                    GUILayout.Label(selected.Name);
-                }
-
-                if (SirenixEditorGUI.ToolbarButton(new GUIContent("Create Item")))
-                {
-                    ScriptableObjectCreator.ShowDialog<ConfigElem>("Assets/OdinTool/MetaConfig/Config/", obj =>
-                    {
-                        obj.Name = obj.name;
-                        base.TrySelectMenuItemWithObject(obj); // Selects the newly created item in the editor
-                    });
-                }
-            }
-            SirenixEditorGUI.EndHorizontalToolbar();
-        }
 
         private void AddDragHandles(OdinMenuItem menuItem)
         {
             menuItem.OnDrawItem += x => DragAndDropUtilities.DragZone(menuItem.Rect, menuItem.Value, false, false);
         }
-        
+
         public void UpdateThree()
         {
             ForceMenuTreeRebuild();
+        }
+
+        public void TrySelectMenuItemWithObject(ScriptableObject target)
+        {
+            base.TrySelectMenuItemWithObject(target);
         }
     }
 
     public interface IMenuTree
     {
         void UpdateThree();
+        void TrySelectMenuItemWithObject(ScriptableObject target);
     }
-    
 
-    public class GroupElemCreator
+    public class ElemCreator<T> where T : ConfigElem
     {
-        private readonly List<ResourceConfigOdin> _resourceConfig;
         private readonly IMenuTree _menuTree;
+        private readonly Action<T> _addToConfig;
 
-        public GroupElemCreator(List<ResourceConfigOdin> resourceConfig, IMenuTree menuTree)
+        public ElemCreator(IMenuTree menuTree, Action<T> addToConfig)
         {
-            _resourceConfig = resourceConfig;
             _menuTree = menuTree;
+            _addToConfig = addToConfig;
         }
-        
+
         [Button]
         public void CreateNew()
         {
-            _menuTree.UpdateThree();
+            ScriptableObjectCreator.ShowDialog<T>("Assets/OdinTool/MetaConfig/Config/", obj =>
+            {
+                obj.Name = obj.name;
+                _addToConfig(obj);
+                _menuTree.UpdateThree();
+                _menuTree.TrySelectMenuItemWithObject(obj);
+            });
         }
-        
-        
-
     }
+
+
+
+
 }

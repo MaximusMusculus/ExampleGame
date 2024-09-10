@@ -17,7 +17,7 @@ namespace Meta.ConfigOdin
         [Button("Open Editor")]
         public void OpenConfigEditor()
         {
-	        MetaOdinConfigInspector.Open(this);
+	        MetaConfigInspector.Open(this);
         }
         //CreateButtons
     }

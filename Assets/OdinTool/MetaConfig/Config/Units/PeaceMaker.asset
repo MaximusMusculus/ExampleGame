@@ -9,8 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: da124e55eed64ea79dc6cdee8b1ec940, type: 3}
-  m_Name: ResourceScrub
+  m_Script: {fileID: 11500000, guid: cd3e286bb4864ad887261886e83a877d, type: 3}
+  m_Name: PeaceMaker
   m_EditorClassIdentifier: 
-  Icon: {fileID: 2800000, guid: 0290b33d209d54f1f9d11f3a060db798, type: 3}
-  Name: Scrub
+  Icon: {fileID: 0}
+  Name: 
+  TypeCalculation: 0
+  PowerByFormula:
+    Melee: 
+    Range: 
+    Health: 
+  PowerByTable:
+    Table: []

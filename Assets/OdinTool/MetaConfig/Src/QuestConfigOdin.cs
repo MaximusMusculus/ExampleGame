@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Meta.ConfigOdin
 {
-    public class QuestConfigOdin : ScriptableObject
+    public class QuestConfigOdin : ConfigElem
     {
         public StateChange Rewards = new StateChange();
 
