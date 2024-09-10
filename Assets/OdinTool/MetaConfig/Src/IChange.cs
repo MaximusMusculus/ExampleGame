@@ -57,6 +57,8 @@ namespace Meta.ConfigOdin
     public class AddUnit : IStateChange
     {
         [HorizontalGroup("Split"), HideLabel] public UnitConfigOdin Unit;
+        
+        [Range(0, 100)]
         [VerticalGroup("Split/Right")] public int Count;
 
         [BoxGroup("Split/Right/Stats"), LabelWidth(200), HideLabel]

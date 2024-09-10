@@ -24,7 +24,12 @@ MonoBehaviour:
   Resources:
   - {fileID: 11400000, guid: d059236f4de3ec140be8befa2e5d91bc, type: 2}
   - {fileID: 11400000, guid: 471feb272c845624cb2230dd1f98bbfe, type: 2}
+  - {fileID: 11400000, guid: 87961fe4db79a134b9d379fd06da4212, type: 2}
+  - {fileID: 11400000, guid: d28e36abbba838c4ea101d386320846a, type: 2}
+  - {fileID: 11400000, guid: 49c5e9f5cfc515440b67b9b939a24d75, type: 2}
   Units:
+  - {fileID: 11400000, guid: 7eeb4c8737d521d4a8e1ed625cba802f, type: 2}
   - {fileID: 11400000, guid: 8a1ca60c1cc98364aad7ec558f47a937, type: 2}
+  - {fileID: 11400000, guid: 4accde3023e61ec4680274d2d2ae71d2, type: 2}
   Quests:
   - {fileID: 11400000, guid: bc9315543898ee54b8075a3e40efdbcf, type: 2}

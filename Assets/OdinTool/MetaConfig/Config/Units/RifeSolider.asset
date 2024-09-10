@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd3e286bb4864ad887261886e83a877d, type: 3}
   m_Name: RifeSolider
   m_EditorClassIdentifier: 
-  Icon: {fileID: 0}
-  Name: 
+  Icon: {fileID: 2800000, guid: 12d6f0dd3649145a0b24fd8ea93d2389, type: 3}
+  Name: RifeSolider
   TypeCalculation: 0
   PowerByFormula:
     Melee: 

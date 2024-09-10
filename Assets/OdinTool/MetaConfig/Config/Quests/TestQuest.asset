@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34827e2142fb4e30a3358c367b7c1319, type: 3}
   m_Name: TestQuest
   m_EditorClassIdentifier: 
+  Icon: {fileID: 2800000, guid: 15a90a4c7ce28457584710423dd4d439, type: 3}
+  Name: 
   Rewards:
     Changes:
     - rid: 3391960597496332311
@@ -34,7 +36,7 @@ MonoBehaviour:
       type: {class: AddUnit, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
       data:
         Unit: {fileID: 11400000, guid: 8a1ca60c1cc98364aad7ec558f47a937, type: 2}
-        Count: 0
+        Count: 5
         Progression:
           MeleeAttackLevel: 0
           RangedAttackLevel: 0
