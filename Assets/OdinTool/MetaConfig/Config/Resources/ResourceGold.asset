@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da124e55eed64ea79dc6cdee8b1ec940, type: 3}
-  m_Name: ResourceHard
+  m_Name: ResourceGold
   m_EditorClassIdentifier: 
-  Icon: {fileID: 2800000, guid: 187f751a62046af4bb6ce6732411eade, type: 3}
+  Icon: {fileID: 2800000, guid: 8aaf12f6bb5094e7e974f5572db769de, type: 3}
   Name: Gold

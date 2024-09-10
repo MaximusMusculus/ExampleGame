@@ -6,10 +6,12 @@ using Sirenix.Utilities;
 using Sirenix.Utilities.Editor;
 using UnityEngine;
 
+
 namespace Meta.ConfigOdin
 {
     /// <summary>
     /// Открытия и работа с существующим конфигом
+    /// OdinTool/MetaConfig/Config/
     /// </summary>
     public class MetaOdinConfigInspector : OdinMenuEditorWindow, IMenuTree
     {
@@ -55,6 +57,31 @@ namespace Meta.ConfigOdin
             _tree.EnumerateTree().AddIcons<UnitConfigOdin>(x => x.Icon);
             
             return _tree;
+        }
+        
+        protected override void OnBeginDrawEditors()
+        {
+            var selected = this.MenuTree.Selection.FirstOrDefault();
+            var toolbarHeight = this.MenuTree.Config.SearchToolbarHeight;
+
+            // Draws a toolbar with the name of the currently selected menu item.
+            SirenixEditorGUI.BeginHorizontalToolbar(toolbarHeight);
+            {
+                if (selected != null)
+                {
+                    GUILayout.Label(selected.Name);
+                }
+
+                if (SirenixEditorGUI.ToolbarButton(new GUIContent("Create Item")))
+                {
+                    ScriptableObjectCreator.ShowDialog<ConfigElem>("Assets/OdinTool/MetaConfig/Config/", obj =>
+                    {
+                        obj.Name = obj.name;
+                        base.TrySelectMenuItemWithObject(obj); // Selects the newly created item in the editor
+                    });
+                }
+            }
+            SirenixEditorGUI.EndHorizontalToolbar();
         }
 
         private void AddDragHandles(OdinMenuItem menuItem)

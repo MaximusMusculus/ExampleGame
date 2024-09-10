@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd3e286bb4864ad887261886e83a877d, type: 3}
   m_Name: UnitArchyType
   m_EditorClassIdentifier: 
-  Icon: {fileID: 2800000, guid: 4f27d4cd48bb668429b1cfedebaf1d0a, type: 3}
+  Icon: {fileID: 2800000, guid: c56134410bc484995844669d7ba0b098, type: 3}
   Name: Gunner
   TypeCalculation: 1
   PowerByFormula:
