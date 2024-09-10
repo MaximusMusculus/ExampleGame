@@ -38,6 +38,6 @@ MonoBehaviour:
         Unit: {fileID: 11400000, guid: 8a1ca60c1cc98364aad7ec558f47a937, type: 2}
         Count: 5
         Progression:
-          MeleeAttackLevel: 0
-          RangedAttackLevel: 0
-          HealthLevel: 0
+          MeleeAttackLevel: 2
+          RangedAttackLevel: 5
+          HealthLevel: 5

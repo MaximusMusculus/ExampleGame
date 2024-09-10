@@ -14,10 +14,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Icon: {fileID: 2800000, guid: aad029f877021464b8f991c64b293582, type: 3}
   Name: PeaceMaker
-  TypeCalculation: 0
+  TypeCalculation: 1
   PowerByFormula:
     Melee: 
     Range: 
     Health: 
   PowerByTable:
-    Table: []
+    Table:
+    - Level: 1
+      Melee: 15
+      Range: 10
+      Health: 10
+    - Level: 2
+      Melee: 17
+      Range: 10
+      Health: 15
+    - Level: 3
+      Melee: 19
+      Range: 10
+      Health: 20
+    - Level: 4
+      Melee: 25
+      Range: 10
+      Health: 25
+    - Level: 5
+      Melee: 35
+      Range: 10
+      Health: 30
+    - Level: 6
+      Melee: 45
+      Range: 10
+      Health: 45
+    - Level: 7
+      Melee: 55
+      Range: 10
+      Health: 55
+    - Level: 8
+      Melee: 75
+      Range: 10
+      Health: 85
+    - Level: 9
+      Melee: 85
+      Range: 15
+      Health: 90
+    - Level: 10
+      Melee: 90
+      Range: 20
+      Health: 91
