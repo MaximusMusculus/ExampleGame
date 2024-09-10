@@ -14,7 +14,9 @@ namespace Meta.Configs
     
     public class ResourceConfig
     {
-        public Id ResourceType;
+        //public Id ResourceType;
+
+        public string id;
         //nameKey
         //Icon?
     }
