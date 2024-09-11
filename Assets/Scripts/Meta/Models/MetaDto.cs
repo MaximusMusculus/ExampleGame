@@ -6,7 +6,7 @@ namespace Meta.Models
     {
         public int ConfigVersion;
         
-        public List<ResourcesDto> Resources = new List<ResourcesDto>();
+        public List<ItemDto> Resources = new List<ItemDto>();
         public List<UnitDto> Units = new List<UnitDto>();
         
         //public List<PerkDto> Perks;
