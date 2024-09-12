@@ -31,14 +31,14 @@ namespace Meta.Controllers
     {
         private readonly Dictionary<Id, UnitConfig> _configsHash;
         private readonly List<UnitDto> _unitsDto;
-        private readonly Dictionary<IUnitModel, UnitDto> _unitModels;
+        private readonly Dictionary<IUnitModel, UnitDto> _unitsModels;
         private readonly IEqualityComparer<UnitProgressionDto> _progressionComparer = new UnitProgressionEqualsComparer();
 
         public UnitsController(List<UnitConfig> unitConfigs, List<UnitDto> unitsDto)
         {
             _unitsDto = unitsDto;
             _configsHash = new Dictionary<Id, UnitConfig>(unitConfigs.Count);
-            _unitModels = new Dictionary<IUnitModel, UnitDto>(_unitsDto.Count);
+            _unitsModels = new Dictionary<IUnitModel, UnitDto>(_unitsDto.Count);
 
             CreateConfigsHash(unitConfigs);
             CreateUnitModels(unitsDto);
@@ -56,7 +56,7 @@ namespace Meta.Controllers
             foreach (var unitDto in units)
             {
                 var config = _configsHash[unitDto.UnitType];
-                _unitModels.Add(CreateUnitModel(config, unitDto), unitDto);
+                _unitsModels.Add(CreateUnitModel(config, unitDto), unitDto);
             }
         }
         private IUnitModel CreateUnitModel(UnitConfig config, UnitDto unitDto)
@@ -119,7 +119,7 @@ namespace Meta.Controllers
                 Count = count
             };
             _unitsDto.Add(unit);
-            _unitModels.Add(CreateUnitModel(config, unit), unit);
+            _unitsModels.Add(CreateUnitModel(config, unit), unit);
         }
 
 
@@ -127,7 +127,7 @@ namespace Meta.Controllers
         {
             Assert.IsTrue(unitModel.Count >= count);
 
-            var dto = _unitModels[unitModel];
+            var dto = _unitsModels[unitModel];
             var config = _configsHash[unitModel.UnitType];
             dto.Count -= count;
 
@@ -137,11 +137,11 @@ namespace Meta.Controllers
             }
 
             _unitsDto.Remove(dto);
-            _unitModels.Remove(unitModel);
+            _unitsModels.Remove(unitModel);
         }
         public IEnumerable<IUnitModel> GetUnits()
         {
-            return _unitModels.Keys.Where(s => s.Count > 0);
+            return _unitsModels.Keys.Where(s => s.Count > 0);
         }
 
 
@@ -150,7 +150,7 @@ namespace Meta.Controllers
         {
             var config = _configsHash[unit.UnitType];
             Assert.IsTrue(config.IsCanUpgrade);
-            var unitDto = _unitModels[unit];
+            var unitDto = _unitsModels[unit];
             var unitProgressionDto = unitDto.Progression;
 
             //todo сделать полноценную грейдилку (проверка на лимиты, работает с конфигом и дто) возможно по Type из конфига
@@ -174,7 +174,7 @@ namespace Meta.Controllers
 
         public IEnumerable<IUnitModel> GetCanUpgradeUnits()
         {
-            foreach (var model in _unitModels)
+            foreach (var model in _unitsModels)
             {
                 if (_configsHash[model.Key.UnitType].IsCanUpgrade)
                 {
