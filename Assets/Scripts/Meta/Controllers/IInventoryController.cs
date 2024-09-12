@@ -15,6 +15,8 @@ namespace Meta.Controllers
         
         int GetLimit(Id item);
         void ExpandLimit(Id item, int count);
+        
+        IEnumerable<Id> GetItems();
     }
 
     public class InventoryController : IInventoryController
@@ -75,6 +77,11 @@ namespace Meta.Controllers
         {
             var elem = _itemsHash[item];
             elem.Limit = checked(elem.Limit + count);
+        }
+
+        public IEnumerable<Id> GetItems()
+        {
+            return _itemsHash.Keys;
         }
     }
 }
