@@ -5,15 +5,17 @@ namespace Meta.Models
     public class MetaDto
     {
         public int ConfigVersion;
-        
-        public List<ItemDto> Resources = new List<ItemDto>();
+        public List<ItemDto> Items = new List<ItemDto>();
         public List<UnitDto> Units = new List<UnitDto>();
+        
+
+        //UnitProgressionDto - self unit progressions
+        //Units - self units (count?)?? -> id/Count + limit => Resources? or UnitsDto?
+        //public List<UnitDto> Army = new List<UnitDto>();             // Юниты, которых можно качать и нанимать
         
         //public List<PerkDto> Perks;
         //public List<TaskDto> Tasks;
         //public List<BuildingDto> Buildings;
-
-        public override int GetHashCode() => HashHelper.GetHashCode(ConfigVersion, Units, Resources);
     }
     /*
  //Копилот торопит события. ^_^

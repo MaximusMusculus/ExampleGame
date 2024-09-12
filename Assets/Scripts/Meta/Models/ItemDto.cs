@@ -4,7 +4,7 @@ namespace Meta.Models
 {
     public class ItemDto
     {
-        public Id Id;
+        public readonly Id ItemType;
         public int Count;
 
         /// <summary>
@@ -12,9 +12,14 @@ namespace Meta.Models
         /// </summary>
         public int Limit;
 
+        public ItemDto(Id itemType)
+        {
+            ItemType = itemType;
+        }
+
         public override int GetHashCode()
         {
-            return Id.GetHashCode();
+            return ItemType.GetHashCode();
         }
     }
 }

@@ -12,9 +12,16 @@ namespace Meta.Configs
     public abstract class UnitConfig
     {
         public Id UnitType;
+        public TypeUnitStacked StackedType;
+        
         public abstract TypeUnitCalculation TypeCalculation { get; }
     }
-    
+
+    public enum TypeUnitStacked
+    {
+        StackByUnitType,
+        StackByProgressionLevel, 
+    }
     
    /// <summary>
    /// В моделе игры по TypeUnitCalculation выбирается конкретный UnitCalculationController с методами в которые передается UnitProgressionDto

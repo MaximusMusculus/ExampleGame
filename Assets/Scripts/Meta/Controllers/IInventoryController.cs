@@ -25,7 +25,7 @@ namespace Meta.Controllers
             _itemsHash = new Dictionary<Id, ItemDto>(configs.Count);
             foreach (var item in items)
             {
-                _itemsHash[item.Id] = item;
+                _itemsHash[item.ItemType] = item;
             }
 
             //добавляем новые айтемы с конфига 
@@ -35,14 +35,13 @@ namespace Meta.Controllers
                 {
                     continue;
                 }
-                var item = new ItemDto
+                var item = new ItemDto(itemConfig.Item)
                 {
-                    Id = itemConfig.Item,
                     Count = itemConfig.DefaultCount,
                     Limit = itemConfig.MaxCount
                 };
                 items.Add(item);
-                _itemsHash.Add(item.Id, item);
+                _itemsHash.Add(item.ItemType, item);
             }
         }
 
