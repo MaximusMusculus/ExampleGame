@@ -23,14 +23,14 @@ namespace TesMapping
         public void TestMetaResource()
         {
             // Arrange
-            var path = "Assets/OdinTool/MetaConfig/Config/Resources/ResourceHard.asset";
+            var path = "Assets/OdinTool/MetaConfig/Config/Resources/Gold.asset";
             var source = AssetDatabase.LoadAssetAtPath<ResourceConfigOdin>(path);
             
             // Act
-            var target = source.Adapt<ResourceConfig>(_config);
+            var target = source.Adapt<ItemConfig>(_config);
             
             // Assert
-            Assert.AreEqual( source.GetGuid(), target.id);
+            Assert.AreEqual( source.GetGuid(), target.TestGuid);
         }
 
     }
@@ -49,8 +49,8 @@ namespace TesMapping
     {
         public void Register(TypeAdapterConfig config)
         {
-            config.NewConfig<ResourceConfigOdin, ResourceConfig>().RequireDestinationMemberSource(true)
-                .Map(dest => dest.id, src => src.GetGuid());
+            config.NewConfig<ResourceConfigOdin, ItemConfig>().RequireDestinationMemberSource(true)
+                .Map(dest => dest.TestGuid, src => src.GetGuid());
 
 
             /*config.NewConfig<Meta.ConfigOdin.MetaConfigOdin, Meta.Config.MetaConfig>()

@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Icon: {fileID: 2800000, guid: f9c980f563045487baa5b4b232c2a967, type: 3}
   Name: Medal
+  Count: 0
+  IsNoLimit: 1
+  Limit: 0

@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Icon: {fileID: 2800000, guid: cd97c8033bb1e445a8796dea40ffc013, type: 3}
   Name: Recruts
+  Count: 0
+  IsNoLimit: 0
+  Limit: 150

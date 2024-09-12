@@ -19,6 +19,8 @@ namespace Meta.Configs
         public int MaxCount;
         //nameKey
         //Icon?
+
+        public string TestGuid;
     }
       
     

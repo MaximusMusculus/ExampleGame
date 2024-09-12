@@ -14,3 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Icon: {fileID: 2800000, guid: 8aaf12f6bb5094e7e974f5572db769de, type: 3}
   Name: Gold
+  Count: 0
+  IsNoLimit: 1
+  Limit: 0
