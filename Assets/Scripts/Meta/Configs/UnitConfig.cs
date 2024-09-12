@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using AppRen;
+using Meta.Models;
 
 namespace Meta.Configs
 {
@@ -9,12 +9,25 @@ namespace Meta.Configs
     /// Тип конфига может быть полиморфным.
     /// Т.е. тут может быть формула с параметрами, а может табличная часть, да все что угодно. 
     /// </summary>
-    public abstract class UnitConfig
+    public  class UnitConfig
     {
         public Id UnitType;
-        public abstract TypeUnitCalculation TypeCalculation { get; }
+        public TypeUnitStacked StackedType;
+        
+        public bool IsCanUpgrade; //можно ли прокачивать юнита
+        public TypeUnitCalculation TypeCalculation => TypeUnitCalculation.Table;
+
+        public UnitProgressionDto GetDefaultProgression()
+        {
+            return new UnitProgressionDto();
+        }
     }
-    
+
+    public enum TypeUnitStacked
+    {
+        StackByUnitType,
+        StackByProgressionLevel, 
+    }
     
    /// <summary>
    /// В моделе игры по TypeUnitCalculation выбирается конкретный UnitCalculationController с методами в которые передается UnitProgressionDto
@@ -26,7 +39,7 @@ namespace Meta.Configs
         Table
     }
     
-    public class UnitConfigFromFormula : UnitConfig
+    /*public class UnitConfigFromFormula : UnitConfig
     {
         public override TypeUnitCalculation TypeCalculation=> TypeUnitCalculation.Formula;
     }
@@ -38,7 +51,7 @@ namespace Meta.Configs
         public List<int> Melee;
         public List<int> Range;
         public List<int> Health;
-    }
+    }*/
     
 
 

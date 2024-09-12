@@ -5,9 +5,12 @@ namespace Meta.Models
     public class UnitDto
     {
         public Id UnitType;
-        public int Count;
         public UnitProgressionDto Progression;
-
-        public override int GetHashCode() => HashHelper.GetHashCode(UnitType, Count, Progression);
+        
+        /// <summary>
+        /// у нас может быть несколько юнитов одного типа, но с разной прокачкой
+        /// не хочтся делать доп id индексы, поэтому количество и прокачка юнита в одном месте
+        /// </summary>
+        public int Count;
     }
 }
