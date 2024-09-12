@@ -18,35 +18,13 @@ namespace Meta.Controllers
         Perks,
     }
     
-    public class UnitStat
+    public interface IUnitStat
     {
-        private readonly UnitProgressionDto _progressionDto;
-        public TypeUnitStat Stat { get; private set; }
-        public int Level
-        {
-            get
-            {
-                return Stat switch
-                {
-                    TypeUnitStat.Melee => _progressionDto.MeleeAttackLevel,
-                    TypeUnitStat.Ranged => _progressionDto.RangedAttackLevel,
-                    TypeUnitStat.Health => _progressionDto.HealthLevel,
-                    TypeUnitStat.MeleeWeapon => 0,
-                    TypeUnitStat.RangedWeapon => 0,
-                    TypeUnitStat.HealthArmor => 0,
-                    TypeUnitStat.Perks => 0,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            }
-        } 
-            
-        public UnitStat(UnitProgressionDto progressionDto, TypeUnitStat stat)
-        {
-            _progressionDto = progressionDto;
-            Stat = stat;
-        }
+        TypeUnitStat Stat { get;}
+        int Level { get; }
     }
-    
+
+
     /// <summary>
     /// Занимается расчетом статов юнита, получает на входе конфиг и данные прокачки.
     /// </summary>
@@ -91,9 +69,38 @@ namespace Meta.Controllers
             CalculateStats();
         }
 
-        public IEnumerable<UnitStat> GetStats()
+        public IEnumerable<IUnitStat> GetStats()
         {
             return _unitStats;
+        }
+        
+        private class UnitStat : IUnitStat
+        {
+            private readonly UnitProgressionDto _progressionDto;
+            public TypeUnitStat Stat { get; private set; }
+            public int Level
+            {
+                get
+                {
+                    return Stat switch
+                    {
+                        TypeUnitStat.Melee => _progressionDto.MeleeAttackLevel,
+                        TypeUnitStat.Ranged => _progressionDto.RangedAttackLevel,
+                        TypeUnitStat.Health => _progressionDto.HealthLevel,
+                        TypeUnitStat.MeleeWeapon => 0,
+                        TypeUnitStat.RangedWeapon => 0,
+                        TypeUnitStat.HealthArmor => 0,
+                        TypeUnitStat.Perks => 0,
+                        _ => throw new ArgumentOutOfRangeException()
+                    };
+                }
+            } 
+            
+            public UnitStat(UnitProgressionDto progressionDto, TypeUnitStat stat)
+            {
+                _progressionDto = progressionDto;
+                Stat = stat;
+            }
         }
     }
 }
