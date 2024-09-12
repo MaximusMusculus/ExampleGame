@@ -6,10 +6,9 @@ using Meta.Configs;
 using Meta.Models;
 using UnityEngine.Assertions;
 
-
 namespace Meta.Controllers
 {
-    public class UnitModel
+    public class UnitModel : IUnitModel
     {
         public UnitConfig Config { get; } //??
         public Id UnitType { get; }
@@ -28,35 +27,19 @@ namespace Meta.Controllers
         }
     }
 
-
-    /// <summary>
-    /// Инвентарь для юнитов? Содержит в себе список юнитов
-    /// При добавлении ориентируется на TypeUnitStacked - складывать:
-    /// В одну кучу по типу юнита.
-    /// В разные по типу юнита + прокачке 
-    /// </summary>
-    public interface IUnitsController
-    {
-        void Add(Id unitType, int count);
-        void Add(Id unitType, UnitProgressionDto progression, int count);
-        void Spend(UnitModel unitModel, int count);
-        IEnumerable<UnitModel> GetUnits();
-    }
-
-
     public class UnitsController : IUnitsController, IUnitsProgression
     {
         private readonly Dictionary<Id, UnitConfig> _configsHash;
         private readonly List<UnitDto> _unitsDto;
-        private readonly Dictionary<UnitModel, UnitDto >_unitModels;
+        private readonly Dictionary<IUnitModel, UnitDto> _unitModels;
         private readonly IEqualityComparer<UnitProgressionDto> _progressionComparer = new UnitProgressionEqualsComparer();
-        
+
         public UnitsController(List<UnitConfig> unitConfigs, List<UnitDto> unitsDto)
         {
             _unitsDto = unitsDto;
             _configsHash = new Dictionary<Id, UnitConfig>(unitConfigs.Count);
-            _unitModels = new Dictionary<UnitModel, UnitDto>(_unitsDto.Count);
-            
+            _unitModels = new Dictionary<IUnitModel, UnitDto>(_unitsDto.Count);
+
             CreateConfigsHash(unitConfigs);
             CreateUnitModels(unitsDto);
         }
@@ -76,14 +59,12 @@ namespace Meta.Controllers
                 _unitModels.Add(CreateUnitModel(config, unitDto), unitDto);
             }
         }
-
-        //from factory?
-        private UnitModel CreateUnitModel(UnitConfig config, UnitDto unitDto)
+        private IUnitModel CreateUnitModel(UnitConfig config, UnitDto unitDto)
         {
+            //Если создание модели станет сложным и захочет много зависимостей, то перенести в фабрику
             var unit = new UnitModel(config, new UnitStatsModel(config, unitDto.Progression), unitDto);
             return unit;
         }
-
 
         public void Add(Id unitType, int count)
         {
@@ -102,7 +83,7 @@ namespace Meta.Controllers
                 AddNotUpgradableUnit(config, progression, count);
             }
         }
-       
+
         private void AddUpgradableUnit(UnitConfig config, UnitProgressionDto progression, int count)
         {
             var unitDto = _unitsDto.FirstOrDefault(unitDto => unitDto.UnitType.Equals(config.UnitType));
@@ -138,15 +119,15 @@ namespace Meta.Controllers
             _unitsDto.Add(unit);
             _unitModels.Add(CreateUnitModel(config, unit), unit);
         }
+
         private void IncreaseUnitCount(UnitDto unit, int count)
         {
             unit.Count = checked(unit.Count + count);
         }
-
-        public void Spend(UnitModel unitModel, int count)
+        public void Spend(IUnitModel unitModel, int count)
         {
             Assert.IsTrue(unitModel.Count >= count);
-            
+
             var dto = _unitModels[unitModel];
             var config = _configsHash[unitModel.UnitType];
             dto.Count -= count;
@@ -155,24 +136,44 @@ namespace Meta.Controllers
             {
                 return;
             }
+
             _unitsDto.Remove(dto);
             _unitModels.Remove(unitModel);
         }
-        
-        public IEnumerable<UnitModel> GetUnits()
+        public IEnumerable<IUnitModel> GetUnits()
         {
             return _unitModels.Keys.Where(s => s.Count > 0);
         }
 
-        
+
         //--спорное решение держать этот здесь.
-        public void Upgrade(UnitModel unit, TypeUnitStat stat)
+        public void Upgrade(IUnitModel unit, TypeUnitStat stat)
         {
-            //гредит юнита если не уперслись в лимиты
-            throw new System.NotImplementedException();
+            var config = _configsHash[unit.UnitType];
+            Assert.IsTrue(config.IsCanUpgrade);
+            var unitDto = _unitModels[unit];
+            var unitProgressionDto = unitDto.Progression;
+
+            //todo сделать полноценную грейдилку (проверка на лимиты, работает с конфигом и дто) возможно по Type из конфига
+            switch (stat)
+            {
+                case TypeUnitStat.Melee:
+                    unitProgressionDto.MeleeAttackLevel++;
+                    break;
+                case TypeUnitStat.Ranged:
+                    unitProgressionDto.RangedAttackLevel++;
+                    break;
+                case TypeUnitStat.Health:
+                    unitProgressionDto.HealthLevel++;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(stat), stat, null);
+            }
+
+            unit.Stats.UpgradeHandler();
         }
 
-        public IEnumerable<UnitModel> GetCanUpgradeUnits()
+        public IEnumerable<IUnitModel> GetCanUpgradeUnits()
         {
             foreach (var model in _unitModels)
             {
