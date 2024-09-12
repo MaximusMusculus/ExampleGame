@@ -22,9 +22,11 @@ namespace Meta.Tests.Editor.Controllers
         {
             var item1 = new ItemConfig {Item = 1, DefaultCount = 10, MaxCount = 100};
             var item2 = new ItemConfig {Item = 2, DefaultCount = 5, MaxCount = 50};
+            var configs = new List<ItemConfig> {item1, item2};
+            
 
             var items = new List<ItemDto>();
-            var configs = new List<ItemConfig> {item1, item2};
+  
             _inventoryController = new InventoryController(configs, items);
 
             _itemId1 = item1.Item;
