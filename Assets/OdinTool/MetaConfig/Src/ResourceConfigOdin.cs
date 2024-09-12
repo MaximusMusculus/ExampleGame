@@ -1,5 +1,4 @@
 using Sirenix.OdinInspector;
-using UnityEngine.Serialization;
 
 
 namespace Meta.ConfigOdin
@@ -8,7 +7,7 @@ namespace Meta.ConfigOdin
     {
         public bool IsNoLimit;
         
-        [FormerlySerializedAs("Limit")] [HideIf("IsNoLimit")]
+        [HideIf("IsNoLimit")]
         public int StartLimit;
         public int StartCount;
         
