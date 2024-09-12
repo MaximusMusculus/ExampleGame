@@ -87,6 +87,16 @@ namespace Meta.Controllers
         private void AddUpgradableUnit(UnitConfig config, UnitProgressionDto progression, int count)
         {
             var unitDto = _unitsDto.FirstOrDefault(unitDto => unitDto.UnitType.Equals(config.UnitType));
+            AddUnit(config, unitDto, progression, count);
+        }
+        private void AddNotUpgradableUnit(UnitConfig config, UnitProgressionDto progression, int count)
+        {
+            var unitDto = _unitsDto.FirstOrDefault(s => s.UnitType.Equals(config.UnitType) && _progressionComparer.Equals(s.Progression, progression));
+            AddUnit(config, unitDto, progression, count);
+        }
+
+        private void AddUnit(UnitConfig config, UnitDto unitDto, UnitProgressionDto progression, int count)
+        {
             if (unitDto != null)
             {
                 IncreaseUnitCount(unitDto, count);
@@ -96,17 +106,9 @@ namespace Meta.Controllers
                 AddNewUnit(config, progression, count);
             }
         }
-        private void AddNotUpgradableUnit(UnitConfig config, UnitProgressionDto progression, int count)
+        private void IncreaseUnitCount(UnitDto unit, int count)
         {
-            var unitDto = _unitsDto.FirstOrDefault(s => s.UnitType.Equals(config.UnitType) && _progressionComparer.Equals(s.Progression, progression));
-            if (unitDto != null)
-            {
-                IncreaseUnitCount(unitDto, count);
-            }
-            else
-            {
-                AddNewUnit(config, progression, count);
-            }
+            unit.Count = checked(unit.Count + count);
         }
         private void AddNewUnit(UnitConfig config, UnitProgressionDto progression, int count)
         {
@@ -120,10 +122,7 @@ namespace Meta.Controllers
             _unitModels.Add(CreateUnitModel(config, unit), unit);
         }
 
-        private void IncreaseUnitCount(UnitDto unit, int count)
-        {
-            unit.Count = checked(unit.Count + count);
-        }
+
         public void Spend(IUnitModel unitModel, int count)
         {
             Assert.IsTrue(unitModel.Count >= count);
@@ -184,4 +183,5 @@ namespace Meta.Controllers
             }
         }
     }
+    
 }
