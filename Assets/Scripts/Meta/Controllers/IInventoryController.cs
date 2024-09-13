@@ -11,11 +11,10 @@ namespace Meta.Controllers
     {
         void Add(Id item, int count);
         void Spend(Id item, int count);
-        int GetCount(Id item);
-        
-        int GetLimit(Id item);
         void ExpandLimit(Id item, int count);
         
+        int GetCount(Id item);
+        int GetLimit(Id item);
         IEnumerable<Id> GetItems();
     }
 

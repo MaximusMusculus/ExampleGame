@@ -20,9 +20,9 @@ namespace Meta.Controllers
         /// <summary>
         /// Прокачать юнита
         /// </summary>
-        /// <param name="unit">кого качаем</param>
+        /// <param name="unitType">кого качаем</param>
         /// <param name="stat">что качаем</param>
-        void Upgrade(IUnitModel unit, TypeUnitStat stat);
+        void Upgrade(Id unitType, TypeUnitStat stat);
         
         /// <summary>
         /// </summary>
@@ -40,6 +40,7 @@ namespace Meta.Controllers
         void Add(Id unitType, int count);
         void Add(Id unitType, UnitProgressionDto progression, int count);
         void Spend(IUnitModel unitModel, int count);
+        
         IEnumerable<IUnitModel> GetUnits();
     }
 }

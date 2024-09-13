@@ -7,18 +7,7 @@ namespace Meta.Models
         public int ConfigVersion;
         public List<ItemDto> Items = new List<ItemDto>();
         public List<UnitDto> Units = new List<UnitDto>();
-
-        //прогресс прокачиваемых юнитов храню отдельно? 
-        public List<UnitProgressionDto> UnitUpgrades = new List<UnitProgressionDto>();
         
-        //могу ли я прокачать любого юнита? А что если у меня будут схожие наемники, схожих уровней?
-
-
-
-        //UnitProgressionDto - self unit progressions
-        //Units - self units (count?)?? -> id/Count + limit => Resources? or UnitsDto?
-        //public List<UnitDto> Army = new List<UnitDto>();             // Юниты, которых можно качать и нанимать
-
         //public List<PerkDto> Perks;
         //public List<TaskDto> Tasks;
         //public List<BuildingDto> Buildings;
