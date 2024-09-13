@@ -146,12 +146,19 @@ namespace Meta.Controllers
 
 
         //--спорное решение держать этот здесь.
-        public void Upgrade(IUnitModel unit, TypeUnitStat stat)
+        //учитывая, что грейдятся только сингл юниты, то можно по типу дергать.
+        public void Upgrade(Id unitType, TypeUnitStat stat)
         {
-            var config = _configsHash[unit.UnitType];
+            var config = _configsHash[unitType];
             Assert.IsTrue(config.IsCanUpgrade);
-            var unitDto = _unitsModels[unit];
+            var unitModel = _unitsModels.Keys.FirstOrDefault(s => s.UnitType == unitType);
+            if (unitModel == null)
+            {
+                throw new InvalidOperationException($"Unit:{unitType} not found model");
+            }
+            var unitDto = _unitsModels[unitModel];
             var unitProgressionDto = unitDto.Progression;
+            //тут получаем цену от модели калькулятора. 
 
             //todo сделать полноценную грейдилку (проверка на лимиты, работает с конфигом и дто) возможно по Type из конфига
             switch (stat)
@@ -168,11 +175,10 @@ namespace Meta.Controllers
                 default:
                     throw new ArgumentOutOfRangeException(nameof(stat), stat, null);
             }
-
-            unit.Stats.UpgradeHandler();
+            unitModel.Stats.UpgradeHandler();
         }
 
-        public IEnumerable<IUnitModel> GetCanUpgradeUnits()
+        public IEnumerable<IUnitModel> GetCanUpgradeUnits() //IUnitModel->IUnitUpgradeModel? или из спец менеджера калькулятора?
         {
             foreach (var model in _unitsModels)
             {
