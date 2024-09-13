@@ -40,6 +40,7 @@ namespace Meta.Controllers
         void Add(Id unitType, int count);
         void Add(Id unitType, UnitProgressionDto progression, int count);
         void Spend(IUnitModel unitModel, int count);
+        
         IEnumerable<IUnitModel> GetUnits();
     }
 }
