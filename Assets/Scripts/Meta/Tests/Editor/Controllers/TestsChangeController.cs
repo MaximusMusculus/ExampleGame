@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Meta.Tests.Editor.Controllers
 {
     [TestFixture]
-    public class ChangeControllerTests
+    public class TestsChangeController
     {
         private IInventoryController _itemsController;
         private IUnitsController _unitsController;
@@ -56,7 +56,7 @@ namespace Meta.Tests.Editor.Controllers
         public void GivenItemWithCount_WhenCountIsSpent_ThenCorrectCountRemains()
         {
             _itemsController.Add(_itemRecruits, 100);
-            _changeController.Process(new ConfigChangeSpendItem {TargetItem = _itemRecruits, Count = 50});
+            _changeController.Process(new ChangeSpendItemConfig {TargetItem = _itemRecruits, Count = 50});
             Assert.AreEqual(50, _itemsController.GetCount(_itemRecruits));
         }
 
@@ -64,12 +64,12 @@ namespace Meta.Tests.Editor.Controllers
         public void GivenItemWithCount_WhenCountIsSpentArray_ThenCorrectCountRemains()
         {
             _itemsController.Add(_itemRecruits, 100);
-            _changeController.Process(new ChangesConfig
+            _changeController.Process(new ChangesArrayConfig
             {
                 Changes = new List<ChangeConfig>
                 {
-                    new ConfigChangeSpendItem {TargetItem = _itemRecruits, Count = 50},
-                    new ConfigChangeSpendItem {TargetItem = _itemRecruits, Count = 30},
+                    new ChangeSpendItemConfig {TargetItem = _itemRecruits, Count = 50},
+                    new ChangeSpendItemConfig {TargetItem = _itemRecruits, Count = 30},
                 }
             });
             Assert.AreEqual(20, _itemsController.GetCount(_itemRecruits));
@@ -82,22 +82,22 @@ namespace Meta.Tests.Editor.Controllers
             _itemsController.Add(_itemIron, 150);
 
 
-            var addUnit = new ConfigChangeAddUnit
+            var addUnit = new ChangeAddUnitConfig
             {
                 UnitType = _unitType,
                 Progression = new UnitProgressionDto {HealthLevel = 1},
                 Count = 5
             };
-            var costItems = new ChangesConfig
+            var costItems = new ChangesArrayConfig
             {
                 Changes = new List<ChangeConfig>
                 {
-                    new ConfigChangeSpendItem {TargetItem = _itemRecruits, Count = 50},
-                    new ConfigChangeSpendItem {TargetItem = _itemIron, Count = 50},
+                    new ChangeSpendItemConfig {TargetItem = _itemRecruits, Count = 50},
+                    new ChangeSpendItemConfig {TargetItem = _itemIron, Count = 50},
                 }
             };
 
-            _changeController.Process(new ChangesConfig {Changes = new List<ChangeConfig> {addUnit, costItems}});
+            _changeController.Process(new ChangesArrayConfig {Changes = new List<ChangeConfig> {addUnit, costItems}});
             Assert.AreEqual(5, _unitsController.GetUnits().First().Count);
             Assert.AreEqual(50, _itemsController.GetCount(_itemRecruits));
             Assert.AreEqual(100, _itemsController.GetCount(_itemIron));
