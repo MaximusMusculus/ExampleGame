@@ -38,6 +38,8 @@ namespace Meta.Tests.Editor.Controllers
                 new UnitConfig {UnitType = _existNotUpgradableUnit, IsCanUpgrade = false}
             };
             _unitsController = new UnitsController(_unitConfigs, _unitsDto);
+            
+            //unitBarraсks <- unitConfigs+Prices+Conditions? 
         }
 
         [Test]

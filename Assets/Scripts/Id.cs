@@ -1,8 +1,18 @@
 using System;
 
 
+public static class DefaultCapacityConst
+{
+    public const int Micro = 8;
+    public const int Small = 16;
+    public const int Medium = 32;
+    public const int Large = 64;
+}
+
+
 namespace AppRen
 {
+
     public struct Id : IEquatable<Id>, IFormattable, IComparable<Id>
     {
         private ushort _value;

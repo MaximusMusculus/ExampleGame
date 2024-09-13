@@ -8,6 +8,7 @@ namespace Meta.Configs
         ChangesArray,
     }
 
+    //или дата?
     public abstract class ChangeConfig
     {
         public abstract TypeChange TypeChange { get; }

@@ -6,6 +6,7 @@ namespace Meta.Controllers
     public interface IChangeController
     {
         void Process(ChangeConfig change);
+        //push event?
     }
     
     public class ChangeController : IChangeController
@@ -16,7 +17,7 @@ namespace Meta.Controllers
         public ChangeController(IChangeControllersFactory changeControllersFactory)
         {
             _changeControllersFactory = changeControllersFactory;
-            _controllersHash = new Dictionary<TypeChange, IChangeController>(16)
+            _controllersHash = new Dictionary<TypeChange, IChangeController>(DefaultCapacityConst.Small)
             {
                 {TypeChange.ChangesArray, new ChangeArrayController(this)}
             };

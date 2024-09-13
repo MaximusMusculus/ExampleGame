@@ -15,6 +15,8 @@ namespace Meta.Controllers
         {
             var configChangeAddItem = (ChangeAddItemConfig) change;
             _inventoryController.Add(configChangeAddItem.TargetItem, configChangeAddItem.Count);
+            //Если потребуются события, то надо будет поставить прослойку в IInventoryController, которая будет помещать нужное событие в очередь.
+            //Или же просто будет являтся частью фасада с методами подписки, на все, что нужно.
         }
     }
 }

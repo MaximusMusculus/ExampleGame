@@ -11,7 +11,6 @@ namespace Meta.Configs
         public List<UnitConfig> Units = new List<UnitConfig>();
     }
     
-    
     public class ItemConfig
     {
         public Id Item;
@@ -20,7 +19,4 @@ namespace Meta.Configs
         //nameKey
         //Icon?
     }
-      
-    
-    
 }
