@@ -18,7 +18,7 @@ namespace OdinTool.MetaConfig.Src
     public class PriceElem
     {
         public int Level;
-        public EntitiesCollection Price;
+        public EntityCollections Price;
     }
 
 }

@@ -16,61 +16,30 @@ MonoBehaviour:
   Name: 
   Rewards:
     Changes:
-    - rid: 3391960597496332311
-    - rid: 3391960597496332313
-    - rid: 3391960628275707922
-  PriceElems:
-  - Level: 1
-    Price:
-      Changes:
-      - rid: 3391960698365673472
-      - rid: 3391960698365673473
-  PriceForLevel:
-  - Changes:
-    - rid: 3391960698365673478
-  - Changes:
-    - rid: 3391960698365673479
-    - rid: 3391960698365673480
+    - rid: 3391960739035217920
+    - rid: 3391960739035217921
+    - rid: 3391960739035217922
+    - rid: 3391960739035217923
   references:
     version: 2
     RefIds:
-    - rid: 3391960597496332311
-      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
-      data:
-        Resource: {fileID: 11400000, guid: d059236f4de3ec140be8befa2e5d91bc, type: 2}
-        Count: 10
-    - rid: 3391960597496332313
-      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+    - rid: 3391960739035217920
+      type: {class: EntityResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
       data:
         Resource: {fileID: 11400000, guid: 471feb272c845624cb2230dd1f98bbfe, type: 2}
-        Count: 50
-    - rid: 3391960628275707922
-      type: {class: AddUnit, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
-      data:
-        Unit: {fileID: 11400000, guid: 4accde3023e61ec4680274d2d2ae71d2, type: 2}
-        Count: 10
-    - rid: 3391960698365673472
-      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
-      data:
-        Resource: {fileID: 11400000, guid: 471feb272c845624cb2230dd1f98bbfe, type: 2}
-        Count: 50
-    - rid: 3391960698365673473
-      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
-      data:
-        Resource: {fileID: 11400000, guid: d28e36abbba838c4ea101d386320846a, type: 2}
-        Count: 10
-    - rid: 3391960698365673478
-      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
-      data:
-        Resource: {fileID: 11400000, guid: d059236f4de3ec140be8befa2e5d91bc, type: 2}
-        Count: 10
-    - rid: 3391960698365673479
-      type: {class: AddResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
-      data:
-        Resource: {fileID: 11400000, guid: 87961fe4db79a134b9d379fd06da4212, type: 2}
-        Count: 10
-    - rid: 3391960698365673480
-      type: {class: AddUnit, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+        Count: 100
+    - rid: 3391960739035217921
+      type: {class: EntityUnit, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
       data:
         Unit: {fileID: 11400000, guid: 7eeb4c8737d521d4a8e1ed625cba802f, type: 2}
+        Count: 5
+    - rid: 3391960739035217922
+      type: {class: EntityResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+      data:
+        Resource: {fileID: 11400000, guid: d059236f4de3ec140be8befa2e5d91bc, type: 2}
+        Count: 10
+    - rid: 3391960739035217923
+      type: {class: EntityUnit, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+      data:
+        Unit: {fileID: 11400000, guid: 4accde3023e61ec4680274d2d2ae71d2, type: 2}
         Count: 5

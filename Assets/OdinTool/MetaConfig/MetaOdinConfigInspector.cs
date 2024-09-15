@@ -24,7 +24,7 @@ namespace Meta.ConfigOdin
             window._metaConfig = configOdin;
             window.position = GUIHelper.GetEditorWindowRect().AlignCenter(800, 500);
         }
-
+        
 
         protected override OdinMenuTree BuildMenuTree()
         {
@@ -37,37 +37,61 @@ namespace Meta.ConfigOdin
             {
                 _tree.Add("Resources/" + resource.name, resource);
             }
+            
+            _tree.Add("Buildings/", new ElemCreator<BuildingsConfigOdin>(this, x => _metaConfig.Buildings.Add(x)));
+            foreach (var building in _metaConfig.Buildings)
+            {
+                _tree.Add("Buildings/" + building.name, building);
+            }
+            
 
             _tree.Add("Units/", new ElemCreator<UnitConfigOdin>(this, x => _metaConfig.Units.Add(x)));
             foreach (var unit in _metaConfig.Units)
             {
                 _tree.Add("Units/" + unit.name, unit);
             }
+            
+            _tree.Add("Upgrades/", new ElemCreator<UpgradesConfigOdin>(this, x => _metaConfig.Upgrades.Add(x)));
+            foreach (var upgrade in _metaConfig.Upgrades)
+            {
+                _tree.Add("Upgrades/" + upgrade.name, upgrade);
+            }
+            
 
             _tree.Add("Quests/", new ElemCreator<QuestConfigOdin>(this, x => _metaConfig.Quests.Add(x)));
             foreach (var quest in _metaConfig.Quests)
             {
                 _tree.Add("Quests/" + quest.name, quest);
             }
+            
+            _tree.Add("Missions/", new ElemCreator<MissionsConfigOdin>(this, x => _metaConfig.Missions.Add(x)));
+            foreach (var mission in _metaConfig.Missions)
+            {
+                _tree.Add("Missions/" + mission.name, mission);
+            }
 
-
-            // Добавьте к предметам маркеры перетаскивания, чтобы их можно было легко перетаскивать в инвентарь, если персонажи и т. д.
             _tree.EnumerateTree().Where(x => x.Value as ResourceConfigOdin).ForEach(AddDragHandles);
+            _tree.EnumerateTree().Where(x => x.Value as BuildingsConfigOdin).ForEach(AddDragHandles);
             _tree.EnumerateTree().Where(x => x.Value as UnitConfigOdin).ForEach(AddDragHandles);
+            _tree.EnumerateTree().Where(x => x.Value as UpgradesConfigOdin).ForEach(AddDragHandles);
             _tree.EnumerateTree().Where(x => x.Value as QuestConfigOdin).ForEach(AddDragHandles);
-
+            _tree.EnumerateTree().Where(x => x.Value as MissionsConfigOdin).ForEach(AddDragHandles);
+            
             _tree.EnumerateTree().AddIcons<ResourceConfigOdin>(x => x.Icon);
+            _tree.EnumerateTree().AddIcons<BuildingsConfigOdin>(x => x.Icon);
             _tree.EnumerateTree().AddIcons<UnitConfigOdin>(x => x.Icon);
+            _tree.EnumerateTree().AddIcons<UpgradesConfigOdin>(x => x.Icon);
             _tree.EnumerateTree().AddIcons<QuestConfigOdin>(x => x.Icon);
+            _tree.EnumerateTree().AddIcons<MissionsConfigOdin>(x => x.Icon);
 
             return _tree;
         }
         
-
         private void AddDragHandles(OdinMenuItem menuItem)
         {
             menuItem.OnDrawItem += x => DragAndDropUtilities.DragZone(menuItem.Rect, menuItem.Value, false, false);
         }
+        
 
         public void UpdateThree()
         {
@@ -85,7 +109,9 @@ namespace Meta.ConfigOdin
         void UpdateThree();
         void TrySelectMenuItemWithObject(ScriptableObject target);
     }
+    
 
+    
     public class ElemCreator<T> where T : ConfigElem
     {
         private readonly IMenuTree _menuTree;

@@ -10,15 +10,15 @@ namespace Meta.ConfigOdin
     /// Теперь есть вопрос. Как их этого - получить то, что нужно мете? (поллекция по которой бегаю или рефлексия?)
     /// ,0
     /// </summary>
-    public interface IEntitiesCollection
+    public interface IEntity
     {
     }
 
     [Serializable]
-    public class EntitiesCollection : IEntitiesCollection
+    public class EntityCollections : IEntity
     {
         [SerializeReference] [HideReferenceObjectPicker] [LabelText("Changes")] [ListDrawerSettings(ShowFoldout = false)]
-        public List<IEntitiesCollection> Changes = new List<IEntitiesCollection>();
+        public List<IEntity> Changes = new List<IEntity>();
 
 
         [HorizontalGroup("Create")]
@@ -37,7 +37,7 @@ namespace Meta.ConfigOdin
     }
 
 
-    public class EntityResource : IEntitiesCollection
+    public class EntityResource : IEntity
     {
         [HorizontalGroup("Split"), HideLabel] public ResourceConfigOdin Resource;
 
@@ -54,7 +54,7 @@ namespace Meta.ConfigOdin
         public void Count100() => Count = 100;
     }
 
-    public class EntityUnit : IEntitiesCollection
+    public class EntityUnit : IEntity
     {
         [HorizontalGroup("Split"), HideLabel] public UnitConfigOdin Unit;
         
