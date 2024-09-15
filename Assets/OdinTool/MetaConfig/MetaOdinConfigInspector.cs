@@ -51,11 +51,7 @@ namespace Meta.ConfigOdin
                 _tree.Add("Units/" + unit.name, unit);
             }
             
-            _tree.Add("Upgrades/", new ElemCreator<UpgradesConfigOdin>(this, x => _metaConfig.Upgrades.Add(x)));
-            foreach (var upgrade in _metaConfig.Upgrades)
-            {
-                _tree.Add("Upgrades/" + upgrade.name, upgrade);
-            }
+            
             
 
             _tree.Add("Quests/", new ElemCreator<QuestConfigOdin>(this, x => _metaConfig.Quests.Add(x)));
@@ -73,14 +69,12 @@ namespace Meta.ConfigOdin
             _tree.EnumerateTree().Where(x => x.Value as ResourceConfigOdin).ForEach(AddDragHandles);
             _tree.EnumerateTree().Where(x => x.Value as BuildingsConfigOdin).ForEach(AddDragHandles);
             _tree.EnumerateTree().Where(x => x.Value as UnitConfigOdin).ForEach(AddDragHandles);
-            _tree.EnumerateTree().Where(x => x.Value as UpgradesConfigOdin).ForEach(AddDragHandles);
             _tree.EnumerateTree().Where(x => x.Value as QuestConfigOdin).ForEach(AddDragHandles);
             _tree.EnumerateTree().Where(x => x.Value as MissionsConfigOdin).ForEach(AddDragHandles);
             
             _tree.EnumerateTree().AddIcons<ResourceConfigOdin>(x => x.Icon);
             _tree.EnumerateTree().AddIcons<BuildingsConfigOdin>(x => x.Icon);
             _tree.EnumerateTree().AddIcons<UnitConfigOdin>(x => x.Icon);
-            _tree.EnumerateTree().AddIcons<UpgradesConfigOdin>(x => x.Icon);
             _tree.EnumerateTree().AddIcons<QuestConfigOdin>(x => x.Icon);
             _tree.EnumerateTree().AddIcons<MissionsConfigOdin>(x => x.Icon);
 

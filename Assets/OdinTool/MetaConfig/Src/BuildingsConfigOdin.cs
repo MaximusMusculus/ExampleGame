@@ -1,4 +1,7 @@
-﻿namespace Meta.ConfigOdin
+﻿using System.Collections.Generic;
+using Sirenix.OdinInspector;
+
+namespace Meta.ConfigOdin
 {
     public class BuildingsConfigOdin : ConfigElem
     { 
@@ -30,9 +33,37 @@
         //какие апгрейды может выполнять (и как? моментально, за прайс, за дабл прайс)
         //условия? 
         
+        
+        public BuildingUnits Units = new BuildingUnits();
     }
     
+    [System.Serializable]
+    public class BuildingUnits
+    {
+        //purchase?
+        public List<ActionTrain> Units = new List<ActionTrain>();
+    }
     
-    
-    
+    public class Action{}
+
+
+    [System.Serializable]
+    public class ActionTrain : Action
+    {
+        [VerticalGroup("Costs/Left"), HideLabel]
+        [HorizontalGroup("Costs", Width = 150)]
+        public UnitConfigOdin Unit;
+        
+        [VerticalGroup("Costs/Left")]
+        [HorizontalGroup("Costs", Width = 150)]
+        public int Limit;
+
+        [HorizontalGroup("Costs/Right")]
+        [VerticalGroup("Costs/Right"), HideLabel]
+        public EntityCollections Costs = new EntityCollections();
+    }
+
+
+
+
 }

@@ -14,7 +14,7 @@ namespace Meta.ConfigOdin
         public List<UnitConfigOdin> Units = new List<UnitConfigOdin>();
         public List<QuestConfigOdin> Quests = new List<QuestConfigOdin>();
         public List<MissionsConfigOdin> Missions = new List<MissionsConfigOdin>();
-        public List<UpgradesConfigOdin> Upgrades = new List<UpgradesConfigOdin>();
+      
 
         [Button("Open Editor")]
         public void OpenConfigEditor()

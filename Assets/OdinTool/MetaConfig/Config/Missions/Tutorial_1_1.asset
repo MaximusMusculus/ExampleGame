@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8482699fd81a41f9aba9c99d52f9cca2, type: 3}
   m_Name: Tutorial_1_1
   m_EditorClassIdentifier: 
-  Icon: {fileID: 0}
-  Name: 
+  Icon: {fileID: 2800000, guid: d6c798903a5f74a47acc196a64c17fe9, type: 3}
+  Name: Tutorial_1_1

@@ -17,7 +17,7 @@ namespace Meta.ConfigOdin
     [Serializable]
     public class EntityCollections : IEntity
     {
-        [SerializeReference] [HideReferenceObjectPicker] [LabelText("Changes")] [ListDrawerSettings(ShowFoldout = false)]
+        [SerializeReference] [HideReferenceObjectPicker] [LabelText("Values")] [ListDrawerSettings(ShowFoldout = false)]
         public List<IEntity> Changes = new List<IEntity>();
 
 
