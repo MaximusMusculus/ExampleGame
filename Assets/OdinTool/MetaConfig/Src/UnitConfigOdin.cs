@@ -19,7 +19,7 @@ namespace Meta.ConfigOdin
 
     }
 
-    
+
     [System.Serializable]
     public class UnitPowerByFormula
     {

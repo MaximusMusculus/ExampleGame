@@ -10,34 +10,34 @@ namespace Meta.ConfigOdin
     /// Теперь есть вопрос. Как их этого - получить то, что нужно мете? (поллекция по которой бегаю или рефлексия?)
     /// ,0
     /// </summary>
-    public interface IStateChange
+    public interface IEntitiesCollection
     {
     }
 
     [Serializable]
-    public class StateChange : IStateChange
+    public class EntitiesCollection : IEntitiesCollection
     {
         [SerializeReference] [HideReferenceObjectPicker] [LabelText("Changes")] [ListDrawerSettings(ShowFoldout = false)]
-        public List<IStateChange> Changes = new List<IStateChange>();
+        public List<IEntitiesCollection> Changes = new List<IEntitiesCollection>();
 
 
         [HorizontalGroup("Create")]
-        [Button("Resource")]
-        public void AddResourceChanger()
+        [Button("AddResource")]
+        public void Resource()
         {
-            Changes.Add(new AddResource());
+            Changes.Add(new EntityResource());
         }
 
         [HorizontalGroup("Create")]
-        [Button("Unit")]
-        public void AddUnit()
+        [Button("AddUnit")]
+        public void Unit()
         {
-            Changes.Add(new AddUnit());
+            Changes.Add(new EntityUnit());
         }
     }
 
 
-    public class AddResource : IStateChange
+    public class EntityResource : IEntitiesCollection
     {
         [HorizontalGroup("Split"), HideLabel] public ResourceConfigOdin Resource;
 
@@ -54,7 +54,7 @@ namespace Meta.ConfigOdin
         public void Count100() => Count = 100;
     }
 
-    public class AddUnit : IStateChange
+    public class EntityUnit : IEntitiesCollection
     {
         [HorizontalGroup("Split"), HideLabel] public UnitConfigOdin Unit;
         
