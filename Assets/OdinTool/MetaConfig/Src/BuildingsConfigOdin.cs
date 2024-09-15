@@ -50,16 +50,15 @@ namespace Meta.ConfigOdin
     [System.Serializable]
     public class ActionTrain : Action
     {
-        [VerticalGroup("Costs/Left"), HideLabel]
-        [HorizontalGroup("Costs", Width = 150)]
+        [VerticalGroup("Costs/Left"), HideLabel] 
+        [HorizontalGroup("Costs", Width = 200)]
         public UnitConfigOdin Unit;
-        
-        [VerticalGroup("Costs/Left")]
-        [HorizontalGroup("Costs", Width = 150)]
+
+        [VerticalGroup("Costs/Left")] 
+        [HorizontalGroup("Costs", Width = 200)]
         public int Limit;
 
-        [HorizontalGroup("Costs/Right")]
-        [VerticalGroup("Costs/Right"), HideLabel]
+        [HorizontalGroup("Costs/Right"), HideLabel]
         public EntityCollections Costs = new EntityCollections();
     }
 

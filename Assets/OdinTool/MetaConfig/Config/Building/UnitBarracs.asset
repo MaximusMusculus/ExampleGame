@@ -12,20 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d08d8f6dff24b0fb1552d653be94033, type: 3}
   m_Name: UnitBarracs
   m_EditorClassIdentifier: 
-  Icon: {fileID: 2800000, guid: df855c8987d9043098d166ee724087fa, type: 3}
+  Icon: {fileID: 2800000, guid: 8c477f89bf3774996938d644193cba1a, type: 3}
   Name: UnitBarracs
   Units:
     Units:
     - Unit: {fileID: 11400000, guid: 7eeb4c8737d521d4a8e1ed625cba802f, type: 2}
+      Limit: 50
       Costs:
         Changes:
         - rid: 3391960739035217928
         - rid: 3391960739035217929
     - Unit: {fileID: 11400000, guid: 8a1ca60c1cc98364aad7ec558f47a937, type: 2}
+      Limit: 30
       Costs:
         Changes:
         - rid: 3391960739035217931
         - rid: 3391960739035217932
+    - Unit: {fileID: 11400000, guid: 4accde3023e61ec4680274d2d2ae71d2, type: 2}
+      Limit: 20
+      Costs:
+        Changes:
+        - rid: 3391960739035217933
+        - rid: 3391960739035217934
   references:
     version: 2
     RefIds:
@@ -49,3 +57,13 @@ MonoBehaviour:
       data:
         Resource: {fileID: 11400000, guid: d28e36abbba838c4ea101d386320846a, type: 2}
         Count: 20
+    - rid: 3391960739035217933
+      type: {class: EntityResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+      data:
+        Resource: {fileID: 11400000, guid: 471feb272c845624cb2230dd1f98bbfe, type: 2}
+        Count: 150
+    - rid: 3391960739035217934
+      type: {class: EntityResource, ns: Meta.ConfigOdin, asm: Assembly-CSharp}
+      data:
+        Resource: {fileID: 11400000, guid: d28e36abbba838c4ea101d386320846a, type: 2}
+        Count: 50
