@@ -7,16 +7,29 @@ using Meta.Models;
 
 namespace Meta.Controllers
 {
+    public interface IResourceItem
+    {
+        int GetCount();
+        int GetLimit();
+    }
+    
     public interface IInventoryController
     {
         void Add(Id item, int count);
         void Spend(Id item, int count);
         void ExpandLimit(Id item, int count);
         
+        //Get - Read
         int GetCount(Id item);
         int GetLimit(Id item);
         IEnumerable<Id> GetItems();
     }
+    
+    public interface IInventoryAggregator
+    {
+        void Register(IInventoryController controller);
+    }
+    
 
     public class InventoryController : IInventoryController
     {

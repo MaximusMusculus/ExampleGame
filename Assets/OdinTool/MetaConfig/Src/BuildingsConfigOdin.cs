@@ -56,7 +56,23 @@ namespace Meta.ConfigOdin
 
         [VerticalGroup("Costs/Left")] 
         [HorizontalGroup("Costs", Width = 200)]
-        public int Limit;
+        public int Limit;   //условие? (максимальное кол-во юнитов)
+
+        [VerticalGroup("Costs/Left")] 
+        [HorizontalGroup("Costs", Width = 200)]
+        public bool Timed; //? 
+
+        
+        
+        //--tasked. если стоит галочка, то это будет таск, с нужными настройками и временем.
+        [ShowIf("Timed")]
+        [VerticalGroup("Costs/Left")] 
+        [HorizontalGroup("Costs", Width = 200)]
+        public int Seconds;
+        //--
+        
+        
+        
 
         [HorizontalGroup("Costs/Right"), HideLabel]
         public EntityCollections Costs = new EntityCollections();
