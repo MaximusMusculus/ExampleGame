@@ -6,11 +6,11 @@ using Meta.Models;
 
 namespace Meta.Configs
 {
-
     public interface IVisitor
     {
         void Visit(EntityItem entityItem);
         void Visit(EntityUnit entityItem);
+        void Visit(IEntityCollection collection);
     }
 
     
@@ -33,6 +33,14 @@ namespace Meta.Configs
             var unit =_unitsController.GetUnits().FirstOrDefault(s => s.UnitType == entityItem.TypeUnit);
             _unitsController.Spend(unit, entityItem.Count);
         }
+        
+        public void Visit(IEntityCollection collection)
+        {
+            foreach (var entity in collection.Get())
+            {
+                entity.Visit(this);
+            }
+        }
     }
 
     /// <summary>
@@ -51,6 +59,14 @@ namespace Meta.Configs
         {
             _unitsController.Add(entityItem.TypeUnit, entityItem.Progression, entityItem.Count);
         }
+
+        public void Visit(IEntityCollection collection)
+        {
+            foreach (var entity in collection.Get())
+            {
+                entity.Visit(this);
+            }
+        }
     }
 
     
@@ -58,6 +74,7 @@ namespace Meta.Configs
     {
         void Visit(IVisitor visitor);
     }
+    
     public class EntityItem : IEntity
     {
         public Id TypeItem { get; }
@@ -74,14 +91,13 @@ namespace Meta.Configs
         public UnitProgressionDto Progression { get; }
         public int Count { get; }
 
-
         public void Visit(IVisitor visitor)
         {
             visitor.Visit(this);
         }
     }
     
-    
+
     public interface IEntityCollection
     {
         IEnumerable<IEntity> Get();
@@ -104,18 +120,20 @@ namespace Meta.Configs
         /// </summary>
         public List<string> RequirementsConfig;
         
-        /// <summary>
-        /// Что требуется. Тоже может проверится по количеству
-        /// </summary>
-        public List<IEntity> SpendConfig;
-        
-        /// <summary>
-        /// Что выдается
-        /// </summary>
-        public List<IEntity> AddConfig;  
+        public Changes Spend;
+        public Changes Add;
         
         //Так же предусмотреть то, что это может происходить через таск (время?)
         //taskConfig?
+    }
+    
+    public class Changes : IEntityCollection
+    {
+        private List<IEntity> Values = new List<IEntity>();
+        public IEnumerable<IEntity> Get()
+        {
+            return Values.AsEnumerable();
+        }
     }
     
     

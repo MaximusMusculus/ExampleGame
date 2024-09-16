@@ -5,13 +5,13 @@ using Meta.Models;
 
 namespace Meta.Controllers
 {
-    public interface IExchangesController
+    public interface IExchangesControllers
     {
         Id Add(ExchangeConfig config);
         void Remove(Id item);
         void DoExchange(Id item);
         
-        IEnumerable<ExchangeModel> GetExchanges();  
+        IEnumerable<ExchangeController> GetExchanges();  
     }
     
 
@@ -20,14 +20,37 @@ namespace Meta.Controllers
     /// Наем юнитов, покупка юнитов, покупка чего либо.
     /// Все сторонние объекты, кот хотят, могут добавлять свои кусочки в список покупок.
     /// </summary>
-    public class ExchangeModel
+    public class ExchangeController
     {
         public Id ItemId { get; }
-        
-        public ExchangeModel(Id itemId)
+        public ExchangeConfig Config { get; }
+        public ExchangeController(Id itemId)
         {
             ItemId = itemId;
         }
+        
+        //+DoExchange?  Spend, Add, Requirements
+        //+task?<- формирует и запускает таск, который черех Х времени сделает У действие.
+        //таск содержит только ту часть, в которой добавляется ресурс.
+
+        private SpendVisitor _spendVisitor;
+        private AddVisitor _addVisitor;
+        
+        public void DoExchange()
+        {
+            _spendVisitor.Visit(Config.Spend);
+            //если это таска - то создаем таску с передаче ей конфига.
+            //таска сделает, то, что мы попросили через Х времени.
+            _addVisitor.Visit(Config.Add);
+        }
+    }
+
+    public class ExchangeTaskController
+    {
+        //добавляет в req проверку на таск, если таск запущен - то не запускаем обмен.
+        //при выполнении - делает кост. 
+        //и создает такск на выполнение Адд. 
+        //т.е. таска знает AddVisitor, время и id предмета.
     }
 
     public interface IExchangeFactory
@@ -40,18 +63,19 @@ namespace Meta.Controllers
     /// <summary>
     /// Все покупки тут. Наем юнитов - тоже покупка.
     /// </summary>
-    public class ExchangesController : IExchangesController
+    public class ExchangesControllers : IExchangesControllers
     {
         private List<ExchangeItemDto> _exchanges;
         private List<ExchangeConfig> _exchangesConfigs;
         //idProvider
         
-        public ExchangesController(List<ExchangeConfig> exchangesConfigs, List<ExchangeItemDto> exchanges)
+        public ExchangesControllers(List<ExchangeConfig> exchangesConfigs, List<ExchangeItemDto> exchanges)
         {
             _exchanges = exchanges;
             _exchangesConfigs = exchangesConfigs;
         }
 
+        //а может быть несколько одинаковых эксченджей? Наверное - нет. В этом нет смысла.
         public Id Add(ExchangeConfig config)
         {
             //добавить айтем в пул
@@ -72,9 +96,10 @@ namespace Meta.Controllers
         public void DoExchange(Id item)
         {
             throw new System.NotImplementedException();
+            //находим предмет. Юзаем его.
         }
 
-        public IEnumerable<ExchangeModel> GetExchanges()
+        public IEnumerable<ExchangeController> GetExchanges()
         {
             throw new System.NotImplementedException();
         }
