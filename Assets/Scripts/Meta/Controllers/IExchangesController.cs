@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AppRen;
 using Meta.Configs;
 using Meta.Models;
@@ -13,6 +15,45 @@ namespace Meta.Controllers
         
         IEnumerable<ExchangeController> GetExchanges();  
     }
+
+    public interface ICheckUnitVisitor
+    {
+        bool Visit(CheckUnitLimit collection);
+    }
+
+    public class CheckUnitVisitor : ICheckUnitVisitor
+    {
+        private IUnitsController _unitsController;
+        public bool Visit(CheckUnitLimit collection)
+        {
+            //проверяем, что у нас юнитов не (больще, меньше, равно) чем в конфиге.
+            var targetUnit = _unitsController.GetUnits().FirstOrDefault(s => s.UnitType == collection.TypeUnit);
+            return targetUnit.Count < collection.Count;
+        }
+    }
+
+    public interface ICheckCollection
+    {
+        
+    }
+
+    public interface ICheckEntity
+    {
+        bool Visit(ICheckUnitVisitor unitVisitor);
+    }
+
+    public class CheckUnitLimit : ICheckEntity
+    {
+        public Id TypeUnit;
+        //condition?
+        public int Count; 
+        
+        public bool Visit(ICheckUnitVisitor unitVisitor)
+        {
+            return unitVisitor.Visit(this);
+        }
+    }
+    
     
 
     /// <summary>
@@ -23,7 +64,7 @@ namespace Meta.Controllers
     public class ExchangeController
     {
         public Id ItemId { get; }
-        public ExchangeConfig Config { get; }
+        public ExchangeConfig Config { get;}
         public ExchangeController(Id itemId)
         {
             ItemId = itemId;
@@ -33,17 +74,82 @@ namespace Meta.Controllers
         //+task?<- формирует и запускает таск, который черех Х времени сделает У действие.
         //таск содержит только ту часть, в которой добавляется ресурс.
 
-        private SpendVisitor _spendVisitor;
-        private AddVisitor _addVisitor;
-        
+        private IVisitor _spendVisitor; //SpendVisitor 
+        private IVisitor _addVisitor; //AddVisitor
+
+        private CheckCanSpend _checkCanSpend;
+
+        public bool Check()
+        {
+            //Константные 
+            using (_checkCanSpend)
+            {
+                _checkCanSpend.Visit(Config.Spend);
+                return _checkCanSpend.Result;
+            }
+        }
+
         public void DoExchange()
         {
+            //способ выполнить набор действий не создаваю мелких сущностей и не прибегая к кастингу.
             _spendVisitor.Visit(Config.Spend);
             //если это таска - то создаем таску с передаче ей конфига.
             //таска сделает, то, что мы попросили через Х времени.
             _addVisitor.Visit(Config.Add);
         }
+        
+        
+        public class CheckCanSpend : IVisitor, IDisposable
+        {
+            private IInventoryController _inventoryController;
+            private IUnitsController _unitsController;
+            
+            public bool Result { get; private set; }
+            private void Reset()
+            {
+                Result = false;
+            }
+            
+            public void Dispose()
+            {
+                Reset();
+            }
+            
+            public void Visit(EntityItem entityItem)
+            {
+                Result = _inventoryController.GetCount(entityItem.TypeItem) >= entityItem.Count;
+            }
+            
+            public void Visit(EntityUnit entityItem)
+            {
+                var unit = _unitsController.GetUnits().FirstOrDefault(s=>s.UnitType == entityItem.TypeUnit);
+                if (unit == null)
+                {
+                    Result = false;
+                    return;
+                }
+                Result = unit.Count >= entityItem.Count;
+            }
+
+            public void Visit(IChangesCollection collection)
+            {
+                Result = true; 
+                foreach (var entity in collection.Get())
+                {
+                    entity.Visit(this);
+                    if (!Result)
+                    {
+                        break; // Выходим из цикла, если Result стал false
+                    }
+                }
+            }
+            
+        }
+
     }
+    
+    
+    
 
     public class ExchangeTaskController
     {

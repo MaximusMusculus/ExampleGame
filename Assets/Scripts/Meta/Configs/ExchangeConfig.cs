@@ -6,11 +6,15 @@ using Meta.Models;
 
 namespace Meta.Configs
 {
+    /// <summary>
+    /// Так как логика выносится из отдельных контроллеров в один. То этот итерфейс будет разрастаться.
+    /// важно соблюсти баланс между его размером и функционалом. Хотя, если это чисто на добавить, удалить - то вполне подойдет.
+    /// </summary>
     public interface IVisitor
     {
         void Visit(EntityItem entityItem);
         void Visit(EntityUnit entityItem);
-        void Visit(IEntityCollection collection);
+        void Visit(IChangesCollection collection);
     }
 
     
@@ -34,7 +38,7 @@ namespace Meta.Configs
             _unitsController.Spend(unit, entityItem.Count);
         }
         
-        public void Visit(IEntityCollection collection)
+        public void Visit(IChangesCollection collection)
         {
             foreach (var entity in collection.Get())
             {
@@ -60,7 +64,7 @@ namespace Meta.Configs
             _unitsController.Add(entityItem.TypeUnit, entityItem.Progression, entityItem.Count);
         }
 
-        public void Visit(IEntityCollection collection)
+        public void Visit(IChangesCollection collection)
         {
             foreach (var entity in collection.Get())
             {
@@ -98,7 +102,7 @@ namespace Meta.Configs
     }
     
 
-    public interface IEntityCollection
+    public interface IChangesCollection
     {
         IEnumerable<IEntity> Get();
     }
@@ -127,7 +131,7 @@ namespace Meta.Configs
         //taskConfig?
     }
     
-    public class Changes : IEntityCollection
+    public class Changes : IChangesCollection
     {
         private List<IEntity> Values = new List<IEntity>();
         public IEnumerable<IEntity> Get()
