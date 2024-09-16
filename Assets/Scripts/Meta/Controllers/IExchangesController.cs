@@ -9,7 +9,7 @@ namespace Meta.Controllers
     {
         Id Add(ExchangeConfig config);
         void Remove(Id item);
-        void Exchange(Id item);
+        void DoExchange(Id item);
         
         IEnumerable<ExchangeModel> GetExchanges();  
     }
@@ -69,7 +69,7 @@ namespace Meta.Controllers
         //PurchaseItem(Id)->CheckRequirements;/??
         //PurchaseItem(Id)->SpendChanges/AddChanges;
         
-        public void Exchange(Id item)
+        public void DoExchange(Id item)
         {
             throw new System.NotImplementedException();
         }
