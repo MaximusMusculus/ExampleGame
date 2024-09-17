@@ -15,44 +15,6 @@ namespace Meta.Controllers
         
         IEnumerable<ExchangeController> GetExchanges();  
     }
-
-    public interface ICheckUnitVisitor
-    {
-        bool Visit(CheckUnitLimit collection);
-    }
-
-    public class CheckUnitVisitor : ICheckUnitVisitor
-    {
-        private IUnitsController _unitsController;
-        public bool Visit(CheckUnitLimit collection)
-        {
-            //проверяем, что у нас юнитов не (больще, меньше, равно) чем в конфиге.
-            var targetUnit = _unitsController.GetUnits().FirstOrDefault(s => s.UnitType == collection.TypeUnit);
-            return targetUnit.Count < collection.Count;
-        }
-    }
-
-    public interface ICheckCollection
-    {
-        
-    }
-
-    public interface ICheckEntity
-    {
-        bool Visit(ICheckUnitVisitor unitVisitor);
-    }
-
-    public class CheckUnitLimit : ICheckEntity
-    {
-        public Id TypeUnit;
-        //condition?
-        public int Count; 
-        
-        public bool Visit(ICheckUnitVisitor unitVisitor)
-        {
-            return unitVisitor.Visit(this);
-        }
-    }
     
     
 
@@ -74,79 +36,150 @@ namespace Meta.Controllers
         //+task?<- формирует и запускает таск, который черех Х времени сделает У действие.
         //таск содержит только ту часть, в которой добавляется ресурс.
 
-        private IVisitor _spendVisitor; //SpendVisitor 
-        private IVisitor _addVisitor; //AddVisitor
+        private IChangeVisitor _spendChangeVisitor; //SpendVisitor 
+        private IChangeVisitor _addChangeVisitor; //AddVisitor
 
-        private CheckCanSpend _checkCanSpend;
+        private ChangesCheckCanSpendController _changesCheckCanSpendController;
 
         public bool Check()
         {
             //Константные 
-            using (_checkCanSpend)
+            using (_changesCheckCanSpendController)
             {
-                _checkCanSpend.Visit(Config.Spend);
-                return _checkCanSpend.Result;
+                _changesCheckCanSpendController.Visit(Config.Spend);
+                return _changesCheckCanSpendController.Result;
             }
         }
 
         public void DoExchange()
         {
             //способ выполнить набор действий не создаваю мелких сущностей и не прибегая к кастингу.
-            _spendVisitor.Visit(Config.Spend);
+            _spendChangeVisitor.Visit(Config.Spend);
             //если это таска - то создаем таску с передаче ей конфига.
             //таска сделает, то, что мы попросили через Х времени.
-            _addVisitor.Visit(Config.Add);
+            _addChangeVisitor.Visit(Config.Add);
         }
-        
-        
-        public class CheckCanSpend : IVisitor, IDisposable
-        {
-            private IInventoryController _inventoryController;
-            private IUnitsController _unitsController;
+    }
+    
+    
+    
+    //-- 
+    
+    public class ChangesCheckCanSpendController : IChangeVisitor, IDisposable
+    {
+        private IInventoryController _inventoryController;
+        private IUnitsController _unitsController;
             
-            public bool Result { get; private set; }
-            private void Reset()
+        public bool Result { get; private set; }
+        private void Reset()
+        {
+            Result = false;
+        }
+            
+        public void Dispose()
+        {
+            Reset();
+        }
+            
+        public void Visit(ChangeItemConfig changeItemConfig)
+        {
+            Result = _inventoryController.GetCount(changeItemConfig.TypeItem) >= changeItemConfig.Count;
+        }
+            
+        public void Visit(ChangeUnitConfig changeItem)
+        {
+            var unit = _unitsController.GetUnits().FirstOrDefault(s=>s.UnitType == changeItem.TypeUnit);
+            if (unit == null)
             {
                 Result = false;
+                return;
             }
-            
-            public void Dispose()
-            {
-                Reset();
-            }
-            
-            public void Visit(EntityItem entityItem)
-            {
-                Result = _inventoryController.GetCount(entityItem.TypeItem) >= entityItem.Count;
-            }
-            
-            public void Visit(EntityUnit entityItem)
-            {
-                var unit = _unitsController.GetUnits().FirstOrDefault(s=>s.UnitType == entityItem.TypeUnit);
-                if (unit == null)
-                {
-                    Result = false;
-                    return;
-                }
-                Result = unit.Count >= entityItem.Count;
-            }
-
-            public void Visit(IChangesCollection collection)
-            {
-                Result = true; 
-                foreach (var entity in collection.Get())
-                {
-                    entity.Visit(this);
-                    if (!Result)
-                    {
-                        break; // Выходим из цикла, если Result стал false
-                    }
-                }
-            }
-            
+            Result = unit.Count >= changeItem.Count;
         }
 
+        public void Visit(IEnumerable<IChangeEntityConfig> collection)
+        {
+            Result = true; 
+            foreach (var entity in collection)
+            {
+                entity.Visit(this);
+                if (!Result)
+                {
+                    break; // Выходим из цикла, если Result стал false
+                }
+            }
+        }
+            
     }
+    
+    /// <summary>
+    /// Сущность, содержит логику взаимодействия. Конкретно эта - то, как списать предметы
+    /// </summary>
+    public class ChangesSpendController : IChangeVisitor
+    {
+        private readonly IInventoryController _inventoryController;
+        private readonly IUnitsController _unitsController;
+
+        public ChangesSpendController(IInventoryController inventoryController, IUnitsController unitsController)
+        {
+            _inventoryController = inventoryController;
+            _unitsController = unitsController;
+        }
+
+        public void Visit(ChangeItemConfig changeItemConfig)
+        {
+            _inventoryController.Spend(changeItemConfig.TypeItem, changeItemConfig.Count);
+        }
+        
+        public void Visit(ChangeUnitConfig changeItem)
+        {
+            //так же можно найти юнитов с учетом прогрессии.
+            var unit =_unitsController.GetUnits().FirstOrDefault(s => s.UnitType == changeItem.TypeUnit);
+            _unitsController.Spend(unit, changeItem.Count);
+        }
+        
+        public void Visit(IEnumerable<IChangeEntityConfig> collection)
+        {
+            foreach (var entity in collection)
+            {
+                entity.Visit(this);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Сущность, содержит логику взаимодействия. Конкретно эта - как добавить предметы
+    /// </summary>
+    public class ChangesAddController : IChangeVisitor
+    {
+        private readonly IInventoryController _inventoryController;
+        private readonly IUnitsController _unitsController;
+
+        public ChangesAddController(IInventoryController inventoryController, IUnitsController unitsController)
+        {
+            _inventoryController = inventoryController;
+            _unitsController = unitsController;
+        }
+
+        public void Visit(ChangeItemConfig changeItemConfig)
+        {
+            _inventoryController.Add(changeItemConfig.TypeItem, changeItemConfig.Count);
+        }
+        public void Visit(ChangeUnitConfig changeItem)
+        {
+            _unitsController.Add(changeItem.TypeUnit, changeItem.Progression, changeItem.Count);
+        }
+
+        public void Visit(IEnumerable<IChangeEntityConfig> collection)
+        {
+            foreach (var entity in collection)
+            {
+                entity.Visit(this);
+            }
+        }
+    }
+
+    
     
     
     
