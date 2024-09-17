@@ -2,7 +2,7 @@
 using AppRen;
 using Meta.Controllers;
 
-namespace Meta.Configs
+namespace Meta.Configs.Check
 {
     public enum TypeCheck
     {
@@ -22,7 +22,7 @@ namespace Meta.Configs
     
     public class CheckItemArgs : IArgs
     {
-        public TypeCheck TypeCheck { get; }
+        public TypeCheck TypeCheck { get; set; }
         public Id TypeItem;
         public int CompareType;
         public int Value;
@@ -34,7 +34,7 @@ namespace Meta.Configs
         //getText?
         //getToast?
     }
-    public abstract class CheckAbstract<TArgs> : IChecker where TArgs : IArgs
+    public abstract class CheckAbstract<TArgs> : IChecker where TArgs : IArgs, new()
     {
         public bool Check(IArgs args)
         {
@@ -42,6 +42,12 @@ namespace Meta.Configs
             return Check((TArgs) args); 
         }
         protected abstract bool Check(TArgs args);
+        
+        //если потребуется
+        public static TArgs CreateEmptyArgs()
+        {
+            return new TArgs();
+        }
     }
 
     public class CheckInventoryItemCount: CheckAbstract<CheckItemArgs>
@@ -76,13 +82,9 @@ namespace Meta.Configs
         }
     }
     
-    
-    
-    
-    
     //может быть центральным, где все регают в него нужные чекеры
     //может быть разбит по кусочкам и реализовать интерфейс IChecker, где внутри пробегается по мелким чекерам, спрашивая, могут ли они обработать аргсу
-    public class CheckProcessor
+    public class CheckProcessor : IChecker
     {
         private readonly Dictionary<TypeCheck, IChecker> _checkers = new Dictionary<TypeCheck, IChecker>();
 
@@ -104,6 +106,16 @@ namespace Meta.Configs
                 return checker.Check(args);
             }
             throw new System.ArgumentException($"Checker not found for {args.TypeCheck}");
+        }
+    }
+
+
+    public class CheckUse
+    {
+        private IChecker _checkProcessor;
+        public void Test()
+        {
+            _checkProcessor.Check(new CheckItemArgs {TypeCheck = TypeCheck.InventoryItemsCount, TypeItem = 1, Value = 50});
         }
     }
 
