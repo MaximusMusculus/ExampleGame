@@ -57,8 +57,7 @@ namespace Meta.Configs
     }
     
    
-
-        
+       
     /// <summary>
     /// Тут, логика будет содержаться в SpendVisitor, AddVisitor
     /// конфиг содержит только данные. А логика добавления/изымания отдельно.
@@ -75,6 +74,7 @@ namespace Meta.Configs
         /// Need (Item, Level, Tech, ...)
         /// </summary>
         public List<ICheckEntityConfig> Requirements;
+        
         public List<IChangeEntityConfig> Spend;
         public List<IChangeEntityConfig> Add;
         

@@ -15,8 +15,7 @@ namespace Meta.Controllers
         
         IEnumerable<ExchangeController> GetExchanges();  
     }
-    
-    
+
 
     /// <summary>
     /// Описание того, как работают покупки.
@@ -67,10 +66,16 @@ namespace Meta.Controllers
     
     public class ChangesCheckCanSpendController : IChangeVisitor, IDisposable
     {
-        private IInventoryController _inventoryController;
-        private IUnitsController _unitsController;
-            
+        private readonly IInventoryController _inventoryController;
+        private readonly IUnitsController _unitsController;
         public bool Result { get; private set; }
+
+        public ChangesCheckCanSpendController(IInventoryController inventoryController, IUnitsController unitsController)
+        {
+            _inventoryController = inventoryController;
+            _unitsController = unitsController;
+        }
+
         private void Reset()
         {
             Result = false;
