@@ -6,7 +6,7 @@ using Meta.Configs;
 using Meta.Models;
 using UnityEngine.Assertions;
 
-namespace Meta.Controllers
+namespace Meta.Controllers.Imp
 {
     public class UnitModel : IUnitModel
     {

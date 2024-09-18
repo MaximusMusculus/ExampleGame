@@ -3,6 +3,7 @@ using System.Linq;
 using AppRen;
 using Meta.Configs;
 using Meta.Controllers;
+using Meta.Controllers.Imp;
 using Meta.Models;
 using NUnit.Framework;
 
