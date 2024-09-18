@@ -7,7 +7,9 @@ namespace Meta.Models
         public int ConfigVersion;
         public List<ItemDto> Items = new List<ItemDto>();
         public List<UnitDto> Units = new List<UnitDto>();
+        public List<ExchangeItemDto> PurchaseItems = new List<ExchangeItemDto>();
         
+
         //public List<PerkDto> Perks;
         //public List<TaskDto> Tasks;
         //public List<BuildingDto> Buildings;

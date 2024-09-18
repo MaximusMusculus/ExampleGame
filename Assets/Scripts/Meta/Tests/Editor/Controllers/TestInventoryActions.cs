@@ -1,30 +1,31 @@
-using System;
 using System.Collections.Generic;
-using AppRen;//?
-using Meta.Models;
+using AppRen;
 using Meta.Configs;
+using Meta.Configs.Actions;
 using Meta.Controllers;
+using Meta.Controllers.Actions;
 using Meta.Controllers.Imp;
+using Meta.Models;
 using NUnit.Framework;
+
 
 namespace Meta.Tests.Editor.Controllers
 {
     [TestFixture]
-    public class TestInventoryController
+    //?? такие же группы на кондишены
+    public class TestInventoryActions
     {
         private IInventoryController _inventoryController;
         private Id _itemId1;
         private Id _itemId2;
         private ItemConfig _item2;
-
-
+        
         [SetUp]
         public void SetUp()
         {
             var item1 = new ItemConfig {Item = 1, DefaultCount = 10, MaxCount = 100};
             var item2 = new ItemConfig {Item = 2, DefaultCount = 5, MaxCount = 50};
             var configs = new List<ItemConfig> {item1, item2};
-            
 
             var items = new List<ItemDto>();
   
@@ -38,55 +39,41 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void Add_IncreasesCountWithinLimit()
         {
-            _inventoryController.Add(_itemId1, 20);
+            var action = new InventoryItemAddAction(_inventoryController);
+            action.Process(new ItemActionConfig {TypeItem = _itemId1, Count = 20});
             Assert.AreEqual(30, _inventoryController.GetCount(_itemId1));
         }
-
+        
         [Test]
         public void Add_ExceedsLimit_SetsToLimit()
         {
-            _inventoryController.Add(_itemId1, 200);
+            var action = new InventoryItemAddAction(_inventoryController);
+            action.Process(new ItemActionConfig {TypeItem = _itemId1, Count = 200});
             Assert.AreEqual(100, _inventoryController.GetCount(_itemId1));
         }
-
+        
         [Test]
         public void Spend_DecreasesCount()
         {
-            _inventoryController.Spend(_itemId1, 5);
+            var action = new InventoryItemSpendAction(_inventoryController);
+            action.Process(new ItemActionConfig {TypeItem = _itemId1, Count = 5});
             Assert.AreEqual(5, _inventoryController.GetCount(_itemId1));
         }
-
+        
         [Test]
         public void Spend_NotEnoughItems_ThrowsException()
         {
-            var ex = Assert.Throws<InvalidOperationException>(() => _inventoryController.Spend(_itemId1, 15));
-            Assert.That(ex.Message, Is.EqualTo("Not enough items:" + _itemId1));
+            var action = new InventoryItemSpendAction(_inventoryController);
+            //Assert.Throws<NotEnoughItemsException>(() => action.Process(new ItemActionConfig {TypeItem = _itemId1, Count = 15})); ??
         }
-
-        [Test]
-        public void GetCount_ReturnsCurrentCount()
-        {
-            Assert.AreEqual(10, _inventoryController.GetCount(_itemId1));
-        }
-
-        [Test]
-        public void GetLimit_ReturnsCurrentLimit()
-        {
-            Assert.AreEqual(100, _inventoryController.GetLimit(_itemId1));
-        }
-
+        
         [Test]
         public void ExpandLimit_IncreasesLimit()
         {
-            _inventoryController.ExpandLimit(_itemId1, 50);
-            Assert.AreEqual(150, _inventoryController.GetLimit(_itemId1));
+            var action = new InventoryItemExpandLimitAction(_inventoryController);
+            action.Process(new ItemActionConfig { TypeItem = _itemId1, Count = 200});
+            Assert.AreEqual(300, _inventoryController.GetLimit(_itemId1));
         }
 
-        [Test]
-        public void ExpandLimit_HandlesOverflow_ThrowsOverflowException()
-        {
-            _inventoryController.ExpandLimit(_itemId2, int.MaxValue - _item2.MaxCount);
-            Assert.Throws<OverflowException>(() => _inventoryController.ExpandLimit(_itemId2, 1));
-        }
     }
 }

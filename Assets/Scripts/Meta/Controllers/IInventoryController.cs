@@ -18,8 +18,7 @@ namespace Meta.Controllers
         void Add(Id item, int count);
         void Spend(Id item, int count);
         void ExpandLimit(Id item, int count);
-        
-        //Get - Read
+
         int GetCount(Id item);
         int GetLimit(Id item);
         IEnumerable<Id> GetItems();
@@ -31,9 +30,14 @@ namespace Meta.Controllers
     }
     
 
+}
+
+namespace Meta.Controllers.Imp
+{
     public class InventoryController : IInventoryController
     {
         private readonly Dictionary<Id, ItemDto> _itemsHash;
+
         public InventoryController(List<ItemConfig> configs, List<ItemDto> items)
         {
             _itemsHash = new Dictionary<Id, ItemDto>(configs.Count);
@@ -49,6 +53,7 @@ namespace Meta.Controllers
                 {
                     continue;
                 }
+
                 var item = new ItemDto(itemConfig.Item)
                 {
                     Count = itemConfig.DefaultCount,
@@ -72,6 +77,7 @@ namespace Meta.Controllers
             {
                 throw new InvalidOperationException("Not enough items:" + item);
             }
+
             elem.Count -= count;
         }
 
