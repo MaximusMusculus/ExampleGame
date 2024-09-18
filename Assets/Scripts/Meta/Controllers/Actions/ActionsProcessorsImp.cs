@@ -79,9 +79,12 @@ namespace Meta.Controllers.Actions
     }
     
     
+    
     /// <summary>
     /// Большой плюс - не надо создавать кучу мелких классов. Нужен только конфиг.
-    /// Из минусов, если у процессора изменится тип IActionArgs, то узнаю я это на этапе выполнения.
+    /// Из минусов, если у процессора изменится тип IActionArgs, то узнаю я это на этапе выполнения (проверку - ожидания/реальность или тесты всех экшенов)
+    /// Пока сущонстей немного, можно передавать через конструктор.
+    /// Как станет оч много - разбить на специализированные процессоры - введя цепочку обработки с выбросом эксепшена в конце цепочки, если не был экшен обработан
     /// </summary>
     public class ActionProcessor : IActionProcessor
     {
@@ -89,6 +92,8 @@ namespace Meta.Controllers.Actions
 
         public ActionProcessor(IInventoryController inventoryController, IUnitsController unitController)
         {
+            _actions.Add(TypeAction.Collection, this);
+            
             _actions.Add(TypeAction.InventoryItemAdd, new InventoryItemAddAction(inventoryController));
             _actions.Add(TypeAction.InventoryItemSpend, new InventoryItemSpendAction(inventoryController));
             _actions.Add(TypeAction.InventoryItemExpandLimit, new InventoryItemExpandLimitAction(inventoryController));
@@ -105,31 +110,4 @@ namespace Meta.Controllers.Actions
             _actions[config.TypeAction].Process(config);
         }
     }
-    
-    public class TestAction
-    {
-        private IActionProcessor _actionProcessor;
-        public void Test()
-        {
-
-            var itemAction = new ItemActionConfig
-            {
-                Action = TypeAction.InventoryItemAdd,
-                TypeItem = new Id(1),
-                Count = 10
-            };
-            _actionProcessor.Process(itemAction);
-            
-            var unitAction = new UnitActionConfig
-            {
-                Action = TypeAction.UnitAdd,
-                TypeUnit = new Id(1),
-                Progression = new UnitProgressionDto(),
-                Count = 10
-            };
-            
-            _actionProcessor.Process(unitAction);
-        }
-    }
-
 }

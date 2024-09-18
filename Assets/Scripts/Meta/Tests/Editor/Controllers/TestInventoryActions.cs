@@ -12,6 +12,7 @@ using NUnit.Framework;
 namespace Meta.Tests.Editor.Controllers
 {
     [TestFixture]
+    //?? такие же группы на кондишены
     public class TestInventoryActions
     {
         private IInventoryController _inventoryController;
@@ -74,12 +75,5 @@ namespace Meta.Tests.Editor.Controllers
             Assert.AreEqual(300, _inventoryController.GetLimit(_itemId1));
         }
 
-        
-        
-        
-        
-        
-        
-   
     }
 }
