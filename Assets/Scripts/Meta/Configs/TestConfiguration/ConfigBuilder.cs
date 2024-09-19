@@ -1,5 +1,7 @@
-﻿using AppRen;
+﻿using System;
+using AppRen;
 using Meta.Configs.Actions;
+using Meta.Configs.Conditions;
 using Meta.Models;
 
 namespace Meta.Configs.TestConfiguration
@@ -131,5 +133,46 @@ namespace Meta.Configs.TestConfiguration
             _config = null;
             return result;
         }
+    }
+
+
+    public class ConditionsConfigBuilder
+    {
+        private ConditionCollectionConfig _config;
+        
+        public enum TypeCollection
+        {
+            And,
+            Or,
+        }
+        public ConditionsConfigBuilder NewCollection(TypeCollection type)
+        {
+            switch (type)
+            {
+                case TypeCollection.And:
+                    _config = new ConditionCollectionConfig {TypeCollection = TypeCondition.AndCollection};
+                    break;
+                case TypeCollection.Or:
+                    _config = new ConditionCollectionConfig {TypeCollection = TypeCondition.OrCollection};
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+            return this;
+        }
+        
+        public ConditionsConfigBuilder AddItemCondition(Id itemId, int compareType, int value)
+        {
+            _config.Conditions.Add(new ItemConditionConfig {TypeItem = itemId, CompareType = compareType, Value = value});
+            return this;
+        }
+        
+        public ConditionCollectionConfig Build()
+        {
+            var result = _config;
+            _config = null;
+            return result;
+        }
+
     }
 }

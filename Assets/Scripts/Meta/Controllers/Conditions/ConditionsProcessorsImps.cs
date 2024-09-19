@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using Meta.Configs;
+﻿using System.Linq;
 using Meta.Configs.Conditions;
 
 namespace Meta.Controllers.Conditions
 {
-    public class ConditionInventoryItemCount : ConditionAbstract<ItemConditionConfig>
+    public class ConditionProcessorInventoryItemCount : ConditionProcessorAbstract<ItemConditionConfig>
     {
         private readonly IInventoryController _inventoryController;
 
-        public ConditionInventoryItemCount(IInventoryController inventoryController)
+        public ConditionProcessorInventoryItemCount(IInventoryController inventoryController)
         {
             _inventoryController = inventoryController;
         }
@@ -20,12 +19,11 @@ namespace Meta.Controllers.Conditions
             return count > conditionConfig.Value;
         }
     }
-
-    public class ConditionInventoryLimit : ConditionAbstract<ItemConditionConfig>
+    public class ConditionProcessorInventoryLimit : ConditionProcessorAbstract<ItemConditionConfig>
     {
         private readonly IInventoryController _inventoryController;
 
-        public ConditionInventoryLimit(IInventoryController inventoryController)
+        public ConditionProcessorInventoryLimit(IInventoryController inventoryController)
         {
             _inventoryController = inventoryController;
         }
@@ -36,44 +34,34 @@ namespace Meta.Controllers.Conditions
             return limit > conditionConfig.Value;
         }
     }
-
-    //может быть центральным, где все регают в него нужные чекеры
-    //может быть разбит по кусочкам и реализовать интерфейс IChecker, где внутри пробегается по мелким чекерам, спрашивая, могут ли они обработать аргсу
-    public class CheckProcessor : ICondition
+    
+    public class ConditionProcessorOrCollection : ConditionProcessorAbstract<ConditionCollectionConfig>
     {
-        private readonly Dictionary<TypeCondition, ICondition> _checkers = new Dictionary<TypeCondition, ICondition>();
+        private readonly IConditionProcessor _conditionProcessor;
 
-        public CheckProcessor(IInventoryController inventoryController)
+        public ConditionProcessorOrCollection(IConditionProcessor conditionProcessor)
         {
-            _checkers.Add(TypeCondition.InventoryItemsCount, new ConditionInventoryItemCount(inventoryController));
-            _checkers.Add(TypeCondition.InventoryItemsLimit, new ConditionInventoryLimit(inventoryController));
+            _conditionProcessor = conditionProcessor;
         }
 
-        public void AddChecker(TypeCondition typeCondition, ICondition condition)
+        protected override bool Check(ConditionCollectionConfig config)
         {
-            _checkers.Add(typeCondition, condition);
-        }
-
-        public bool Check(IConditionConfig conditionConfig)
-        {
-            if (_checkers.TryGetValue(conditionConfig.TypeCondition, out var checker))
-            {
-                return checker.Check(conditionConfig);
-            }
-
-            throw new System.ArgumentException($"Checker not found for {conditionConfig.TypeCondition}");
+            return config.Any(orCondition => _conditionProcessor.Check(orCondition));
         }
     }
-
-
-    public class CheckUse
+    public class ConditionProcessorAndCollection : ConditionProcessorAbstract<ConditionCollectionConfig>
     {
-        private ICondition _checkProcessor;
+        private readonly IConditionProcessor _conditionProcessor;
 
-        public void Test()
+        public ConditionProcessorAndCollection(IConditionProcessor conditionProcessor)
         {
-            _checkProcessor.Check(new ItemConditionConfig {TypeCondition = TypeCondition.InventoryItemsCount, TypeItem = 1, Value = 50});
+            _conditionProcessor = conditionProcessor;
+        }
+
+        protected override bool Check(ConditionCollectionConfig config)
+        {
+            return config.All(andCondition => _conditionProcessor.Check(andCondition));
         }
     }
-
+    
 }
