@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
@@ -135,29 +136,27 @@ namespace Meta.TestConfiguration
             return result;
         }
     }
-    
+
+
+    public enum TypeCollection
+    {
+        And,
+        Or,
+    }
+
     public class ConditionsConfigBuilder
     {
         private ConditionCollectionConfig _config;
-        
-        public enum TypeCollection
+        private readonly Dictionary<TypeCollection, TypeCondition> _map = new Dictionary<TypeCollection, TypeCondition>
         {
-            And,
-            Or,
-        }
+            {TypeCollection.And, TypeCondition.AndCollection},
+            {TypeCollection.Or, TypeCondition.OrCollection},
+        };
+
+
         public ConditionsConfigBuilder NewCollection(TypeCollection type)
         {
-            switch (type)
-            {
-                case TypeCollection.And:
-                    _config = new ConditionCollectionConfig {TypeCollection = TypeCondition.AndCollection};
-                    break;
-                case TypeCollection.Or:
-                    _config = new ConditionCollectionConfig {TypeCollection = TypeCondition.OrCollection};
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
+            _config = new ConditionCollectionConfig {TypeCollection = _map[type]};
             return this;
         }
 

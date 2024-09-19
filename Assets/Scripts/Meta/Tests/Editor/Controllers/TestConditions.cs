@@ -37,7 +37,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestConditions_InventoryDefault()
         {
-            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
+            var condition = _conditionsBuilder.NewCollection(TypeCollection.And)
                 .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Equal, 100)
                 .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
                 .Build();
@@ -50,9 +50,9 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestConditions_InventoryItemsLimit()
         {
-            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
-                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Less, 101)
-                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Less, 101)
+            var condition = _conditionsBuilder.NewCollection(TypeCollection.And)
+                .ItemLimitCondition(MapTestId.Scrup.Id(), TypeCompare.Less, 101)
+                .ItemLimitCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
                 .Build();
 
             var result = _conditionProcessor.Check(condition);
@@ -62,9 +62,9 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestConditions_InventoryItemsLimitFalse()
         {
-            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
-                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Less, 101)
-                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Less, 90)
+            var condition = _conditionsBuilder.NewCollection(TypeCollection.And)
+                .ItemLimitCondition(MapTestId.Scrup.Id(), TypeCompare.Less, 150)
+                .ItemLimitCondition(MapTestId.Recruts.Id(), TypeCompare.Less, 90)
                 .Build();
 
             var result = _conditionProcessor.Check(condition);
@@ -75,7 +75,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestAndConditions_InventoryNotEqual()
         {
-            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
+            var condition = _conditionsBuilder.NewCollection(TypeCollection.And)
                 .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.NotEqual, 100)
                 .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
                 .Build();
@@ -88,7 +88,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestOrConditions_InventoryNotEqual()
         {
-            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.Or)
+            var condition = _conditionsBuilder.NewCollection(TypeCollection.Or)
                 .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.NotEqual, 100)
                 .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
                 .Build();
