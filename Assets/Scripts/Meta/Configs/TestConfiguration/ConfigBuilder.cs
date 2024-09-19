@@ -134,8 +134,7 @@ namespace Meta.Configs.TestConfiguration
             return result;
         }
     }
-
-
+    
     public class ConditionsConfigBuilder
     {
         private ConditionCollectionConfig _config;
@@ -160,19 +159,41 @@ namespace Meta.Configs.TestConfiguration
             }
             return this;
         }
-        
-        public ConditionsConfigBuilder AddItemCondition(Id itemId, int compareType, int value)
+
+        public ConditionsConfigBuilder ItemCountCondition(Id itemId, TypeCompare compareType, int value)
         {
-            _config.Conditions.Add(new ItemConditionConfig {TypeItem = itemId, CompareType = compareType, Value = value});
+            _config.Conditions.Add(new ItemConditionConfig
+            {
+                TypeCondition = TypeCondition.InventoryItemsCount,
+                TypeItem = itemId, 
+                CompareType = compareType,
+                Value = value
+            });
             return this;
         }
         
+        public ConditionsConfigBuilder ItemLimitCondition(Id itemId, TypeCompare compareType, int value)
+        {
+            _config.Conditions.Add(new ItemConditionConfig
+            {
+                TypeCondition = TypeCondition.InventoryItemsLimit,
+                TypeItem = itemId, 
+                CompareType = compareType,
+                Value = value
+            });
+            return this;
+        }
+        
+        public ConditionsConfigBuilder AddCollection(ConditionCollectionConfig config)
+        {
+            _config.Conditions.Add(config);
+            return this;
+        }
         public ConditionCollectionConfig Build()
         {
             var result = _config;
             _config = null;
             return result;
         }
-
     }
 }

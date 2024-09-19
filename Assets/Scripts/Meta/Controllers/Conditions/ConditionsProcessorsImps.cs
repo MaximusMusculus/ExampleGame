@@ -15,8 +15,7 @@ namespace Meta.Controllers.Conditions
         protected override bool Check(ItemConditionConfig conditionConfig)
         {
             var count = _inventoryController.GetCount(conditionConfig.TypeItem);
-            //+compare
-            return count > conditionConfig.Value;
+            return count.CheckCompareIsTrue(conditionConfig.CompareType, conditionConfig.Value);
         }
     }
     public class ConditionProcessorInventoryLimit : ConditionProcessorAbstract<ItemConditionConfig>
@@ -31,7 +30,7 @@ namespace Meta.Controllers.Conditions
         protected override bool Check(ItemConditionConfig conditionConfig)
         {
             var limit = _inventoryController.GetLimit(conditionConfig.TypeItem);
-            return limit > conditionConfig.Value;
+            return limit.CheckCompareIsTrue(conditionConfig.CompareType, conditionConfig.Value);
         }
     }
     

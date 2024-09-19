@@ -1,8 +1,7 @@
-﻿using System.Linq;
-using Meta.Configs;
+﻿using Meta.Configs;
+using Meta.Configs.Conditions;
 using Meta.Configs.TestConfiguration;
 using Meta.Controllers;
-using Meta.Controllers.Actions;
 using Meta.Controllers.Conditions;
 using Meta.Controllers.Imp;
 using Meta.Models;
@@ -14,14 +13,14 @@ namespace Meta.Tests.Editor.Controllers
     public class TestConditions
     {
         private readonly MetaConfigBuilder _metaBuilder = new MetaConfigBuilder();
-        private readonly ActionConfigBuilder _actionConfigBuilder = new ActionConfigBuilder(); //condition
+        private readonly ConditionsConfigBuilder _conditionsBuilder = new ConditionsConfigBuilder();
 
         private MetaConfig _metaConfig;
         private MetaDto _metaDto;
 
         private IInventoryController _inventoryController;
         private IConditionProcessor _conditionProcessor;
-
+        
         [SetUp]
         public void SetUp()
         {
@@ -34,21 +33,71 @@ namespace Meta.Tests.Editor.Controllers
             _inventoryController = new InventoryController(_metaConfig.InventoryItems, _metaDto.Items);
             _conditionProcessor = new ConditionProcessor(_inventoryController);
         }
+        
+        [Test]
+        public void TestConditions_InventoryDefault()
+        {
+            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
+                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Equal, 100)
+                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
+                .Build();
+
+            var result = _conditionProcessor.Check(condition);
+            
+            Assert.IsTrue(result);
+        }
 
         [Test]
-        public void TestUnitPurchase_InventorySpendAndUnitAdd()
+        public void TestConditions_InventoryItemsLimit()
         {
-            /*var purchaseUnitAction = _actionConfigBuilder.NewAction()
-                    .InventoryItemSpend(MapTestId.Recruts.Id(), 10)
-                    .InventoryItemSpend(MapTestId.Scrup.Id(), 20)
-                    .UnitAdd(_units.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build(), 1).Build();
-            
-            _actionProcessor.Process(purchaseUnitAction);
-            
-            Assert.AreEqual(90, _inventoryController.GetCount(MapTestId.Recruts.Id()));
-            Assert.AreEqual(80, _inventoryController.GetCount(MapTestId.Scrup.Id()));
-            Assert.AreEqual(1, _metaDto.Units.FirstOrDefault(s=>s.UnitType ==MapTestId.Unit_1.Id())!.Count);*/
+            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
+                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Less, 101)
+                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Less, 101)
+                .Build();
+
+            var result = _conditionProcessor.Check(condition);
+            Assert.IsTrue(result);
         }
+        
+        [Test]
+        public void TestConditions_InventoryItemsLimitFalse()
+        {
+            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
+                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Less, 101)
+                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Less, 90)
+                .Build();
+
+            var result = _conditionProcessor.Check(condition);
+            Assert.IsFalse(result);
+        }
+        
+        
+        [Test]
+        public void TestAndConditions_InventoryNotEqual()
+        {
+            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.And)
+                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.NotEqual, 100)
+                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
+                .Build();
+
+            var result = _conditionProcessor.Check(condition);
+            
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void TestOrConditions_InventoryNotEqual()
+        {
+            var condition = _conditionsBuilder.NewCollection(ConditionsConfigBuilder.TypeCollection.Or)
+                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.NotEqual, 100)
+                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
+                .Build();
+
+            var result = _conditionProcessor.Check(condition);
+            
+            Assert.IsTrue(result);
+        }
+    
 
 
     }

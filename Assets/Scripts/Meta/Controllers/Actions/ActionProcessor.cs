@@ -31,11 +31,11 @@ namespace Meta.Controllers.Actions
 
         public void Process(IActionConfig config)
         {
-            if (_actions.TryGetValue(config.TypeAction, out var action))
+            if (_actions.TryGetValue(config.TypeAction, out var action) == false)
             {
-                action.Process(config);
+                throw new ArgumentException($"Action {config.TypeAction} not found");
             }
-            throw new ArgumentException($"Action {config.TypeAction} not found");
+            action.Process(config);
         }
     }
 }
