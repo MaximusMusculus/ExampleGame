@@ -1,10 +1,10 @@
 ﻿using System.Linq;
 using Meta.Configs;
-using Meta.Configs.TestConfiguration;
 using Meta.Controllers;
 using Meta.Controllers.Actions;
 using Meta.Controllers.Imp;
 using Meta.Models;
+using Meta.TestConfiguration;
 using NUnit.Framework;
 
 namespace Meta.Tests.Editor.Controllers

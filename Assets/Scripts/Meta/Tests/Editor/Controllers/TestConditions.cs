@@ -1,10 +1,10 @@
 ﻿using Meta.Configs;
 using Meta.Configs.Conditions;
-using Meta.Configs.TestConfiguration;
 using Meta.Controllers;
 using Meta.Controllers.Conditions;
 using Meta.Controllers.Imp;
 using Meta.Models;
+using Meta.TestConfiguration;
 using NUnit.Framework;
 
 namespace Meta.Tests.Editor.Controllers

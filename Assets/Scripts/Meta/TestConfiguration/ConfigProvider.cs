@@ -1,9 +1,14 @@
 using AppRen;
-using Meta.Configs.Actions;
-using Meta.Models;
+using Meta.Configs;
 
-namespace Meta.Configs.TestConfiguration
+namespace Meta.TestConfiguration
 {
+    public interface IMetaConfigProvider
+    {
+        MetaConfig GetConfig();
+    }
+
+    //--
     public enum MapTestId : ushort
     {
         Hard = 11,
@@ -14,6 +19,7 @@ namespace Meta.Configs.TestConfiguration
         Unit_2 = 23,
         Unit_3 = 24,
     }
+    
     public static class MapEntityIdExtensions
     {
         public static Id Id(this MapTestId map)
@@ -22,12 +28,6 @@ namespace Meta.Configs.TestConfiguration
         }
     }
     
-    
-    //--
-    public interface IMetaConfigProvider
-    {
-        MetaConfig GetConfig();
-    }
     public class MetaConfigForTestGameplay : IMetaConfigProvider
     {
         private readonly MetaConfigBuilder _metaBuilder = new MetaConfigBuilder();

@@ -1,10 +1,11 @@
 ﻿using System;
 using AppRen;
+using Meta.Configs;
 using Meta.Configs.Actions;
 using Meta.Configs.Conditions;
 using Meta.Models;
 
-namespace Meta.Configs.TestConfiguration
+namespace Meta.TestConfiguration
 {
     public class MetaConfigBuilder
     {
