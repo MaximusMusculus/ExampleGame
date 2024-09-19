@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using AppRen;       //убрать в утилс?
-using Meta.Models;  //объединить с Configs и переназвать?
 using Meta.Configs;
 using Meta.Configs.Actions;
 
@@ -92,7 +90,7 @@ namespace Meta.Controllers.Actions
 
         public ActionProcessor(IInventoryController inventoryController, IUnitsController unitController)
         {
-            _actions.Add(TypeAction.Collection, this);
+            _actions.Add(TypeAction.Collection, new ActionCollectionProcessor(this));
             
             _actions.Add(TypeAction.InventoryItemAdd, new InventoryItemAddAction(inventoryController));
             _actions.Add(TypeAction.InventoryItemSpend, new InventoryItemSpendAction(inventoryController));
@@ -108,6 +106,24 @@ namespace Meta.Controllers.Actions
         public void Process(IActionConfig config)
         {
             _actions[config.TypeAction].Process(config);
+        }
+    }
+
+    public class ActionCollectionProcessor : ActionAbstract<ActionCollectionConfig>
+    {
+        private readonly IActionProcessor _actionProcessor;
+
+        public ActionCollectionProcessor(IActionProcessor actionProcessor)
+        {
+            _actionProcessor = actionProcessor;
+        }
+
+        protected override void Process(ActionCollectionConfig args)
+        {
+            foreach (var anyAction in args)
+            {
+                _actionProcessor.Process(anyAction);
+            }
         }
     }
 }

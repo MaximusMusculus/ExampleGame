@@ -15,7 +15,6 @@ namespace Meta.Configs.Actions
         public Id TypeItem;
         public int Count;
     }
-
     public class UnitActionConfig : IActionConfig
     {
         public TypeAction TypeAction => Action;
@@ -25,15 +24,16 @@ namespace Meta.Configs.Actions
         public UnitProgressionDto Progression;
         public int Count;
     }
-
-
+    
+    
+    
     /// <summary>
     /// Пример читаемого конфига удобного для сериализации.
     /// </summary>
     public class ActionCollectionConfig : IActionConfig, IEnumerable<IActionConfig>
     {
         public TypeAction TypeAction => TypeAction.Collection;
-
+        
         //хранение коллекции в типизированном виде
         public List<UnitActionConfig> Untis = new List<UnitActionConfig>();
         public List<ItemActionConfig> Items = new List<ItemActionConfig>();
@@ -52,6 +52,11 @@ namespace Meta.Configs.Actions
             foreach (var itemAction in Items)
             {
                 yield return itemAction;
+            }
+
+            foreach (var abstractAction in Actions)
+            {
+                yield return abstractAction;
             }
         }
 
