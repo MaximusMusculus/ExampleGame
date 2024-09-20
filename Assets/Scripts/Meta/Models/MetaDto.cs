@@ -5,8 +5,9 @@ namespace Meta.Models
     public class MetaDto
     {
         public int ConfigVersion;
-        public List<ItemDto> Items = new List<ItemDto>();
-        public List<UnitDto> Units = new List<UnitDto>();
+        public List<ItemDto> Items = new List<ItemDto>(); //itemCollection
+        public List<UnitDto> Units = new List<UnitDto>(); //unitCollection
+        
         public List<ExchangeItemDto> PurchaseItems = new List<ExchangeItemDto>();
         
 

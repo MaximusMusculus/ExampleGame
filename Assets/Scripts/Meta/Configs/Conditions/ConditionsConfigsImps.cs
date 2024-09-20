@@ -15,7 +15,7 @@ namespace Meta.Configs.Conditions
         Equal,          //==
         NotEqual,       //!=
     }
-    public static class UtilExtended
+    public static class UtilCompareExtended
     {
         private static readonly float FloatingPointComparisonTolerance = 0.01f;
         
@@ -66,7 +66,6 @@ namespace Meta.Configs.Conditions
         }
     }
     
-    
     public class ItemConditionConfig : IConditionConfig
     {
         public TypeCondition TypeCondition { get; set; }
@@ -78,14 +77,25 @@ namespace Meta.Configs.Conditions
     public class ConditionCollectionConfig : IConditionConfig, IEnumerable<IConditionConfig>
     {
         public TypeCondition TypeCondition => TypeCollection;
-        public TypeCondition TypeCollection; //And.Or.Not?
-        public List<IConditionConfig> Conditions = new List<IConditionConfig>();
-        
+
+        public TypeCondition TypeCollection; //And.Or./Not
+        public List<ConditionCollectionConfig> Collection = new List<ConditionCollectionConfig>();
+        public List<ItemConditionConfig > CheckItems = new List<ItemConditionConfig>();
+        //checkUnits
+        //checkTechs
+        //checkCounters
+
         public IEnumerator<IConditionConfig> GetEnumerator()
         {
-            return Conditions.GetEnumerator();
+            foreach(var item in CheckItems)
+            {
+                yield return item;
+            }
+            foreach (var collection in Collection)
+            {
+                yield return collection;
+            }
         }
-        
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();

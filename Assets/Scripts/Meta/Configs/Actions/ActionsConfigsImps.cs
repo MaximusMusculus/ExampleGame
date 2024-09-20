@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using AppRen;
 using Meta.Models;
 
-
-
 namespace Meta.Configs.Actions
 {
     public class ItemActionConfig : IActionConfig
@@ -25,38 +23,24 @@ namespace Meta.Configs.Actions
         public int Count;
     }
     
-    
-    
-    /// <summary>
-    /// Пример читаемого конфига удобного для сериализации.
-    /// </summary>
     public class ActionCollectionConfig : IActionConfig, IEnumerable<IActionConfig>
     {
         public TypeAction TypeAction => TypeAction.Collection;
-        
-        //хранение коллекции в типизированном виде
+        //хранение набора коллекции в типизированном виде
+        //для удобной читаемости и сериализации/десериализации
         public List<UnitActionConfig> Untis = new List<UnitActionConfig>();
         public List<ItemActionConfig> Items = new List<ItemActionConfig>();
-
-        //хранение в виде абстракций
-        public List<IActionConfig> Actions = new List<IActionConfig>();
-
+        
         //получение и использование в абстракции.
         public IEnumerator<IActionConfig> GetEnumerator()
         {
-            foreach (var unitActionConfig in Untis)
-            {
-                yield return unitActionConfig;
-            }
-
             foreach (var itemAction in Items)
             {
                 yield return itemAction;
             }
-
-            foreach (var abstractAction in Actions)
+            foreach (var unitActionConfig in Untis)
             {
-                yield return abstractAction;
+                yield return unitActionConfig;
             }
         }
 
@@ -65,4 +49,6 @@ namespace Meta.Configs.Actions
             return GetEnumerator();
         }
     }
+    
+    
 }

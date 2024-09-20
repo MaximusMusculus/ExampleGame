@@ -1,18 +1,26 @@
+using Meta.Configs.Actions;
+
 namespace Meta.Configs
 {
-    public enum TypeAction
+    
+    // Игровое действие, имеет проверки, меняет стейт?
+    public class ActionConfig
     {
-        InventoryItemAdd,
-        InventoryItemSpend,
-        InventoryItemExpandLimit,
+        public IConditionConfig Require;
+        public IActionConfig Spend => _spend;
+        public IActionConfig Add => _add;
 
-        UnitAdd,
-        UnitSpend,
-        Collection,
+        
+        private ActionCollectionConfig _spend;
+        private ActionCollectionConfig _add;
     }
 
-    public interface IActionConfig
-    {
-        TypeAction TypeAction { get; }
-    }
+    //как можно представить игровые действия?
+    //как можно представить группу игровых действий?
+    //как их группировать?
+    //как с ними работать?
+    
+    
+    //Вызов экшена пока статичен. Когда он станет динамичным - когда появятся самостоятельные сущности по типу эвентов и баттл пассов
+    //тогда будет создан их контроллер и дто.
 }

@@ -101,31 +101,31 @@ namespace Meta.TestConfiguration
 
         public ActionConfigBuilder UnitAdd(UnitConfig unit, int count)
         {
-            _config.Actions.Add(new UnitActionConfig {Action = TypeAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(new UnitActionConfig {Action = TypeAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
         public ActionConfigBuilder UnitSpend(UnitConfig unit, int count)
         {
-            _config.Actions.Add(new UnitActionConfig {Action = TypeAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(new UnitActionConfig {Action = TypeAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
         public ActionConfigBuilder InventoryItemAdd(Id itemId, int count)
         {
-            _config.Actions.Add(new ItemActionConfig {Action = TypeAction.InventoryItemAdd, TypeItem = itemId, Count = count});
+            _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemAdd, TypeItem = itemId, Count = count});
             return this;
         }
 
         public ActionConfigBuilder InventoryItemSpend(Id itemId, int count)
         {
-            _config.Actions.Add(new ItemActionConfig {Action = TypeAction.InventoryItemSpend, TypeItem = itemId, Count = count});
+            _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemSpend, TypeItem = itemId, Count = count});
             return this;
         }
 
         public ActionConfigBuilder InventoryItemExpandLimit(Id itemId, int count)
         {
-            _config.Actions.Add(new ItemActionConfig {Action = TypeAction.InventoryItemExpandLimit, TypeItem = itemId, Count = count});
+            _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemExpandLimit, TypeItem = itemId, Count = count});
             return this;
         }
 
@@ -162,7 +162,7 @@ namespace Meta.TestConfiguration
 
         public ConditionsConfigBuilder ItemCountCondition(Id itemId, TypeCompare compareType, int value)
         {
-            _config.Conditions.Add(new ItemConditionConfig
+            _config.CheckItems.Add(new ItemConditionConfig
             {
                 TypeCondition = TypeCondition.InventoryItemsCount,
                 TypeItem = itemId, 
@@ -174,7 +174,7 @@ namespace Meta.TestConfiguration
         
         public ConditionsConfigBuilder ItemLimitCondition(Id itemId, TypeCompare compareType, int value)
         {
-            _config.Conditions.Add(new ItemConditionConfig
+            _config.CheckItems.Add(new ItemConditionConfig
             {
                 TypeCondition = TypeCondition.InventoryItemsLimit,
                 TypeItem = itemId, 
@@ -186,7 +186,7 @@ namespace Meta.TestConfiguration
         
         public ConditionsConfigBuilder AddCollection(ConditionCollectionConfig config)
         {
-            _config.Conditions.Add(config);
+            _config.Collection.Add(config);
             return this;
         }
         public ConditionCollectionConfig Build()

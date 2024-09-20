@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Meta.Configs;
 using Meta.Controllers;
 using Meta.Controllers.Actions;
@@ -35,6 +36,12 @@ namespace Meta.Tests.Editor.Controllers
 
             _inventoryController = new InventoryController(_metaConfig.InventoryItems, _metaDto.Items);
             _unitsController = new UnitsController(_metaConfig.Units, _metaDto.Units);
+            
+            //_actionProcessor = new ActionProcessor(_inventoryController, _unitsController, actionGroupCountController? - т.е. сущность, кот-я будет знать экшен. и хендлить его.
+            //что то вроде selfCountCost. Проще всего на эвенте его рассмотреть.
+            
+            
+            
             _actionProcessor = new ActionProcessor(_inventoryController, _unitsController);
         }
 
@@ -51,6 +58,17 @@ namespace Meta.Tests.Editor.Controllers
             Assert.AreEqual(90, _inventoryController.GetCount(MapTestId.Recruts.Id()));
             Assert.AreEqual(80, _inventoryController.GetCount(MapTestId.Scrup.Id()));
             Assert.AreEqual(1, _metaDto.Units.FirstOrDefault(s=>s.UnitType ==MapTestId.Unit_1.Id())!.Count);
+        }
+        
+        [Test]
+        public void TestUnitPurchase_InventorySpendAndUnitAdd_Fail()
+        {
+            var purchaseUnitAction = _actionConfigBuilder.NewAction()
+                .InventoryItemSpend(MapTestId.Recruts.Id(), 10)
+                .InventoryItemSpend(MapTestId.Scrup.Id(), 200)
+                .UnitAdd(_units.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build(), 1).Build();
+
+            Assert.Throws<InvalidOperationException>(() => _actionProcessor.Process(purchaseUnitAction));
         }
 
 

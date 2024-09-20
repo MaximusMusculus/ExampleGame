@@ -11,6 +11,7 @@ namespace Meta.Configs
         //использовать это будет только вьюха. 
         public List<LocalizedDescription> DescriptionConfigs = new List<LocalizedDescription>();
         public List<IconMapping> IconsConfigs = new List<IconMapping>();
+        public List<DialogMapping> DialogConfigs = new List<DialogMapping>();
     }
 
     public class LocalizedDescription
@@ -19,10 +20,15 @@ namespace Meta.Configs
         public string nameKey;
         public string descriptionKey;
     }
-
     public class IconMapping
     {
         public Id TargetId;
         public string IconPath;
     }
+    public class DialogMapping
+    {
+        public Id TargetId;
+        public string DialogPath;
+    }
+    
 }
