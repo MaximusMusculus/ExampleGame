@@ -162,7 +162,7 @@ namespace Meta.TestConfiguration
 
         public ConditionsConfigBuilder ItemCountCondition(Id itemId, TypeCompare compareType, int value)
         {
-            _config.CheckItems.Add(new ItemConditionConfig
+            _config.CheckItems.Add(new CountConditionConfig
             {
                 TypeCondition = TypeCondition.InventoryItemsCount,
                 TypeItem = itemId, 
@@ -172,9 +172,21 @@ namespace Meta.TestConfiguration
             return this;
         }
         
+        public ConditionsConfigBuilder UnitCountCondition(Id id, TypeCompare compareType, int value)
+        {
+            _config.CheckItems.Add(new CountConditionConfig()
+            {
+                TypeCondition = TypeCondition.UnitsCount,
+                TypeItem = id,
+                CompareType = compareType,
+                Value = value
+            });
+            return this;
+        }
+        
         public ConditionsConfigBuilder InventoryItemHas(Id itemId, int value)
         {
-            _config.CheckItems.Add(new ItemConditionConfig
+            _config.CheckItems.Add(new CountConditionConfig
             {
                 TypeCondition = TypeCondition.InventoryItemsCount,
                 TypeItem = itemId, 
@@ -186,7 +198,7 @@ namespace Meta.TestConfiguration
         
         public ConditionsConfigBuilder ItemLimitCondition(Id itemId, TypeCompare compareType, int value)
         {
-            _config.CheckItems.Add(new ItemConditionConfig
+            _config.CheckItems.Add(new CountConditionConfig
             {
                 TypeCondition = TypeCondition.InventoryItemsLimit,
                 TypeItem = itemId, 
@@ -207,6 +219,8 @@ namespace Meta.TestConfiguration
             _config = null;
             return result;
         }
+
+
     }
 
     public class MetaActionConfigBuilder

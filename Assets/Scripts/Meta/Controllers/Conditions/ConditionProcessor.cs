@@ -10,13 +10,15 @@ namespace Meta.Controllers.Conditions
     {
         private readonly Dictionary<TypeCondition, IConditionProcessor> _checkers = new Dictionary<TypeCondition, IConditionProcessor>();
 
-        public ConditionProcessor(IInventoryController inventoryController)
+        public ConditionProcessor(IInventoryController inventoryController, IUnitsController unitsController)
         {
             _checkers.Add(TypeCondition.AndCollection, new ConditionProcessorAndCollection(this));
             _checkers.Add(TypeCondition.OrCollection, new ConditionProcessorOrCollection(this));
 
             _checkers.Add(TypeCondition.InventoryItemsCount, new ConditionProcessorInventoryItemCount(inventoryController));
             _checkers.Add(TypeCondition.InventoryItemsLimit, new ConditionProcessorInventoryLimit(inventoryController));
+            
+            _checkers.Add(TypeCondition.UnitsCount, new ConditionProcessorUnitsCount(unitsController));
         }
 
         public void AddChecker(TypeCondition typeCondition, IConditionProcessor conditionProcessor)
@@ -40,7 +42,7 @@ namespace Meta.Controllers.Conditions
 
         public void Test()
         {
-            _checkProcessor.Check(new ItemConditionConfig {TypeCondition = TypeCondition.InventoryItemsCount, TypeItem = 1, Value = 50});
+            _checkProcessor.Check(new CountConditionConfig {TypeCondition = TypeCondition.InventoryItemsCount, TypeItem = 1, Value = 50});
         }
     }
 }

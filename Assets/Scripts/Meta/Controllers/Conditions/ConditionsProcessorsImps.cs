@@ -1,9 +1,8 @@
-﻿using System.Linq;
-using Meta.Configs.Conditions;
+﻿using Meta.Configs.Conditions;
 
 namespace Meta.Controllers.Conditions
 {
-    public class ConditionProcessorInventoryItemCount : ConditionProcessorAbstract<ItemConditionConfig>
+    public class ConditionProcessorInventoryItemCount : ConditionProcessorAbstract<CountConditionConfig>
     {
         private readonly IInventoryController _inventoryController;
 
@@ -12,13 +11,13 @@ namespace Meta.Controllers.Conditions
             _inventoryController = inventoryController;
         }
 
-        protected override bool Check(ItemConditionConfig conditionConfig)
+        protected override bool Check(CountConditionConfig conditionConfig)
         {
             var count = _inventoryController.GetCount(conditionConfig.TypeItem);
             return count.CheckCompareIsTrue(conditionConfig.CompareType, conditionConfig.Value);
         }
     }
-    public class ConditionProcessorInventoryLimit : ConditionProcessorAbstract<ItemConditionConfig>
+    public class ConditionProcessorInventoryLimit : ConditionProcessorAbstract<CountConditionConfig>
     {
         private readonly IInventoryController _inventoryController;
 
@@ -27,39 +26,33 @@ namespace Meta.Controllers.Conditions
             _inventoryController = inventoryController;
         }
 
-        protected override bool Check(ItemConditionConfig conditionConfig)
+        protected override bool Check(CountConditionConfig conditionConfig)
         {
             var limit = _inventoryController.GetLimit(conditionConfig.TypeItem);
             return limit.CheckCompareIsTrue(conditionConfig.CompareType, conditionConfig.Value);
         }
     }
     
-    public class ConditionProcessorOrCollection : ConditionProcessorAbstract<ConditionCollectionConfig>
+    public class ConditionProcessorUnitsCount : ConditionProcessorAbstract<CountConditionConfig>
     {
-        private readonly IConditionProcessor _conditionProcessor;
+        private readonly IUnitsController _unitsController;
 
-        public ConditionProcessorOrCollection(IConditionProcessor conditionProcessor)
+        public ConditionProcessorUnitsCount(IUnitsController unitsController)
         {
-            _conditionProcessor = conditionProcessor;
+            _unitsController = unitsController;
         }
 
-        protected override bool Check(ConditionCollectionConfig config)
+        protected override bool Check(CountConditionConfig args)
         {
-            return config.Any(orCondition => _conditionProcessor.Check(orCondition));
-        }
-    }
-    public class ConditionProcessorAndCollection : ConditionProcessorAbstract<ConditionCollectionConfig>
-    {
-        private readonly IConditionProcessor _conditionProcessor;
-
-        public ConditionProcessorAndCollection(IConditionProcessor conditionProcessor)
-        {
-            _conditionProcessor = conditionProcessor;
-        }
-
-        protected override bool Check(ConditionCollectionConfig config)
-        {
-            return config.All(andCondition => _conditionProcessor.Check(andCondition));
+            foreach (var unit in _unitsController.GetUnits())
+            {
+                if (unit.UnitType.Equals(args.TypeItem))
+                {
+                    return unit.Count.CheckCompareIsTrue(args.CompareType, args.Value);
+                }
+            }
+            //если нет юнитов, значит нет лимита?)
+            return true;
         }
     }
     

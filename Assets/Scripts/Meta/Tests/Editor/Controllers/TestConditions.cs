@@ -1,4 +1,5 @@
-﻿using Meta.Configs;
+﻿using System.Collections.Generic;
+using Meta.Configs;
 using Meta.Configs.Conditions;
 using Meta.Controllers;
 using Meta.Controllers.Conditions;
@@ -31,7 +32,7 @@ namespace Meta.Tests.Editor.Controllers
             
             _metaConfig = _metaBuilder.Build();
             _inventoryController = new InventoryController(_metaConfig.InventoryItems, _metaDto.Items);
-            _conditionProcessor = new ConditionProcessor(_inventoryController);
+            _conditionProcessor = new ConditionProcessor(_inventoryController, new UnitsController(new List<UnitConfig>(), new List<UnitDto>()));
         }
         
         [Test]

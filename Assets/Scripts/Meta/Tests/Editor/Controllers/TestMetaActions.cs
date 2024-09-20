@@ -7,6 +7,7 @@ using Meta.Controllers.Imp;
 using Meta.Models;
 using Meta.TestConfiguration;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace Meta.Tests.Editor.Controllers
 {
@@ -22,6 +23,8 @@ namespace Meta.Tests.Editor.Controllers
         private IUnitsController _unitsController;
         private IActionProcessor _actionProcessor;
         private IConditionProcessor _conditionProcessor;
+        
+        
 
         [SetUp]
         public void Setup()
@@ -32,7 +35,7 @@ namespace Meta.Tests.Editor.Controllers
             _inventoryController = new InventoryController(_metaConfig.InventoryItems, _metaDto.Items);
             _unitsController = new UnitsController(_metaConfig.Units, _metaDto.Units);
             _actionProcessor = new ActionProcessor(_inventoryController, _unitsController);
-            _conditionProcessor = new ConditionProcessor(_inventoryController);
+            _conditionProcessor = new ConditionProcessor(_inventoryController, _unitsController);
         }
 
         [Test]
@@ -47,6 +50,25 @@ namespace Meta.Tests.Editor.Controllers
             Assert.AreEqual(50, _inventoryController.GetCount(MapTestId.Scrup.Id()));
             Assert.AreEqual(80, _inventoryController.GetCount(MapTestId.Recruts.Id()));
             Assert.AreEqual(1, _metaDto.Units.Find(s => s.UnitType == MapTestId.Unit_1.Id())!.Count);
+        }
+        
+        [Test]
+        public void TestMetaActions_TrainUnitToUnitsLimit()
+        {
+            var startCount = 5000;
+            _inventoryController.ExpandLimit(MapTestId.Scrup.Id(), startCount);
+            _inventoryController.ExpandLimit(MapTestId.Recruts.Id(), startCount);
+            _inventoryController.Add(MapTestId.Scrup.Id(), startCount);
+            _inventoryController.Add(MapTestId.Recruts.Id(), startCount);
+
+            var action = _metaConfig.Actions[0];
+            for (int i = 0; i < 10; i++)
+            {
+                Debug.Log(i);
+                Assert.IsTrue(_conditionProcessor.Check(action.Require));
+                _actionProcessor.Process(action.Actions);
+            }
+            Assert.IsFalse(_conditionProcessor.Check(action.Require));
         }
         
         

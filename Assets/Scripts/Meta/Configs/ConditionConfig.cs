@@ -3,9 +3,11 @@ namespace Meta.Configs
     public enum TypeCondition
     {
         None,
-        InventoryItemsCount = 10,
-        InventoryItemsLimit,
-        UnitsCount,
+        InventoryItemsCount = 10,  //CountConditionConfig
+        InventoryItemsLimit,       //CountConditionConfig
+        
+        UnitsCount,                //CountConditionConfig
+        UnitsLevel,//?
         //Level,
         //maps
         //...
