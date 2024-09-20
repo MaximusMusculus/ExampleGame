@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
@@ -171,6 +172,18 @@ namespace Meta.TestConfiguration
             return this;
         }
         
+        public ConditionsConfigBuilder InventoryItemHas(Id itemId, int value)
+        {
+            _config.CheckItems.Add(new ItemConditionConfig
+            {
+                TypeCondition = TypeCondition.InventoryItemsCount,
+                TypeItem = itemId, 
+                CompareType = TypeCompare.GreaterOrEqual,
+                Value = value
+            });
+            return this;
+        }
+        
         public ConditionsConfigBuilder ItemLimitCondition(Id itemId, TypeCompare compareType, int value)
         {
             _config.CheckItems.Add(new ItemConditionConfig
@@ -208,23 +221,24 @@ namespace Meta.TestConfiguration
         
         public MetaActionConfigBuilder SetRequire(ConditionCollectionConfig config)
         {
+            if (_config.Require != null)
+            {
+                throw new ArgumentException("Require already set");
+            }
             _config.Require = config;
             return this;
         }
         
-        public MetaActionConfigBuilder SetAdd(ActionCollectionConfig config)
+        public MetaActionConfigBuilder SetActions(ActionCollectionConfig config)
         {
-            _config.Add = config;
+            if (_config.Actions != null)
+            {
+                throw new ArgumentException("Actions already set");
+            }
+            _config.Actions = config;
             return this;
         }
-        
-        public MetaActionConfigBuilder SetSpend(ActionCollectionConfig config)
-        {
-            _config.Spend = config;
-            return this;
-        }
-        
-        
+
         public MetaActionConfig Build()
         {
             var result = _config;

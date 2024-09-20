@@ -1,6 +1,8 @@
+using System;
 using Meta.Configs;
 using Meta.Controllers;
 using Meta.Controllers.Actions;
+using Meta.Controllers.Conditions;
 using Meta.Controllers.Imp;
 using Meta.Models;
 using Meta.TestConfiguration;
@@ -19,6 +21,7 @@ namespace Meta.Tests.Editor.Controllers
         private IInventoryController _inventoryController;
         private IUnitsController _unitsController;
         private IActionProcessor _actionProcessor;
+        private IConditionProcessor _conditionProcessor;
 
         [SetUp]
         public void Setup()
@@ -29,6 +32,7 @@ namespace Meta.Tests.Editor.Controllers
             _inventoryController = new InventoryController(_metaConfig.InventoryItems, _metaDto.Items);
             _unitsController = new UnitsController(_metaConfig.Units, _metaDto.Units);
             _actionProcessor = new ActionProcessor(_inventoryController, _unitsController);
+            _conditionProcessor = new ConditionProcessor(_inventoryController);
         }
 
         [Test]
@@ -38,12 +42,28 @@ namespace Meta.Tests.Editor.Controllers
             _inventoryController.Add(MapTestId.Recruts.Id(), 100);
 
             var action = _metaConfig.Actions[0];
-            _actionProcessor.Process(action.Spend);
-            _actionProcessor.Process(action.Add);
+            _actionProcessor.Process(action.Actions);
 
             Assert.AreEqual(50, _inventoryController.GetCount(MapTestId.Scrup.Id()));
             Assert.AreEqual(80, _inventoryController.GetCount(MapTestId.Recruts.Id()));
             Assert.AreEqual(1, _metaDto.Units.Find(s => s.UnitType == MapTestId.Unit_1.Id())!.Count);
+        }
+        
+        
+        [Test]
+        public void TestMetaActions_CheckAndTrainUnit()
+        {
+            _inventoryController.Add(MapTestId.Scrup.Id(), 10);
+            _inventoryController.Add(MapTestId.Recruts.Id(), 100);
+
+            var action = _metaConfig.Actions[0];
+            //как проверить наличие? Перед действием?
+            //По идее это будет делать вьюха.
+            //А я просто разверну 2ю модель и буду на ней смотреть. Если она при выполнения действия не падает - то все ок ^_^
+            //это избавит от кучи проверок
+
+            Assert.IsFalse(_conditionProcessor.Check(action.Require));
+            Assert.Throws<InvalidOperationException>(() => _actionProcessor.Process(action.Actions));
         }
     }
 }

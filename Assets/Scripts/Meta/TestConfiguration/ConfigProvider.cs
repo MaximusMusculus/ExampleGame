@@ -52,14 +52,16 @@ namespace Meta.TestConfiguration
                 .AddUnitConfig(_unit.NewUnit(MapTestId.Unit_3.Id()).SetCanUpgrade().Progression(1, 2, 3).Build());
 
             //train unit action
-            _metaBuilder.AddActionConfig( 
+            _metaBuilder.AddActionConfig(
                 _metaActions.NewAction()
-                    .SetSpend(_actionCollection.NewAction()
+                    .SetActions(_actionCollection.NewAction()
                         .InventoryItemSpend(MapTestId.Scrup.Id(), 50)
                         .InventoryItemSpend(MapTestId.Recruts.Id(), 20)
-                        .Build())
-                    .SetAdd(_actionCollection.NewAction()
                         .UnitAdd(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
+                        .Build())
+                    .SetRequire(_conditions.NewCollection(TypeCollection.And)
+                        .InventoryItemHas(MapTestId.Scrup.Id(), 50)
+                        .InventoryItemHas(MapTestId.Recruts.Id(), 20)
                         .Build())
                     .Build());
 

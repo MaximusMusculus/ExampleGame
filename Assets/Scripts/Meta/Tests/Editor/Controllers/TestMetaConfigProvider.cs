@@ -30,14 +30,18 @@ namespace Meta.Tests.Editor.Controllers
             
             
             //train unit action
-            _metaBuilder.AddActionConfig( 
+            _metaBuilder.AddActionConfig(
                 _metaActions.NewAction()
-                    .SetSpend(_actionCollection.NewAction()
+                    .SetActions(_actionCollection.NewAction()
                         .InventoryItemSpend(MapTestId.Scrup.Id(), 50)
                         .InventoryItemSpend(MapTestId.Recruts.Id(), 20)
-                        .Build())
-                    .SetAdd(_actionCollection.NewAction()
                         .UnitAdd(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
+                        .Build())
+                    
+                    //тут будут зависимости на открытие. Проверку на возможность делать то или иное буду проводить во 2й модели 
+                    .SetRequire(_conditions.NewCollection(TypeCollection.And)
+                        .InventoryItemHas(MapTestId.Scrup.Id(), 50)
+                        .InventoryItemHas(MapTestId.Recruts.Id(), 20)
                         .Build())
                     .Build());
             
