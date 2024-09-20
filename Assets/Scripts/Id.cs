@@ -50,7 +50,7 @@ namespace AppRen
     
     public interface IIdProvider
     {
-        Id GetNext();
+        Id GetId();
         //void Return(Id id);
     }
 
@@ -69,7 +69,7 @@ namespace AppRen
             _dto = dto;
         }
 
-        public Id GetNext()
+        public Id GetId()
         {
             return _dto.nextId++;
         }

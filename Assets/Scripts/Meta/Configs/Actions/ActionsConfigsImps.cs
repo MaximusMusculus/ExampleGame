@@ -35,26 +35,18 @@ namespace Meta.Configs.Actions
 
         private List<IActionConfig> _actionConfigs;
         private IEnumerator<IActionConfig> _enumerator;
-        
-        
 
-        public IEnumerable<IActionConfig> GetActions()
+
+        private IEnumerator<IActionConfig> CreateHash()
         {
-            if (_actionConfigs == null)
+            if (_enumerator != null)
             {
-                _actionConfigs = new List<IActionConfig>();
-                foreach (var itemAction in Items)
-                {
-                    _actionConfigs.Add(itemAction);
-                }
-
-                foreach (var unitActionConfig in Untis)
-                {
-                    _actionConfigs.Add(unitActionConfig);
-                }
+                return _enumerator;
             }
-            _enumerator = _actionConfigs.GetEnumerator();
-            return _actionConfigs;
+            var actionConfigs = new List<IActionConfig>(Items.Count + Untis.Count);
+            actionConfigs.AddRange(Items);
+            actionConfigs.AddRange(Untis);
+            return _enumerator = actionConfigs.GetEnumerator();
         }
 
         //получение и использование в абстракции.
@@ -62,7 +54,7 @@ namespace Meta.Configs.Actions
         {
             if (_actionConfigs == null)
             {
-                GetActions();
+                CreateHash();
             }
             _enumerator.Reset();
             return _enumerator;

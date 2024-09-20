@@ -1,41 +1,18 @@
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Conditions;
+using UnityEngine;
 
 namespace Meta.TestConfiguration
 {
-    public interface IMetaConfigProvider
-    {
-        MetaConfig GetConfig();
-    }
-
-    //--
-    public enum MapTestId : ushort
-    {
-        Hard = 11,
-        Scrup = 12,
-        Recruts = 13,
-
-        Unit_1 = 22,
-        Unit_2 = 23,
-        Unit_3 = 24,
-    }
-    
-    public static class MapEntityIdExtensions
-    {
-        public static Id Id(this MapTestId map)
-        {
-            return new Id((ushort) map);
-        }
-    }
-
-    public class MetaConfigForTestGameplay : IMetaConfigProvider
+    public class MetaConfigProviderTestBig : IMetaConfigProvider
     {
         private readonly MetaConfigBuilder _metaBuilder = new MetaConfigBuilder();
         private readonly UnitConfigBuilder _unit = new UnitConfigBuilder();
         private readonly ActionCollectionConfigBuilder _actionCollection = new ActionCollectionConfigBuilder();
         private readonly ConditionsConfigBuilder _conditions = new ConditionsConfigBuilder();
         private readonly MetaActionConfigBuilder _metaActions = new MetaActionConfigBuilder();
+        private readonly IIdProvider _idProvider = new IdProvider(new IdProviderDto {nextId = 100});
 
         public MetaConfig GetConfig()
         {
@@ -76,10 +53,41 @@ namespace Meta.TestConfiguration
                         .Build())
                     .Build());
 
+            //resoures
+            for (int i = 0; i < 1000; i++)
+            {
+                _metaBuilder.AddItemConfig(_idProvider.GetId(), i, i);
+            }
+
+            //units
+            var unitIdRange = new Vector2Int(0, 0);
+            for (var i = 0; i < 1000; i++)
+            {
+                var unitId = _idProvider.GetId();
+                _metaBuilder.AddUnitConfig(_unit.NewUnit(unitId).SetCanUpgrade().Build());
+                
+                if (i == 0)
+                {
+                    unitIdRange.x = unitId;
+                }
+                unitIdRange.y = unitId;
+            }
+            
+            //actions
+            for (int i = 0; i < 1000; i++)
+            {
+                var addAllUnitsAction = _actionCollection.NewAction();
+                for (var unitId = unitIdRange.x; unitId < unitIdRange.y; unitId++)
+                {
+                    addAllUnitsAction.UnitAdd(_unit.NewUnit((ushort) unitId).Build(), 1);
+                }
+                _metaBuilder.AddActionConfig(
+                    _metaActions.NewAction()
+                        .SetActions(addAllUnitsAction.Build())
+                        .Build());
+            }
+            
             return _metaBuilder.Build();
         }
     }
-
-
-
 }

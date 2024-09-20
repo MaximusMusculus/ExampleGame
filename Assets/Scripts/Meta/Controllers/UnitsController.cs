@@ -151,6 +151,7 @@ namespace Meta.Controllers.Imp
 
         public bool TryGetUnit(Id typeUnit, UnitProgressionDto progression, out IUnitModel model)
         {
+            //растет o(n), станет критичено - поправим.
             model = null;
             foreach (var unitsModel in _unitsModels)
             {

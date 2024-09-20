@@ -3,6 +3,7 @@ using Meta.Configs;
 using Meta.Models;
 using Meta.TestConfiguration;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Meta
 {
@@ -15,19 +16,23 @@ namespace Meta
 
         protected void Awake()
         {
-            var config = new MetaConfigForTestGameplay().GetConfig();
+            var config = new MetaConfigProviderTestBig().GetConfig();
             _metaDto = new MetaDto();
             _model = new MetaModel(config, _metaDto);
             _trainUnit = config.Actions[0];
             _costUnit = config.Actions[1];
+            
+            _model.RunAction(config.Actions[2]);
         }
 
         public void Update()
         {
             _model.RunAction(_trainUnit);
-            //Debug.Log(_metaDto.Units.First().Count);
+            Assert.AreEqual(1,_metaDto.Units.Last().Count);
+            
             _model.RunAction(_costUnit);
-            //Debug.Log(_metaDto.Units.First().Count);
+            Assert.AreEqual(0,_metaDto.Units.Last().Count);
+            
         }
         
         private void TestTrainAndCost(int count)
