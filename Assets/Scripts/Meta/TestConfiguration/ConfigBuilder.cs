@@ -255,6 +255,8 @@ namespace Meta.TestConfiguration
 
         public MetaActionConfig Build()
         {
+            _config.Require ??= new ConditionCollectionConfig {TypeCollection = TypeCondition.AndCollection};
+            
             var result = _config;
             _config = null;
             return result;

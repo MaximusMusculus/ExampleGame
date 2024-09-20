@@ -46,6 +46,17 @@ namespace Meta.Tests.Editor.Controllers
                         .Build())
                     .Build());
             
+            
+            //add resourse and costUnitAction
+            _metaBuilder.AddActionConfig(
+                _metaActions.NewAction()
+                    .SetActions(_actionCollection.NewAction()
+                        .InventoryItemAdd(MapTestId.Scrup.Id(), 50)
+                        .InventoryItemAdd(MapTestId.Recruts.Id(), 20)
+                        .UnitSpend(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
+                        .Build())
+                    .Build());
+            
             return _metaBuilder.Build();
         }
     }

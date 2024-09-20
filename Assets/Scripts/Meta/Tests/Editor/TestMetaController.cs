@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Meta.Configs;
 using Meta.Models;
 using Meta.Tests.Editor.Controllers;
@@ -26,7 +25,7 @@ namespace Meta.Tests.Editor
         [Test]
         public void TestCheckRequireAction()
         {
-            var action = _config.Actions.First();
+            var action = _config.Actions[0];
             Assert.IsFalse(_model.CheckRequire(action));
         }
         
@@ -34,8 +33,15 @@ namespace Meta.Tests.Editor
         [Test]
         public void TestUseAction()
         {
-            var action = _config.Actions.First();
+            var action = _config.Actions[0];
             Assert.Throws<InvalidOperationException>(() => _model.RunAction(action));
+        }
+
+        [Test]
+        public void TestCheckEmptyRequireAction()
+        {
+            var action = _config.Actions[1];
+            _model.CheckRequire(action);
         }
     }
 }
