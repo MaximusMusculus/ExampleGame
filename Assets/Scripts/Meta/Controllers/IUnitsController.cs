@@ -42,5 +42,6 @@ namespace Meta.Controllers
         void Spend(IUnitModel unitModel, int count);
         
         IEnumerable<IUnitModel> GetUnits();
+        bool TryGetUnit(Id typeUnit, UnitProgressionDto progression, out IUnitModel model);
     }
 }

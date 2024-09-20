@@ -69,8 +69,10 @@ namespace Meta.Controllers.Actions
         }
         protected override void Process(UnitActionConfig config)
         {
-            var targetUnit =_unitController.GetUnits().First(s => s.UnitType == config.TypeUnit);// && s.Stats.Level == args.Progression.Level);
-            _unitController.Spend(targetUnit, config.Count);
+            if (_unitController.TryGetUnit(config.TypeUnit, config.Progression, out var unit))
+            {
+                _unitController.Spend(unit, config.Count);
+            }
         }
     }
 
@@ -86,7 +88,7 @@ namespace Meta.Controllers.Actions
 
         protected override void Process(ActionCollectionConfig args)
         {
-            foreach (var anyAction in args)
+            foreach (var anyAction in args)//.GetActions())
             {
                 _actionProcessor.Process(anyAction);
             }

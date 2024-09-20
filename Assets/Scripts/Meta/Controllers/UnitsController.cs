@@ -86,7 +86,15 @@ namespace Meta.Controllers.Imp
 
         private void AddUpgradableUnit(UnitConfig config, UnitProgressionDto progression, int count)
         {
-            var unitDto = _unitsDto.FirstOrDefault(unitDto => unitDto.UnitType.Equals(config.UnitType));
+            UnitDto unitDto = null;
+            foreach (var dto in _unitsDto)
+            {
+                if(dto.UnitType.Equals(config.UnitType))
+                {
+                    unitDto = dto;
+                    break;
+                }
+            }
             AddUnit(config, unitDto, progression, count);
         }
         private void AddNotUpgradableUnit(UnitConfig config, UnitProgressionDto progression, int count)
@@ -139,9 +147,31 @@ namespace Meta.Controllers.Imp
             _unitsDto.Remove(dto);
             _unitsModels.Remove(unitModel);
         }
+
+
+        public bool TryGetUnit(Id typeUnit, UnitProgressionDto progression, out IUnitModel model)
+        {
+            model = null;
+            foreach (var unitsModel in _unitsModels)
+            {
+                if (unitsModel.Key.UnitType.Equals(typeUnit) && _progressionComparer.Equals(unitsModel.Value.Progression, progression))
+                {
+                    model = unitsModel.Key;
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         public IEnumerable<IUnitModel> GetUnits()
         {
-            return _unitsModels.Keys.Where(s => s.Count > 0);
+            foreach (var unitModel in _unitsModels.Keys)
+            {
+                if (unitModel.Count > 0)
+                {
+                    yield return unitModel;
+                }
+            }
         }
 
 
