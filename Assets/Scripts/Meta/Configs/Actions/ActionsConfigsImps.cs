@@ -28,8 +28,8 @@ namespace Meta.Configs.Actions
         public TypeAction TypeAction => TypeAction.Collection;
         //хранение набора коллекции в типизированном виде
         //для удобной читаемости и сериализации/десериализации
-        public List<UnitActionConfig> Untis = new List<UnitActionConfig>();
-        public List<ItemActionConfig> Items = new List<ItemActionConfig>();
+        public readonly List<UnitActionConfig> Untis = new List<UnitActionConfig>();
+        public readonly List<ItemActionConfig> Items = new List<ItemActionConfig>();
         
         //получение и использование в абстракции.
         public IEnumerator<IActionConfig> GetEnumerator()

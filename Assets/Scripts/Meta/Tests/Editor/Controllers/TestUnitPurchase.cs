@@ -15,7 +15,7 @@ namespace Meta.Tests.Editor.Controllers
     {
         private readonly MetaConfigBuilder _metaBuilder = new MetaConfigBuilder();
         private readonly UnitConfigBuilder _unitBuilder = new UnitConfigBuilder();
-        private readonly ActionConfigBuilder _actionConfigBuilder = new ActionConfigBuilder();
+        private readonly ActionCollectionConfigBuilder _actionCollectionConfigBuilder = new ActionCollectionConfigBuilder();
         private readonly UnitConfigBuilder _units = new UnitConfigBuilder();
         
         private MetaConfig _metaConfig;
@@ -48,7 +48,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestUnitPurchase_InventorySpendAndUnitAdd()
         {
-            var purchaseUnitAction = _actionConfigBuilder.NewAction()
+            var purchaseUnitAction = _actionCollectionConfigBuilder.NewAction()
                     .InventoryItemSpend(MapTestId.Recruts.Id(), 10)
                     .InventoryItemSpend(MapTestId.Scrup.Id(), 20)
                     .UnitAdd(_units.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build(), 1).Build();
@@ -63,7 +63,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestUnitPurchase_InventorySpendAndUnitAdd_Fail()
         {
-            var purchaseUnitAction = _actionConfigBuilder.NewAction()
+            var purchaseUnitAction = _actionCollectionConfigBuilder.NewAction()
                 .InventoryItemSpend(MapTestId.Recruts.Id(), 10)
                 .InventoryItemSpend(MapTestId.Scrup.Id(), 200)
                 .UnitAdd(_units.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build(), 1).Build();

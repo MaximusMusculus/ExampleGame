@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
@@ -41,8 +40,9 @@ namespace Meta.TestConfiguration
             return this;
         }
 
-        public MetaConfigBuilder AddActionConfig(ActionCollectionConfig action)
+        public MetaConfigBuilder AddActionConfig(MetaActionConfig metaAction)
         {
+            _config.Actions.Add(metaAction);
             return this;
         }
 
@@ -89,41 +89,42 @@ namespace Meta.TestConfiguration
         }
     }
 
-    public class ActionConfigBuilder
+    
+    public class ActionCollectionConfigBuilder
     {
         private ActionCollectionConfig _config;
-
-        public ActionConfigBuilder NewAction()
+        
+        public ActionCollectionConfigBuilder NewAction()
         {
             _config = new ActionCollectionConfig();
             return this;
         }
 
-        public ActionConfigBuilder UnitAdd(UnitConfig unit, int count)
+        public ActionCollectionConfigBuilder UnitAdd(UnitConfig unit, int count)
         {
             _config.Untis.Add(new UnitActionConfig {Action = TypeAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
-        public ActionConfigBuilder UnitSpend(UnitConfig unit, int count)
+        public ActionCollectionConfigBuilder UnitSpend(UnitConfig unit, int count)
         {
             _config.Untis.Add(new UnitActionConfig {Action = TypeAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
-        public ActionConfigBuilder InventoryItemAdd(Id itemId, int count)
+        public ActionCollectionConfigBuilder InventoryItemAdd(Id itemId, int count)
         {
             _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemAdd, TypeItem = itemId, Count = count});
             return this;
         }
 
-        public ActionConfigBuilder InventoryItemSpend(Id itemId, int count)
+        public ActionCollectionConfigBuilder InventoryItemSpend(Id itemId, int count)
         {
             _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemSpend, TypeItem = itemId, Count = count});
             return this;
         }
 
-        public ActionConfigBuilder InventoryItemExpandLimit(Id itemId, int count)
+        public ActionCollectionConfigBuilder InventoryItemExpandLimit(Id itemId, int count)
         {
             _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemExpandLimit, TypeItem = itemId, Count = count});
             return this;
@@ -136,14 +137,12 @@ namespace Meta.TestConfiguration
             return result;
         }
     }
-
-
+    
     public enum TypeCollection
     {
         And,
         Or,
     }
-
     public class ConditionsConfigBuilder
     {
         private ConditionCollectionConfig _config;
@@ -196,4 +195,42 @@ namespace Meta.TestConfiguration
             return result;
         }
     }
+
+    public class MetaActionConfigBuilder
+    {
+        private MetaActionConfig _config;
+        
+        public MetaActionConfigBuilder NewAction()
+        {
+            _config = new MetaActionConfig();
+            return this;
+        }
+        
+        public MetaActionConfigBuilder SetRequire(ConditionCollectionConfig config)
+        {
+            _config.Require = config;
+            return this;
+        }
+        
+        public MetaActionConfigBuilder SetAdd(ActionCollectionConfig config)
+        {
+            _config.Add = config;
+            return this;
+        }
+        
+        public MetaActionConfigBuilder SetSpend(ActionCollectionConfig config)
+        {
+            _config.Spend = config;
+            return this;
+        }
+        
+        
+        public MetaActionConfig Build()
+        {
+            var result = _config;
+            _config = null;
+            return result;
+        }
+    }
+
 }

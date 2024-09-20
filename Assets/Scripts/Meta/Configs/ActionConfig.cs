@@ -1,18 +1,15 @@
 using Meta.Configs.Actions;
+using Meta.Configs.Conditions;
 
 namespace Meta.Configs
 {
     
     // Игровое действие, имеет проверки, меняет стейт?
-    public class ActionConfig
+    public class MetaActionConfig
     {
-        public IConditionConfig Require;
-        public IActionConfig Spend => _spend;
-        public IActionConfig Add => _add;
-
-        
-        private ActionCollectionConfig _spend;
-        private ActionCollectionConfig _add;
+        public ConditionCollectionConfig Require;
+        public ActionCollectionConfig Spend;
+        public ActionCollectionConfig Add;
     }
 
     //как можно представить игровые действия?
