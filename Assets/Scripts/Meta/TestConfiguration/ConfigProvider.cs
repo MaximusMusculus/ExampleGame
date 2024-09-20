@@ -1,5 +1,6 @@
 using AppRen;
 using Meta.Configs;
+using Meta.Configs.Conditions;
 
 namespace Meta.TestConfiguration
 {
@@ -60,8 +61,7 @@ namespace Meta.TestConfiguration
                         .UnitAdd(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
                         .Build())
                     .SetRequire(_conditions.NewCollection(TypeCollection.And)
-                        .InventoryItemHas(MapTestId.Scrup.Id(), 50)
-                        .InventoryItemHas(MapTestId.Recruts.Id(), 20)
+                        .UnitCountCondition(MapTestId.Unit_1.Id(), TypeCompare.Less, 10)
                         .Build())
                     .Build());
 

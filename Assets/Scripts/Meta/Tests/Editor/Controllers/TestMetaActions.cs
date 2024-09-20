@@ -7,7 +7,6 @@ using Meta.Controllers.Imp;
 using Meta.Models;
 using Meta.TestConfiguration;
 using NUnit.Framework;
-using UnityEngine;
 
 namespace Meta.Tests.Editor.Controllers
 {
@@ -64,7 +63,6 @@ namespace Meta.Tests.Editor.Controllers
             var action = _metaConfig.Actions[0];
             for (int i = 0; i < 10; i++)
             {
-                Debug.Log(i);
                 Assert.IsTrue(_conditionProcessor.Check(action.Require));
                 _actionProcessor.Process(action.Actions);
             }
