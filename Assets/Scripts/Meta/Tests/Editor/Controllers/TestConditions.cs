@@ -47,6 +47,29 @@ namespace Meta.Tests.Editor.Controllers
             
             Assert.IsTrue(result);
         }
+        
+        [Test]
+        public void ConditionCoolectionOr()
+        {
+            var condition1 = _conditionsBuilder.NewCollection(TypeCollection.And)
+                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Equal, 100)
+                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
+                .Build();
+            
+            var condition2 = _conditionsBuilder.NewCollection(TypeCollection.Or)
+                .ItemCountCondition(MapTestId.Scrup.Id(), TypeCompare.Equal, 100)
+                .ItemCountCondition(MapTestId.Recruts.Id(), TypeCompare.Equal, 100)
+                .Build();
+
+            var condOr = _conditionsBuilder.NewCollection(TypeCollection.Or)
+                .AddCollection(condition1)
+                .AddCollection(condition2)
+                .Build();
+            
+            var result = _conditionProcessor.Check(condOr);
+            
+            Assert.IsTrue(result);
+        }
 
         [Test]
         public void TestConditions_InventoryItemsLimit()

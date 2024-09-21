@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using AppRen;
 using Meta.Models;
+using UnityEngine.Assertions;
 
 namespace Meta.Configs.Actions
 {
@@ -32,29 +34,30 @@ namespace Meta.Configs.Actions
         public readonly List<UnitActionConfig> Untis = new List<UnitActionConfig>();
         public readonly List<ItemActionConfig> Items = new List<ItemActionConfig>();
         
+        //схож с ConditionCollectionConfig, там тестирую массив
         
-        private List<IActionConfig> _actionConfigs;
         private IEnumerator<IActionConfig> _enumerator;
-
         private IEnumerator<IActionConfig> CreateHash()
         {
-            if (_enumerator != null)
-            {
-                return _enumerator;
-            }
             var actionConfigs = new List<IActionConfig>(Items.Count + Untis.Count);
             actionConfigs.AddRange(Items);
             actionConfigs.AddRange(Untis);
-            return _enumerator = actionConfigs.GetEnumerator();
+            _enumerator = actionConfigs.GetEnumerator();
+            return _enumerator;
         }
 
         //получение и использование в абстракции.
         public IEnumerator<IActionConfig> GetEnumerator()
         {
-            if (_actionConfigs == null)
+            if (_enumerator == null)
             {
-                CreateHash();
+                _enumerator = CreateHash();
             }
+            else
+            {
+                Assert.IsFalse(_enumerator.MoveNext(), "Enumerator is not reset");
+            }
+
             _enumerator.Reset();
             return _enumerator;
         }

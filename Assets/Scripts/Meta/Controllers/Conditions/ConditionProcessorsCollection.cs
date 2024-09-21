@@ -1,4 +1,3 @@
-using System.Linq;
 using Meta.Configs.Conditions;
 
 namespace Meta.Controllers.Conditions
@@ -14,7 +13,7 @@ namespace Meta.Controllers.Conditions
 
         protected override bool Check(ConditionCollectionConfig conditionsConfig)
         {
-            foreach (var condition in conditionsConfig)
+            foreach (var condition in conditionsConfig.Elems())
             {
                 if (_conditionProcessor.Check(condition))
                 {
@@ -37,7 +36,7 @@ namespace Meta.Controllers.Conditions
 
         protected override bool Check(ConditionCollectionConfig conditionsConfig)
         {
-            foreach (var condition in conditionsConfig)
+            foreach (var condition in conditionsConfig.Elems())
             {
                 if (_conditionProcessor.Check(condition) == false)
                 {

@@ -25,6 +25,8 @@ namespace Meta.Tests.Editor
         public void ShowSerializedJsonConfig()
         {
             var config = new MetaConfigDevelopProvider().GetConfig();
+            //new MetaConfigProviderTestBig().GetConfig();   don't do this ^_^
+                
             config.ConfigVersion = 777;
 
             var json = JsonConvert.SerializeObject(config, _settings);

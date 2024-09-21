@@ -208,11 +208,13 @@ namespace Meta.TestConfiguration
             return this;
         }
         
+
         public ConditionsConfigBuilder AddCollection(ConditionCollectionConfig config)
         {
             _config.Collection.Add(config);
             return this;
         }
+
         public ConditionCollectionConfig Build()
         {
             var result = _config;

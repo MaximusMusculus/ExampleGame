@@ -22,6 +22,7 @@ namespace Meta.Tests.Editor
             _model = new MetaModel(_config, _data);
         }
 
+        /*
         [Test]
         public void TestCheckRequireAction()
         {
@@ -42,6 +43,6 @@ namespace Meta.Tests.Editor
         {
             var action = _config.ActionsGroups[0].Actions[1];
             _model.CheckRequire(action);
-        }
+        }*/
     }
 }

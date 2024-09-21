@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+
+
 namespace Meta.Configs.Conditions
 {
     public class ConditionCollectionConfig : IConditionConfig
@@ -7,24 +9,37 @@ namespace Meta.Configs.Conditions
         public TypeCondition TypeCondition => TypeCollection;
 
         public TypeCondition TypeCollection; //And.Or./Not
-        public List<ConditionCollectionConfig> Collection = new List<ConditionCollectionConfig>();
-
-        public List<CountConditionConfig> CheckItems = new List<CountConditionConfig>();
+        public readonly List<CountConditionConfig> CheckItems = new List<CountConditionConfig>();
         //checkUnits
         //checkTechs
         //checkCounters
-
-        public IEnumerator<IConditionConfig> GetEnumerator()
+        public readonly List<ConditionCollectionConfig> Collection = new List<ConditionCollectionConfig>();
+        
+        //схож с ActionCollectionConfig, там тестирую _enumerator
+        private IConditionConfig[] _conditionsHash;
+        private void CreateHash()
         {
+            _conditionsHash = new IConditionConfig[CheckItems.Count + Collection.Count];
+            var i = 0;
             foreach (var item in CheckItems)
             {
-                yield return item;
+                _conditionsHash[i] = item;
+                i++;
             }
-
-            foreach (var collection in Collection)
+            foreach (var item in Collection)
             {
-                yield return collection;
+                _conditionsHash[i] = item;
+                i++;
             }
+        }
+        
+        public IConditionConfig[] Elems()
+        {
+            if (_conditionsHash == null)
+            {
+                CreateHash();
+            }
+            return _conditionsHash;
         }
     }
 }
