@@ -1,6 +1,5 @@
 using AppRen;
 using Meta.Configs;
-using Meta.Configs.Conditions;
 
 namespace Meta.TestConfiguration
 {
@@ -16,9 +15,13 @@ namespace Meta.TestConfiguration
         Scrup = 12,
         Recruts = 13,
 
-        Unit_1 = 22,
-        Unit_2 = 23,
-        Unit_3 = 24,
+        UnitGunner = 22,
+        UnitScout = 23,
+        UnitAssault = 24,
+        
+        GroupBarracs = 31, //barracks
+        GroupShop = 32, //shop
+        GroupLaboratory = 33, //lab
     }
     
     public static class MapEntityIdExtensions
@@ -33,9 +36,8 @@ namespace Meta.TestConfiguration
     {
         private readonly MetaConfigBuilder _metaBuilder = new MetaConfigBuilder();
         private readonly UnitConfigBuilder _unit = new UnitConfigBuilder();
-        private readonly ActionCollectionConfigBuilder _actionCollection = new ActionCollectionConfigBuilder();
-        private readonly ConditionsConfigBuilder _conditions = new ConditionsConfigBuilder();
         private readonly MetaActionConfigBuilder _metaActions = new MetaActionConfigBuilder();
+        private readonly MetaActionGroupConfigBuilder _actionGroup = new MetaActionGroupConfigBuilder();
 
         public MetaConfig GetConfig()
         {
@@ -44,36 +46,22 @@ namespace Meta.TestConfiguration
 
         private MetaConfig GetConfigForTests()
         {
-            _metaBuilder.NewConfig()
+            _metaBuilder.NewConfig();
+
+            _metaBuilder
                 .AddItemConfig(MapTestId.Hard.Id(), 50)
                 .AddItemConfig(MapTestId.Scrup.Id(), 50, 500)
                 .AddItemConfig(MapTestId.Recruts.Id(), 100, 150)
-                .AddUnitConfig(_unit.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build())
-                .AddUnitConfig(_unit.NewUnit(MapTestId.Unit_2.Id()).SetCanUpgrade().Progression(1, 1, 1).Build())
-                .AddUnitConfig(_unit.NewUnit(MapTestId.Unit_3.Id()).SetCanUpgrade().Progression(1, 2, 3).Build());
 
-            //train unit action
-            _metaBuilder.AddActionConfig(
-                _metaActions.NewAction()
-                    .SetActions(_actionCollection.NewAction()
-                        .InventoryItemSpend(MapTestId.Scrup.Id(), 50)
-                        .InventoryItemSpend(MapTestId.Recruts.Id(), 20)
-                        .UnitAdd(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
-                        .Build())
-                    .SetRequire(_conditions.NewCollection(TypeCollection.And)
-                        .UnitCountCondition(MapTestId.Unit_1.Id(), TypeCompare.Less, 10)
-                        .Build())
-                    .Build());
-            
-            
-            //add resourse and costUnitAction
-            _metaBuilder.AddActionConfig(
-                _metaActions.NewAction()
-                    .SetActions(_actionCollection.NewAction()
-                        .InventoryItemAdd(MapTestId.Scrup.Id(), 50)
-                        .InventoryItemAdd(MapTestId.Recruts.Id(), 20)
-                        .UnitSpend(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
-                        .Build())
+                .AddUnitConfig(_unit.NewUnit(MapTestId.UnitGunner.Id()).SetCanUpgrade().Build())
+                .AddUnitConfig(_unit.NewUnit(MapTestId.UnitScout.Id()).SetCanUpgrade().Progression(1, 1, 1).Build())
+                .AddUnitConfig(_unit.NewUnit(MapTestId.UnitAssault.Id()).SetCanUpgrade().Progression(1, 2, 3).Build())
+
+                .AddActionGroup(_actionGroup.New(MapTestId.GroupBarracs.Id())
+                    .AddAction(_metaActions.NewAction().AddTrainUnit(MapTestId.UnitScout.Id(), 10, 50, 20).Build())
+                    .AddAction(_metaActions.NewAction().AddTrainUnit(MapTestId.UnitGunner.Id(), 30, 100, 10).Build())
+                    .AddAction(_metaActions.NewAction().AddTrainUnit(MapTestId.UnitAssault.Id(), 50, 150, 5).Build())
+                    .SetDialogName("ViewBarracks")
                     .Build());
 
             return _metaBuilder.Build();

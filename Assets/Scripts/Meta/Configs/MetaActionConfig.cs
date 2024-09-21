@@ -1,8 +1,17 @@
+using System.Collections.Generic;
+using AppRen;
 using Meta.Configs.Actions;
 using Meta.Configs.Conditions;
 
 namespace Meta.Configs
 {
+    public class MetaActionsGroupConfig
+    {
+        public Id TypeGroup;
+        public List<MetaActionConfig> Actions = new List<MetaActionConfig>();
+        public string DialogName;//??
+    }
+    
     
     // Игровое действие, имеет проверки, меняет стейт?
     public class MetaActionConfig

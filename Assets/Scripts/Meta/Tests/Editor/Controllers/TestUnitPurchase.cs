@@ -32,7 +32,7 @@ namespace Meta.Tests.Editor.Controllers
             _metaConfig = _metaBuilder.NewConfig()
                 .AddItemConfig(MapTestId.Scrup.Id(), 100, 100)
                 .AddItemConfig(MapTestId.Recruts.Id(), 100, 100)
-                .AddUnitConfig(_unitBuilder.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build()).Build();
+                .AddUnitConfig(_unitBuilder.NewUnit(MapTestId.UnitGunner.Id()).SetCanUpgrade().Build()).Build();
 
             _inventoryController = new InventoryController(_metaConfig.InventoryItems, _metaDto.Items);
             _unitsController = new UnitsController(_metaConfig.Units, _metaDto.Units);
@@ -51,13 +51,13 @@ namespace Meta.Tests.Editor.Controllers
             var purchaseUnitAction = _actionCollectionConfigBuilder.NewAction()
                     .InventoryItemSpend(MapTestId.Recruts.Id(), 10)
                     .InventoryItemSpend(MapTestId.Scrup.Id(), 20)
-                    .UnitAdd(_units.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build(), 1).Build();
+                    .UnitAdd(_units.NewUnit(MapTestId.UnitGunner.Id()).SetCanUpgrade().Build(), 1).Build();
             
             _actionProcessor.Process(purchaseUnitAction);
             
             Assert.AreEqual(90, _inventoryController.GetCount(MapTestId.Recruts.Id()));
             Assert.AreEqual(80, _inventoryController.GetCount(MapTestId.Scrup.Id()));
-            Assert.AreEqual(1, _metaDto.Units.FirstOrDefault(s=>s.UnitType ==MapTestId.Unit_1.Id())!.Count);
+            Assert.AreEqual(1, _metaDto.Units.FirstOrDefault(s=>s.UnitType ==MapTestId.UnitGunner.Id())!.Count);
         }
         
         [Test]
@@ -66,7 +66,7 @@ namespace Meta.Tests.Editor.Controllers
             var purchaseUnitAction = _actionCollectionConfigBuilder.NewAction()
                 .InventoryItemSpend(MapTestId.Recruts.Id(), 10)
                 .InventoryItemSpend(MapTestId.Scrup.Id(), 200)
-                .UnitAdd(_units.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build(), 1).Build();
+                .UnitAdd(_units.NewUnit(MapTestId.UnitGunner.Id()).SetCanUpgrade().Build(), 1).Build();
 
             Assert.Throws<InvalidOperationException>(() => _actionProcessor.Process(purchaseUnitAction));
         }

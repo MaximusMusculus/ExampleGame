@@ -48,7 +48,7 @@ namespace Meta.Tests.Editor.Controllers
 
             Assert.AreEqual(50, _inventoryController.GetCount(MapTestId.Scrup.Id()));
             Assert.AreEqual(80, _inventoryController.GetCount(MapTestId.Recruts.Id()));
-            Assert.AreEqual(1, _metaDto.Units.Find(s => s.UnitType == MapTestId.Unit_1.Id())!.Count);
+            Assert.AreEqual(1, _metaDto.Units.Find(s => s.UnitType == MapTestId.UnitGunner.Id())!.Count);
         }
         
         [Test]

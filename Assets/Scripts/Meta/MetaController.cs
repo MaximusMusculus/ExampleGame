@@ -27,7 +27,7 @@ namespace Meta
             _actions = new ActionProcessor(Inventory, Units);
             _conditions = new ConditionProcessor(Inventory, Units);
         }
-
+        
         public void RunAction(MetaActionConfig actionConfig)
         {
             _actions.Process(actionConfig.Actions);

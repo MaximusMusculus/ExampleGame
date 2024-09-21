@@ -31,6 +31,7 @@ namespace Meta.Controllers.Imp
     {
         private readonly Dictionary<Id, UnitConfig> _configsHash;
         private readonly List<UnitDto> _unitsDto;
+        
         private readonly Dictionary<IUnitModel, UnitDto> _unitsModels;
         private readonly IEqualityComparer<UnitProgressionDto> _progressionComparer = new UnitProgressionEqualsComparer();
 
@@ -151,6 +152,12 @@ namespace Meta.Controllers.Imp
 
         public bool TryGetUnit(Id typeUnit, UnitProgressionDto progression, out IUnitModel model)
         {
+            //Получить юнита с соотв прокачкой.
+            _unitKey.UnitId = typeUnit;
+            _unitKey.Progression = progression;
+            _unitKey.Reset();
+            
+            
             //растет o(n), станет критичено - поправим.
             model = null;
             foreach (var unitsModel in _unitsModels)
@@ -163,7 +170,6 @@ namespace Meta.Controllers.Imp
             }
             return false;
         }
-        
         public IEnumerable<IUnitModel> GetUnits()
         {
             foreach (var unitModel in _unitsModels.Keys)
@@ -174,6 +180,44 @@ namespace Meta.Controllers.Imp
                 }
             }
         }
+        
+        
+        //----- как оптимизация потом
+        private UnitKey _unitKey = new UnitKey(0, new UnitProgressionDto(), new UnitProgressionEqualsComparer());
+        private struct UnitKey : IEquatable<UnitKey>
+        {
+            public Id UnitId { get; set; }
+            public UnitProgressionDto Progression { get; set; }
+
+            public void Reset()
+            {
+                UnitId = 0;
+                Progression = null;
+            }
+
+            private readonly UnitProgressionEqualsComparer _progressionComparer;
+
+            public UnitKey(Id unitId, UnitProgressionDto progression, UnitProgressionEqualsComparer progressionComparer)
+            {
+                UnitId = unitId;
+                Progression = progression;
+                _progressionComparer = progressionComparer;
+            }
+
+            public override bool Equals(object obj) => obj is UnitKey key && Equals(key);
+
+            public bool Equals(UnitKey other)
+            {
+                return UnitId.Equals(other.UnitId) && _progressionComparer.Equals(Progression, other.Progression);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(UnitId, Progression);
+            }
+        }
+
+        
 
 
         //--спорное решение держать этот здесь.
@@ -208,7 +252,6 @@ namespace Meta.Controllers.Imp
             }
             unitModel.Stats.UpgradeHandler();
         }
-
         public IEnumerable<IUnitModel> GetCanUpgradeUnits() //IUnitModel->IUnitUpgradeModel? или из спец менеджера калькулятора?
         {
             foreach (var model in _unitsModels)

@@ -35,6 +35,12 @@ namespace Meta.TestConfiguration
             return this;
         }
         
+        public MetaConfigBuilder AddActionGroup(MetaActionsGroupConfig groupConfig)
+        {
+            _config.ActionsGroups.Add(groupConfig);
+            return this;
+        }
+        
         public MetaConfigBuilder AddUnitConfig(UnitConfig unit)
         {
             _config.Units.Add(unit);
@@ -53,6 +59,7 @@ namespace Meta.TestConfiguration
             _config = null;
             return metaConfig;
         }
+        
     }
 
     public class UnitConfigBuilder
@@ -100,7 +107,7 @@ namespace Meta.TestConfiguration
             _config = new ActionCollectionConfig();
             return this;
         }
-
+        
         public ActionCollectionConfigBuilder UnitAdd(UnitConfig unit, int count)
         {
             _config.Untis.Add(new UnitActionConfig {Action = TypeAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
@@ -219,20 +226,21 @@ namespace Meta.TestConfiguration
             _config = null;
             return result;
         }
-
-
     }
 
     public class MetaActionConfigBuilder
     {
         private MetaActionConfig _config;
+        private readonly ActionCollectionConfigBuilder _actionCollection = new ActionCollectionConfigBuilder();
+        private readonly ConditionsConfigBuilder _conditions = new ConditionsConfigBuilder();
+        private readonly UnitConfigBuilder _unit = new UnitConfigBuilder();
+        
         
         public MetaActionConfigBuilder NewAction()
         {
             _config = new MetaActionConfig();
             return this;
         }
-        
         public MetaActionConfigBuilder SetRequire(ConditionCollectionConfig config)
         {
             if (_config.Require != null)
@@ -242,7 +250,6 @@ namespace Meta.TestConfiguration
             _config.Require = config;
             return this;
         }
-        
         public MetaActionConfigBuilder SetActions(ActionCollectionConfig config)
         {
             if (_config.Actions != null)
@@ -252,11 +259,64 @@ namespace Meta.TestConfiguration
             _config.Actions = config;
             return this;
         }
+        
+
+        public MetaActionConfigBuilder AddTrainUnit(Id unitType, int recruts, int scrub, int unitLimit = int.MaxValue)
+        {
+            SetActions(_actionCollection.NewAction()
+                .InventoryItemSpend(MapTestId.Scrup.Id(), scrub)
+                .InventoryItemSpend(MapTestId.Recruts.Id(), recruts)
+                .UnitAdd(_unit.NewUnit(unitType).Build(), 1)
+                .Build());
+
+            if (unitLimit != int.MaxValue)
+            {
+                SetRequire(_conditions.NewCollection(TypeCollection.And)
+                    .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.Less, unitLimit)
+                    .Build());
+            }
+            return this;
+        }
 
         public MetaActionConfig Build()
         {
             _config.Require ??= new ConditionCollectionConfig {TypeCollection = TypeCondition.AndCollection};
-            
+            var result = _config;
+            _config = null;
+            return result;
+        }
+    }
+
+
+    public class MetaActionGroupConfigBuilder
+    {
+        private MetaActionsGroupConfig _config;
+        private MetaActionGroupConfigBuilder _actionGroup;
+        
+
+
+        public MetaActionGroupConfigBuilder New(Id id)
+        {
+            _config = new MetaActionsGroupConfig {TypeGroup = id};
+            return this;
+        }
+        
+        public MetaActionGroupConfigBuilder SetDialogName(string name)
+        {
+            _config.DialogName = name;
+            return this;
+        }
+        
+        public MetaActionGroupConfigBuilder AddAction(MetaActionConfig action)
+        {
+            _config.Actions.Add(action);
+            return this;
+        }
+        
+
+
+        public MetaActionsGroupConfig Build()
+        {
             var result = _config;
             _config = null;
             return result;

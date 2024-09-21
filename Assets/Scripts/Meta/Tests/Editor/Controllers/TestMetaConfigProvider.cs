@@ -25,9 +25,9 @@ namespace Meta.Tests.Editor.Controllers
                 .AddItemConfig(MapTestId.Scrup.Id(), 0,500)
                 .AddItemConfig(MapTestId.Recruts.Id(), 0, 500)
         
-                .AddUnitConfig(_unit.NewUnit(MapTestId.Unit_1.Id()).SetCanUpgrade().Build())
-                .AddUnitConfig(_unit.NewUnit(MapTestId.Unit_2.Id()).SetCanUpgrade().Progression(1, 1, 1).Build())
-                .AddUnitConfig(_unit.NewUnit(MapTestId.Unit_3.Id()).SetCanUpgrade().Progression(1, 2, 3).Build());
+                .AddUnitConfig(_unit.NewUnit(MapTestId.UnitGunner.Id()).SetCanUpgrade().Build())
+                .AddUnitConfig(_unit.NewUnit(MapTestId.UnitScout.Id()).SetCanUpgrade().Progression(1, 1, 1).Build())
+                .AddUnitConfig(_unit.NewUnit(MapTestId.UnitAssault.Id()).SetCanUpgrade().Progression(1, 2, 3).Build());
             
             
             //train unit action
@@ -36,13 +36,13 @@ namespace Meta.Tests.Editor.Controllers
                     .SetActions(_actionCollection.NewAction()
                         .InventoryItemSpend(MapTestId.Scrup.Id(), 50)
                         .InventoryItemSpend(MapTestId.Recruts.Id(), 20)
-                        .UnitAdd(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
+                        .UnitAdd(_unit.NewUnit(MapTestId.UnitGunner.Id()).Build(), 1)
                         .Build())
                     //тут будут зависимости на открытие. Проверку на возможность делать то или иное буду проводить во 2й модели 
                     .SetRequire(_conditions.NewCollection(TypeCollection.And)
                         .InventoryItemHas(MapTestId.Scrup.Id(), 50)
                         .InventoryItemHas(MapTestId.Recruts.Id(), 20)
-                        .UnitCountCondition(MapTestId.Unit_1.Id(), TypeCompare.Less, 10)
+                        .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.Less, 10)
                         .Build())
                     .Build());
             
@@ -53,7 +53,7 @@ namespace Meta.Tests.Editor.Controllers
                     .SetActions(_actionCollection.NewAction()
                         .InventoryItemAdd(MapTestId.Scrup.Id(), 50)
                         .InventoryItemAdd(MapTestId.Recruts.Id(), 20)
-                        .UnitSpend(_unit.NewUnit(MapTestId.Unit_1.Id()).Build(), 1)
+                        .UnitSpend(_unit.NewUnit(MapTestId.UnitGunner.Id()).Build(), 1)
                         .Build())
                     .Build());
             

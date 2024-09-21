@@ -16,13 +16,14 @@ namespace Meta
 
         protected void Awake()
         {
-            var config = new MetaConfigProviderTestBig().GetConfig();
+            var config = new MetaConfigForTestGameplay().GetConfig();
             _metaDto = new MetaDto();
             _model = new MetaModel(config, _metaDto);
             _trainUnit = config.Actions[0];
             _costUnit = config.Actions[1];
             
-            _model.RunAction(config.Actions[2]);
+            var actionAddUnits1000 = config.Actions[2];
+            _model.RunAction(actionAddUnits1000);
         }
 
         public void Update()
@@ -32,7 +33,6 @@ namespace Meta
             
             _model.RunAction(_costUnit);
             Assert.AreEqual(0,_metaDto.Units.Last().Count);
-            
         }
         
         private void TestTrainAndCost(int count)
