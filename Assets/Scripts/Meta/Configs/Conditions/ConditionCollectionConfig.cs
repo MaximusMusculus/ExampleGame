@@ -1,9 +1,8 @@
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Meta.Configs.Conditions
 {
-    public class ConditionCollectionConfig : IConditionConfig, IEnumerable<IConditionConfig>
+    public class ConditionCollectionConfig : IConditionConfig
     {
         public TypeCondition TypeCondition => TypeCollection;
 
@@ -26,11 +25,6 @@ namespace Meta.Configs.Conditions
             {
                 yield return collection;
             }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
         }
     }
 }

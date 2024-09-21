@@ -12,12 +12,20 @@ namespace Meta.Controllers.Conditions
             _conditionProcessor = conditionProcessor;
         }
 
-        protected override bool Check(ConditionCollectionConfig config)
+        protected override bool Check(ConditionCollectionConfig conditionsConfig)
         {
-            return config.Any(orCondition => _conditionProcessor.Check(orCondition));
+            foreach (var condition in conditionsConfig)
+            {
+                if (_conditionProcessor.Check(condition))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
-    
+
     public class ConditionProcessorAndCollection : ConditionProcessorAbstract<ConditionCollectionConfig>
     {
         private readonly IConditionProcessor _conditionProcessor;
@@ -27,10 +35,17 @@ namespace Meta.Controllers.Conditions
             _conditionProcessor = conditionProcessor;
         }
 
-        protected override bool Check(ConditionCollectionConfig config)
+        protected override bool Check(ConditionCollectionConfig conditionsConfig)
         {
-            return config.All(andCondition => _conditionProcessor.Check(andCondition));
+            foreach (var condition in conditionsConfig)
+            {
+                if (_conditionProcessor.Check(condition) == false)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
-
 }

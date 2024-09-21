@@ -171,7 +171,7 @@ namespace Meta.TestConfiguration
         {
             _config.CheckItems.Add(new CountConditionConfig
             {
-                TypeCondition = TypeCondition.InventoryItemsCount,
+                Condition = TypeCondition.InventoryItemsCount,
                 TypeItem = itemId, 
                 CompareType = compareType,
                 Value = value
@@ -183,7 +183,7 @@ namespace Meta.TestConfiguration
         {
             _config.CheckItems.Add(new CountConditionConfig()
             {
-                TypeCondition = TypeCondition.UnitsCount,
+                Condition = TypeCondition.UnitsCount,
                 TypeItem = id,
                 CompareType = compareType,
                 Value = value
@@ -195,7 +195,7 @@ namespace Meta.TestConfiguration
         {
             _config.CheckItems.Add(new CountConditionConfig
             {
-                TypeCondition = TypeCondition.InventoryItemsCount,
+                Condition = TypeCondition.InventoryItemsCount,
                 TypeItem = itemId, 
                 CompareType = TypeCompare.GreaterOrEqual,
                 Value = value
@@ -207,7 +207,7 @@ namespace Meta.TestConfiguration
         {
             _config.CheckItems.Add(new CountConditionConfig
             {
-                TypeCondition = TypeCondition.InventoryItemsLimit,
+                Condition = TypeCondition.InventoryItemsLimit,
                 TypeItem = itemId, 
                 CompareType = compareType,
                 Value = value

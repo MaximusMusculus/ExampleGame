@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using AppRen;
 using Meta.Models;
@@ -24,7 +23,7 @@ namespace Meta.Configs.Actions
         public int Count;
     }
 
-    public class ActionCollectionConfig : IActionConfig, IEnumerable<IActionConfig>
+    public class ActionCollectionConfig : IActionConfig
     {
         public TypeAction TypeAction => TypeAction.Collection;
 
@@ -32,10 +31,10 @@ namespace Meta.Configs.Actions
         //для удобной читаемости и сериализации/десериализации
         public readonly List<UnitActionConfig> Untis = new List<UnitActionConfig>();
         public readonly List<ItemActionConfig> Items = new List<ItemActionConfig>();
-
+        
+        
         private List<IActionConfig> _actionConfigs;
         private IEnumerator<IActionConfig> _enumerator;
-
 
         private IEnumerator<IActionConfig> CreateHash()
         {
@@ -56,13 +55,6 @@ namespace Meta.Configs.Actions
             {
                 CreateHash();
             }
-            _enumerator.Reset();
-            return _enumerator;
-        }
-
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
             _enumerator.Reset();
             return _enumerator;
         }

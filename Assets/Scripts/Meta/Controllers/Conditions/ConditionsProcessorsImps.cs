@@ -11,10 +11,10 @@ namespace Meta.Controllers.Conditions
             _inventoryController = inventoryController;
         }
 
-        protected override bool Check(CountConditionConfig conditionConfig)
+        protected override bool Check(CountConditionConfig conditionsConfig)
         {
-            var count = _inventoryController.GetCount(conditionConfig.TypeItem);
-            return count.CheckCompareIsTrue(conditionConfig.CompareType, conditionConfig.Value);
+            var count = _inventoryController.GetCount(conditionsConfig.TypeItem);
+            return count.CheckCompareIsTrue(conditionsConfig.CompareType, conditionsConfig.Value);
         }
     }
     public class ConditionProcessorInventoryLimit : ConditionProcessorAbstract<CountConditionConfig>
@@ -26,10 +26,10 @@ namespace Meta.Controllers.Conditions
             _inventoryController = inventoryController;
         }
 
-        protected override bool Check(CountConditionConfig conditionConfig)
+        protected override bool Check(CountConditionConfig conditionsConfig)
         {
-            var limit = _inventoryController.GetLimit(conditionConfig.TypeItem);
-            return limit.CheckCompareIsTrue(conditionConfig.CompareType, conditionConfig.Value);
+            var limit = _inventoryController.GetLimit(conditionsConfig.TypeItem);
+            return limit.CheckCompareIsTrue(conditionsConfig.CompareType, conditionsConfig.Value);
         }
     }
     
@@ -42,13 +42,13 @@ namespace Meta.Controllers.Conditions
             _unitsController = unitsController;
         }
 
-        protected override bool Check(CountConditionConfig args)
+        protected override bool Check(CountConditionConfig conditionsConfig)
         {
             foreach (var unit in _unitsController.GetUnits())
             {
-                if (unit.UnitType.Equals(args.TypeItem))
+                if (unit.UnitType.Equals(conditionsConfig.TypeItem))
                 {
-                    return unit.Count.CheckCompareIsTrue(args.CompareType, args.Value);
+                    return unit.Count.CheckCompareIsTrue(conditionsConfig.CompareType, conditionsConfig.Value);
                 }
             }
             //если нет юнитов, значит нет лимита?)

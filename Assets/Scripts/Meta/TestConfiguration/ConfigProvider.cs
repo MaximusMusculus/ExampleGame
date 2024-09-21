@@ -32,7 +32,7 @@ namespace Meta.TestConfiguration
         }
     }
 
-    public class MetaConfigForTestGameplay : IMetaConfigProvider
+    public class MetaConfigDevelopProvider : IMetaConfigProvider
     {
         private readonly MetaConfigBuilder _metaBuilder = new MetaConfigBuilder();
         private readonly UnitConfigBuilder _unit = new UnitConfigBuilder();

@@ -16,7 +16,8 @@ namespace Meta
 
         protected void Awake()
         {
-            var config = new MetaConfigForTestGameplay().GetConfig();
+            var config = new MetaConfigProviderTestBig().GetConfig(); 
+                //new MetaConfigDevelopProvider().GetConfig();
             _metaDto = new MetaDto();
             _model = new MetaModel(config, _metaDto);
             _trainUnit = config.Actions[0];

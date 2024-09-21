@@ -17,7 +17,7 @@ namespace Meta.Controllers
             return Check((TArgs) conditionConfig);
         }
 
-        protected abstract bool Check(TArgs args);
+        protected abstract bool Check(TArgs conditionsConfig);
 
         //если потребуется
         public static TArgs CreateEmptyArgs()

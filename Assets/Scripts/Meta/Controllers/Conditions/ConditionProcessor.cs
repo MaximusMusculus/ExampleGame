@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Meta.Configs;
-using Meta.Configs.Conditions;
 
 namespace Meta.Controllers.Conditions
 {
@@ -35,14 +34,5 @@ namespace Meta.Controllers.Conditions
             throw new System.ArgumentException($"Checker not found for {conditionConfig.TypeCondition}");
         }
     }
-    
-    public class CheckUse
-    {
-        private IConditionProcessor _checkProcessor;
 
-        public void Test()
-        {
-            _checkProcessor.Check(new CountConditionConfig {TypeCondition = TypeCondition.InventoryItemsCount, TypeItem = 1, Value = 50});
-        }
-    }
 }
