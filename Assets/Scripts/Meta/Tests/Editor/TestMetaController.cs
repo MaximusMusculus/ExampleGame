@@ -25,7 +25,7 @@ namespace Meta.Tests.Editor
         [Test]
         public void TestCheckRequireAction()
         {
-            var action = _config.Actions[0];
+            var action = _config.ActionsGroups[0].Actions[0];
             Assert.IsFalse(_model.CheckRequire(action));
         }
         
@@ -33,14 +33,14 @@ namespace Meta.Tests.Editor
         [Test]
         public void TestUseAction()
         {
-            var action = _config.Actions[0];
+            var action = _config.ActionsGroups[0].Actions[0];
             Assert.Throws<InvalidOperationException>(() => _model.RunAction(action));
         }
 
         [Test]
         public void TestCheckEmptyRequireAction()
         {
-            var action = _config.Actions[1];
+            var action = _config.ActionsGroups[0].Actions[1];
             _model.CheckRequire(action);
         }
     }

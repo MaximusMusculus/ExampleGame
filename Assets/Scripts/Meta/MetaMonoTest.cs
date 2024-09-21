@@ -20,10 +20,10 @@ namespace Meta
                 //new MetaConfigDevelopProvider().GetConfig();
             _metaDto = new MetaDto();
             _model = new MetaModel(config, _metaDto);
-            _trainUnit = config.Actions[0];
-            _costUnit = config.Actions[1];
+            _trainUnit = config.ActionsGroups[0].Actions[0];
+            _costUnit = config.ActionsGroups[0].Actions[1];
             
-            var actionAddUnits1000 = config.Actions[2];
+            var actionAddUnits1000 = config.ActionsGroups[0].Actions[2];
             _model.RunAction(actionAddUnits1000);
         }
 

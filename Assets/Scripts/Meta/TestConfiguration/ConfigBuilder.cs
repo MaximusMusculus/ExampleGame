@@ -47,12 +47,6 @@ namespace Meta.TestConfiguration
             return this;
         }
 
-        public MetaConfigBuilder AddActionConfig(MetaActionConfig metaAction)
-        {
-            _config.Actions.Add(metaAction);
-            return this;
-        }
-
         public MetaConfig Build()
         {
             var metaConfig = _config;
@@ -96,7 +90,6 @@ namespace Meta.TestConfiguration
             return result;
         }
     }
-
     
     public class ActionCollectionConfigBuilder
     {
@@ -286,7 +279,6 @@ namespace Meta.TestConfiguration
             return result;
         }
     }
-
 
     public class MetaActionGroupConfigBuilder
     {

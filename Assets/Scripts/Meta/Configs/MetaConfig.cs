@@ -10,9 +10,6 @@ namespace Meta.Configs
         public List<UnitConfig> Units = new List<UnitConfig>();
         
         
-        //actionsGroup
-        public List<MetaActionConfig> Actions = new List<MetaActionConfig>();
-        
         public List<MetaActionsGroupConfig> ActionsGroups = new List<MetaActionsGroupConfig>();
     }
 }

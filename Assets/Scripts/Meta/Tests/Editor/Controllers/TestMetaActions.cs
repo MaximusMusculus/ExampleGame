@@ -23,8 +23,6 @@ namespace Meta.Tests.Editor.Controllers
         private IActionProcessor _actionProcessor;
         private IConditionProcessor _conditionProcessor;
         
-        
-
         [SetUp]
         public void Setup()
         {
@@ -43,7 +41,7 @@ namespace Meta.Tests.Editor.Controllers
             _inventoryController.Add(MapTestId.Scrup.Id(), 100);
             _inventoryController.Add(MapTestId.Recruts.Id(), 100);
 
-            var action = _metaConfig.Actions[0];
+            var action = _metaConfig.ActionsGroups[0].Actions[0];
             _actionProcessor.Process(action.Actions);
 
             Assert.AreEqual(50, _inventoryController.GetCount(MapTestId.Scrup.Id()));
@@ -60,7 +58,7 @@ namespace Meta.Tests.Editor.Controllers
             _inventoryController.Add(MapTestId.Scrup.Id(), startCount);
             _inventoryController.Add(MapTestId.Recruts.Id(), startCount);
 
-            var action = _metaConfig.Actions[0];
+            var action = _metaConfig.ActionsGroups[0].Actions[0];
             for (int i = 0; i < 10; i++)
             {
                 Assert.IsTrue(_conditionProcessor.Check(action.Require));
@@ -76,7 +74,7 @@ namespace Meta.Tests.Editor.Controllers
             _inventoryController.Add(MapTestId.Scrup.Id(), 10);
             _inventoryController.Add(MapTestId.Recruts.Id(), 100);
 
-            var action = _metaConfig.Actions[0];
+            var action = _metaConfig.ActionsGroups[0].Actions[0];
             //как проверить наличие? Перед действием?
             //По идее это будет делать вьюха.
             //А я просто разверну 2ю модель и буду на ней смотреть. Если она при выполнения действия не падает - то все ок ^_^

@@ -12,7 +12,11 @@ namespace Meta.TestConfiguration
         private readonly ActionCollectionConfigBuilder _actionCollection = new ActionCollectionConfigBuilder();
         private readonly ConditionsConfigBuilder _conditions = new ConditionsConfigBuilder();
         private readonly MetaActionConfigBuilder _metaActions = new MetaActionConfigBuilder();
+        private readonly MetaActionGroupConfigBuilder _actionGroup = new MetaActionGroupConfigBuilder();
+        
+        
         private readonly IIdProvider _idProvider = new IdProvider(new IdProviderDto {nextId = 100});
+        
 
         public MetaConfig GetConfig()
         {
@@ -29,29 +33,28 @@ namespace Meta.TestConfiguration
                 .AddUnitConfig(_unit.NewUnit(MapTestId.UnitScout.Id()).SetCanUpgrade().Progression(1, 1, 1).Build())
                 .AddUnitConfig(_unit.NewUnit(MapTestId.UnitAssault.Id()).SetCanUpgrade().Progression(1, 2, 3).Build());
 
+            _actionGroup.New(MapTestId.GroupBarracs.Id());
             //train unit action
-            _metaBuilder.AddActionConfig(
-                _metaActions.NewAction()
-                    .SetActions(_actionCollection.NewAction()
-                        .InventoryItemSpend(MapTestId.Scrup.Id(), 50)
-                        .InventoryItemSpend(MapTestId.Recruts.Id(), 20)
-                        .UnitAdd(_unit.NewUnit(MapTestId.UnitGunner.Id()).Build(), 1)
-                        .Build())
-                    .SetRequire(_conditions.NewCollection(TypeCollection.And)
-                        .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.Less, 10)
-                        .Build())
-                    .Build());
-            
-            
-            //add resourse and costUnitAction
-            _metaBuilder.AddActionConfig(
-                _metaActions.NewAction()
-                    .SetActions(_actionCollection.NewAction()
-                        .InventoryItemAdd(MapTestId.Scrup.Id(), 50)
-                        .InventoryItemAdd(MapTestId.Recruts.Id(), 20)
-                        .UnitSpend(_unit.NewUnit(MapTestId.UnitGunner.Id()).Build(), 1)
-                        .Build())
-                    .Build());
+            _actionGroup.AddAction(_metaActions.NewAction()
+                .SetActions(_actionCollection.NewAction()
+                    .InventoryItemSpend(MapTestId.Scrup.Id(), 50)
+                    .InventoryItemSpend(MapTestId.Recruts.Id(), 20)
+                    .UnitAdd(_unit.NewUnit(MapTestId.UnitGunner.Id()).Build(), 1)
+                    .Build())
+                .SetRequire(_conditions.NewCollection(TypeCollection.And)
+                    .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.Less, 10)
+                    .Build())
+                .Build());
+
+            //spend
+            _actionGroup.AddAction(_metaActions.NewAction()
+                .SetActions(_actionCollection.NewAction()
+                    .InventoryItemAdd(MapTestId.Scrup.Id(), 50)
+                    .InventoryItemAdd(MapTestId.Recruts.Id(), 20)
+                    .UnitSpend(_unit.NewUnit(MapTestId.UnitGunner.Id()).Build(), 1)
+                    .Build())
+                .Build());
+
 
             //resoures
             for (int i = 0; i < 1000; i++)
@@ -65,14 +68,15 @@ namespace Meta.TestConfiguration
             {
                 var unitId = _idProvider.GetId();
                 _metaBuilder.AddUnitConfig(_unit.NewUnit(unitId).SetCanUpgrade().Build());
-                
+
                 if (i == 0)
                 {
                     unitIdRange.x = unitId;
                 }
+
                 unitIdRange.y = unitId;
             }
-            
+
             //actions
             for (int i = 0; i < 1000; i++)
             {
@@ -81,12 +85,14 @@ namespace Meta.TestConfiguration
                 {
                     addAllUnitsAction.UnitAdd(_unit.NewUnit((ushort) unitId).Build(), 1);
                 }
-                _metaBuilder.AddActionConfig(
-                    _metaActions.NewAction()
-                        .SetActions(addAllUnitsAction.Build())
-                        .Build());
+
+                _actionGroup.AddAction(_metaActions.NewAction()
+                    .SetActions(addAllUnitsAction.Build())
+                    .Build());
             }
-            
+
+
+            _metaBuilder.AddActionGroup(_actionGroup.Build());
             return _metaBuilder.Build();
         }
     }
