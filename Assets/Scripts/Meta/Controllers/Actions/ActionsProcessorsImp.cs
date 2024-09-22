@@ -1,8 +1,4 @@
-using System.Collections.Generic;
 using System.Linq;
-using AppRen;       //убрать в утилс?
-using Meta.Models;  //объединить с Configs и переназвать?
-using Meta.Configs;
 using Meta.Configs.Actions;
 
 
@@ -73,41 +69,29 @@ namespace Meta.Controllers.Actions
         }
         protected override void Process(UnitActionConfig config)
         {
-            var targetUnit =_unitController.GetUnits().First(s => s.UnitType == config.TypeUnit);// && s.Stats.Level == args.Progression.Level);
-            _unitController.Spend(targetUnit, config.Count);
+            if (_unitController.TryGetUnit(config.TypeUnit, config.Progression, out var unit))
+            {
+                _unitController.Spend(unit, config.Count);
+            }
         }
     }
-    
-    
-    
-    /// <summary>
-    /// Большой плюс - не надо создавать кучу мелких классов. Нужен только конфиг.
-    /// Из минусов, если у процессора изменится тип IActionArgs, то узнаю я это на этапе выполнения (проверку - ожидания/реальность или тесты всех экшенов)
-    /// Пока сущонстей немного, можно передавать через конструктор.
-    /// Как станет оч много - разбить на специализированные процессоры - введя цепочку обработки с выбросом эксепшена в конце цепочки, если не был экшен обработан
-    /// </summary>
-    public class ActionProcessor : IActionProcessor
+
+
+    public class ActionCollectionProcessor : ActionAbstract<ActionCollectionConfig>
     {
-        private readonly Dictionary<TypeAction, IActionProcessor> _actions = new Dictionary<TypeAction, IActionProcessor>();
+        private readonly IActionProcessor _actionProcessor;
 
-        public ActionProcessor(IInventoryController inventoryController, IUnitsController unitController)
+        public ActionCollectionProcessor(IActionProcessor actionProcessor)
         {
-            _actions.Add(TypeAction.Collection, this);
-            
-            _actions.Add(TypeAction.InventoryItemAdd, new InventoryItemAddAction(inventoryController));
-            _actions.Add(TypeAction.InventoryItemSpend, new InventoryItemSpendAction(inventoryController));
-            _actions.Add(TypeAction.InventoryItemExpandLimit, new InventoryItemExpandLimitAction(inventoryController));
-            
-            _actions.Add(TypeAction.UnitAdd, new UnitAddAction(unitController));
-            _actions.Add(TypeAction.UnitSpend, new UnitSpendAction(unitController));
+            _actionProcessor = actionProcessor;
         }
-        
-        //как улучшение 
-        //private bool CanProcess(TypeAction action);
 
-        public void Process(IActionConfig config)
+        protected override void Process(ActionCollectionConfig args)
         {
-            _actions[config.TypeAction].Process(config);
+            foreach (var anyAction in args)//.GetActions())
+            {
+                _actionProcessor.Process(anyAction);
+            }
         }
     }
 }

@@ -2,14 +2,14 @@ using Meta.Configs;
 
 namespace Meta.Controllers
 {
-    public interface ICondition
+    public interface IConditionProcessor
     {
         bool Check(IConditionConfig conditionConfig);
         //getText?
         //getToast?
     }
     
-    public abstract class ConditionAbstract<TArgs> : ICondition where TArgs : IConditionConfig, new()
+    public abstract class ConditionProcessorAbstract<TArgs> : IConditionProcessor where TArgs : IConditionConfig, new()
     {
         public bool Check(IConditionConfig conditionConfig)
         {
@@ -17,7 +17,7 @@ namespace Meta.Controllers
             return Check((TArgs) conditionConfig);
         }
 
-        protected abstract bool Check(TArgs args);
+        protected abstract bool Check(TArgs conditionsConfig);
 
         //если потребуется
         public static TArgs CreateEmptyArgs()

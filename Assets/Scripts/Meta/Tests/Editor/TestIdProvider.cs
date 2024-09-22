@@ -13,7 +13,7 @@ namespace Meta.Tests.Editor
             var dict = new Dictionary<Id, int>();
             for (int i = 0; i < 10; i++)
             {
-                dict.Add(provider.GetNext(), i);
+                dict.Add(provider.GetId(), i);
             }
 
             Assert.AreEqual(10, dict.Count);
@@ -24,7 +24,7 @@ namespace Meta.Tests.Editor
         {
             var data = new IdProviderDto {nextId = 10};
             var provider = new IdProvider(data);
-            Assert.AreEqual(10, provider.GetNext().Value);
+            Assert.AreEqual(10, provider.GetId().Value);
         }
     }
 }

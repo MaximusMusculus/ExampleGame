@@ -12,22 +12,16 @@ namespace Meta.Configs
     public  class UnitConfig
     {
         public Id UnitType;
-        public TypeUnitStacked StackedType;
-        
         public bool IsCanUpgrade; //можно ли прокачивать юнита
         public TypeUnitCalculation TypeCalculation => TypeUnitCalculation.Table;
+        public UnitProgressionDto Progression = new UnitProgressionDto();  
 
         public UnitProgressionDto GetDefaultProgression()
         {
             return new UnitProgressionDto();
         }
     }
-
-    public enum TypeUnitStacked
-    {
-        StackByUnitType,
-        StackByProgressionLevel, 
-    }
+    
     
    /// <summary>
    /// В моделе игры по TypeUnitCalculation выбирается конкретный UnitCalculationController с методами в которые передается UnitProgressionDto

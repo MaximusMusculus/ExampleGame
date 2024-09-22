@@ -2,11 +2,13 @@ using AppRen;
 
 namespace Meta.Configs.Conditions
 {
-    public class ItemConditionConfig : IConditionConfig
+    public class CountConditionConfig : IConditionConfig
     {
-        public TypeCondition TypeCondition { get; set; }
+        public TypeCondition TypeCondition => Condition;
+
+        public TypeCondition Condition;
         public Id TypeItem;
-        public int CompareType;
+        public TypeCompare CompareType;
         public int Value;
     }
 }

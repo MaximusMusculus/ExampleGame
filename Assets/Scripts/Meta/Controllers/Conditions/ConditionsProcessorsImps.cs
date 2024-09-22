@@ -1,79 +1,59 @@
-﻿using System.Collections.Generic;
-using Meta.Configs;
-using Meta.Configs.Conditions;
+﻿using Meta.Configs.Conditions;
 
 namespace Meta.Controllers.Conditions
 {
-    public class ConditionInventoryItemCount : ConditionAbstract<ItemConditionConfig>
+    public class ConditionProcessorInventoryItemCount : ConditionProcessorAbstract<CountConditionConfig>
     {
         private readonly IInventoryController _inventoryController;
 
-        public ConditionInventoryItemCount(IInventoryController inventoryController)
+        public ConditionProcessorInventoryItemCount(IInventoryController inventoryController)
         {
             _inventoryController = inventoryController;
         }
 
-        protected override bool Check(ItemConditionConfig conditionConfig)
+        protected override bool Check(CountConditionConfig conditionsConfig)
         {
-            var count = _inventoryController.GetCount(conditionConfig.TypeItem);
-            //+compare
-            return count > conditionConfig.Value;
+            var count = _inventoryController.GetCount(conditionsConfig.TypeItem);
+            return count.CheckCompareIsTrue(conditionsConfig.CompareType, conditionsConfig.Value);
         }
     }
-
-    public class ConditionInventoryLimit : ConditionAbstract<ItemConditionConfig>
+    public class ConditionProcessorInventoryLimit : ConditionProcessorAbstract<CountConditionConfig>
     {
         private readonly IInventoryController _inventoryController;
 
-        public ConditionInventoryLimit(IInventoryController inventoryController)
+        public ConditionProcessorInventoryLimit(IInventoryController inventoryController)
         {
             _inventoryController = inventoryController;
         }
 
-        protected override bool Check(ItemConditionConfig conditionConfig)
+        protected override bool Check(CountConditionConfig conditionsConfig)
         {
-            var limit = _inventoryController.GetLimit(conditionConfig.TypeItem);
-            return limit > conditionConfig.Value;
+            var limit = _inventoryController.GetLimit(conditionsConfig.TypeItem);
+            return limit.CheckCompareIsTrue(conditionsConfig.CompareType, conditionsConfig.Value);
         }
     }
-
-    //может быть центральным, где все регают в него нужные чекеры
-    //может быть разбит по кусочкам и реализовать интерфейс IChecker, где внутри пробегается по мелким чекерам, спрашивая, могут ли они обработать аргсу
-    public class CheckProcessor : ICondition
+    
+    public class ConditionProcessorUnitsCount : ConditionProcessorAbstract<CountConditionConfig>
     {
-        private readonly Dictionary<TypeCondition, ICondition> _checkers = new Dictionary<TypeCondition, ICondition>();
+        private readonly IUnitsController _unitsController;
 
-        public CheckProcessor(IInventoryController inventoryController)
+        public ConditionProcessorUnitsCount(IUnitsController unitsController)
         {
-            _checkers.Add(TypeCondition.InventoryItemsCount, new ConditionInventoryItemCount(inventoryController));
-            _checkers.Add(TypeCondition.InventoryItemsLimit, new ConditionInventoryLimit(inventoryController));
+            _unitsController = unitsController;
         }
 
-        public void AddChecker(TypeCondition typeCondition, ICondition condition)
+        protected override bool Check(CountConditionConfig conditionsConfig)
         {
-            _checkers.Add(typeCondition, condition);
-        }
-
-        public bool Check(IConditionConfig conditionConfig)
-        {
-            if (_checkers.TryGetValue(conditionConfig.TypeCondition, out var checker))
+            foreach (var unit in _unitsController.GetUnits())
             {
-                return checker.Check(conditionConfig);
+                if (unit.UnitType.Equals(conditionsConfig.TypeItem))
+                {
+                    return unit.Count.CheckCompareIsTrue(conditionsConfig.CompareType, conditionsConfig.Value);
+                }
             }
-
-            throw new System.ArgumentException($"Checker not found for {conditionConfig.TypeCondition}");
+            //если нет юнитов, значит нет лимита?)
+            return true;
         }
     }
-
-
-    public class CheckUse
-    {
-        private ICondition _checkProcessor;
-
-        public void Test()
-        {
-            _checkProcessor.Check(new ItemConditionConfig {TypeCondition = TypeCondition.InventoryItemsCount, TypeItem = 1, Value = 50});
-        }
-    }
-
+    
 }

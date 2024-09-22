@@ -1,9 +1,8 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using AppRen;
 using Meta.Models;
-
-
+using UnityEngine.Assertions;
 
 namespace Meta.Configs.Actions
 {
@@ -26,38 +25,41 @@ namespace Meta.Configs.Actions
         public int Count;
     }
 
-
-    /// <summary>
-    /// Пример читаемого конфига удобного для сериализации.
-    /// </summary>
-    public class ActionCollectionConfig : IActionConfig, IEnumerable<IActionConfig>
+    public class ActionCollectionConfig : IActionConfig
     {
         public TypeAction TypeAction => TypeAction.Collection;
 
-        //хранение коллекции в типизированном виде
-        public List<UnitActionConfig> Untis = new List<UnitActionConfig>();
-        public List<ItemActionConfig> Items = new List<ItemActionConfig>();
-
-        //хранение в виде абстракций
-        public List<IActionConfig> Actions = new List<IActionConfig>();
+        //хранение набора коллекции в типизированном виде
+        //для удобной читаемости и сериализации/десериализации
+        public readonly List<UnitActionConfig> Untis = new List<UnitActionConfig>();
+        public readonly List<ItemActionConfig> Items = new List<ItemActionConfig>();
+        
+        //схож с ConditionCollectionConfig, там тестирую массив
+        
+        private IEnumerator<IActionConfig> _enumerator;
+        private IEnumerator<IActionConfig> CreateHash()
+        {
+            var actionConfigs = new List<IActionConfig>(Items.Count + Untis.Count);
+            actionConfigs.AddRange(Items);
+            actionConfigs.AddRange(Untis);
+            _enumerator = actionConfigs.GetEnumerator();
+            return _enumerator;
+        }
 
         //получение и использование в абстракции.
         public IEnumerator<IActionConfig> GetEnumerator()
         {
-            foreach (var unitActionConfig in Untis)
+            if (_enumerator == null)
             {
-                yield return unitActionConfig;
+                _enumerator = CreateHash();
+            }
+            else
+            {
+                Assert.IsFalse(_enumerator.MoveNext(), "Enumerator is not reset");
             }
 
-            foreach (var itemAction in Items)
-            {
-                yield return itemAction;
-            }
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            _enumerator.Reset();
+            return _enumerator;
         }
     }
 }
