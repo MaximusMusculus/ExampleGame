@@ -2979,6 +2979,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Notificator
       objectReference: {fileID: 0}
+    - target: {fileID: 7606967019573280495, guid: 9a1cd96b0e4d6b24f8548a438bde1c35, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a1cd96b0e4d6b24f8548a438bde1c35, type: 3}
 --- !u!224 &9151706630602914958 stripped
