@@ -29,24 +29,22 @@ namespace Meta.Controllers
         /// <returns>Список доступных дляпрокачки юнитов</returns>
         IEnumerable<IUnitModel> GetCanUpgradeUnits();
     }
-    
-    
+
+
+    public interface IUnits
+    {
+        IEnumerable<IUnitModel> GetUnits();
+        bool TryGetUnit(Id typeUnit, UnitProgressionDto progression, out IUnitModel model);
+    }
+
     /// <summary>
     /// При добавлении ориентируется на IsCanUpgrade -
     /// То, что грейдится, складывается в одну кучу. И не удаляется при 0.
     /// </summary>
-    public interface IUnitsController
+    public interface IUnitsController : IUnits
     {
         void Add(Id unitType, int count);
         void Add(Id unitType, UnitProgressionDto progression, int count);
         void Spend(IUnitModel unitModel, int count);
-        
-
-        bool TryGetUnit(Id typeUnit, UnitProgressionDto progression, out IUnitModel model);
-        
-        
-        
-        
-        IEnumerable<IUnitModel> GetUnits();
     }
 }

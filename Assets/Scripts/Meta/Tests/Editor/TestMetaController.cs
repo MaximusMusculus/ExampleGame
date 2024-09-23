@@ -19,7 +19,7 @@ namespace Meta.Tests.Editor
         {
             _data = new MetaDto();
             _config = new TestMetaConfigProvider().GetConfig();
-            _model = new MetaModel(_config, _data);
+            _model = new MetaModel(_config, _data, new MetaControllersFactory(_config));
         }
 
         /*

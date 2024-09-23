@@ -211,7 +211,7 @@ namespace Meta.TestConfiguration
 
         public ConditionsConfigBuilder AddCollection(ConditionCollectionConfig config)
         {
-            _config.Collection.Add(config);
+            _config.Collections.Add(config);
             return this;
         }
 

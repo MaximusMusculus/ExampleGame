@@ -7,15 +7,18 @@ using Meta.Models;
 
 namespace Meta.Controllers
 {
-    public interface IInventoryController
+    public interface IInventory
+    {
+        int GetCount(Id item);
+        int GetLimit(Id item);
+        IEnumerable<Id> GetItems();
+    }
+
+    public interface IInventoryController : IInventory
     {
         void Add(Id item, int count);
         void Spend(Id item, int count);
         void ExpandLimit(Id item, int count);
-
-        int GetCount(Id item);
-        int GetLimit(Id item);
-        IEnumerable<Id> GetItems();
     }
 
 }
@@ -57,7 +60,7 @@ namespace Meta.Controllers.Imp
             var elem = _itemsHash[item];
             elem.Count = Math.Clamp(elem.Count + count, 0, elem.Limit);
         }
-
+        
         public void Spend(Id item, int count)
         {
             var elem = _itemsHash[item];
@@ -68,7 +71,15 @@ namespace Meta.Controllers.Imp
 
             elem.Count -= count;
         }
+        
+        public void ExpandLimit(Id item, int count)
+        {
+            var elem = _itemsHash[item];
+            elem.Limit = checked(elem.Limit + count);
+        }
 
+        
+        //----
         public int GetCount(Id item)
         {
             return _itemsHash[item].Count;
@@ -77,12 +88,6 @@ namespace Meta.Controllers.Imp
         public int GetLimit(Id item)
         {
             return _itemsHash[item].Limit;
-        }
-
-        public void ExpandLimit(Id item, int count)
-        {
-            var elem = _itemsHash[item];
-            elem.Limit = checked(elem.Limit + count);
         }
 
         public IEnumerable<Id> GetItems()

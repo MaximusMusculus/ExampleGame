@@ -2,7 +2,7 @@
 
 namespace MetaUi
 {
-    public class MetaRoot : MonoBehaviour
+    public class MetaUiRoot : MonoBehaviour
     {
         
     }

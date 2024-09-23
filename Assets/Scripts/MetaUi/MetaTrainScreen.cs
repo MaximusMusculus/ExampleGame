@@ -1,36 +1,42 @@
+using Meta.Configs;
+using Meta.Controllers;
 using UnityEngine;
+
 
 namespace MetaUi
 {
-    public enum TypeUiEvent
-    {
-        None,
-        TrainUnit,
-    }
-
-    public interface IUiEvent
-    {
-        
-    }
+    public interface IUiEvent { }
     public interface IUiEventHandler
     {
         void HandleEvent(IUiEvent uiEvent);
     }
-
-    public interface IUiEvtHandler<in TEvent> where TEvent : IUiEvent
+    public interface IUiCustomEventHandler<in TEvent> where TEvent : IUiEvent
     {
         void Handle(TEvent uiEvent);
     }
     
     
-    public class MetaTrainScreen : MonoBehaviour, IUiEvtHandler<TrainUiEvent>
+    
+    
+    /// <summary>
+    /// Тут нужны юниты, ресурсы, действия и кондишены.  
+    /// </summary>
+    public class MetaTrainScreen : MonoBehaviour
     {
-        private  IUiEventHandler _parentEventHandler;
-
-
-        public void Handle(TrainUiEvent uiEvent)
+        private IInventory _items;            //topBar
+        private IUnits _units;                //unitsContent
+        private IConditionProcessor _conditionProcessor;//checkRequire
+        private MetaActionsGroupConfig _actionsGroup;   //config
+        
+        public MetaTrainScreen Setup(IInventory items, IUnits units, IConditionProcessor conditions, MetaActionsGroupConfig actions)
         {
-            _parentEventHandler.HandleEvent(uiEvent);
+            _items = items;
+            _units = units;
+            _conditionProcessor = conditions;
+            _actionsGroup = actions;
+            return this;
         }
+        
+        
     }
 }
