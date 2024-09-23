@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 
 namespace MetaUi
 {
-    public class TrainElemData : IUiEvent
+    public class TrainElemData
     {
         public string Title;
         public string Description;
@@ -17,58 +17,42 @@ namespace MetaUi
         
         public bool ButtonEnabled;
         public Sprite Icon;
-
+        
         public Id UnitType;
-        public IUiEventHandler ParentEventHandler;
-        public TrainUiEvent Event = new TrainUiEvent();
     }
-    public class TrainUiEvent : IUiEvent
+    public class TrainUiEvent : IMessage
     {
         public Id UnitType;
         public Transform UnitPivot;
     }
 
-    
     /// <summary>
     /// знает про юнитов их количество
     /// знает, можно ли купить юнита
     /// знает про список юнитов и их данные
     /// </summary>
-    public class MetaTrainUnits : MonoBehaviour, IUiEventHandler, IUiCustomEventHandler<TrainUiEvent>
+    public class MetaTrainUnits : MonoBehaviour, IHierarchyHandler<TrainUiEvent>
     {
         private IUnitsController _unitsController;
         private IConditionProcessor _conditions;
         private IEnumerable<MetaActionConfig> _trainActions;
-        private IUiEventHandler _parentUiEventHandler; //??
-
+        
         private List<TrainElemData> _elemsData;
         [SerializeField] private List<MetaTrainUnit> _elemsView;
 
-        public void Setup(IUnitsController unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions,
-            IUiEventHandler parentUiEventHandler) //это в базовый класс
+        public void Setup(IUnitsController unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions) //это в базовый класс
         {
             _unitsController = unitsController;
             _conditions = conditions;
             _trainActions = trainActions;
-            _parentUiEventHandler = parentUiEventHandler;
             FillUnits();
         }
-
-
-        // тут как то делается обработка событий. 
-        // суть в том, что я тут могу объявить типизированный обработчик
-        //и по идее должен вывалиться в обработку сюда. Тут - я либо прерываю цепочку, либо пускаю эвент дальше.
-        //если я не реализую никакой интерфейс прослушивателя - то обработка событий идет дальше наверх
-        public void HandleEvent(IUiEvent uiEvent)
+        
+        public void OnMessage(TrainUiEvent message)
         {
-            //передать выше или обработать самому?
-            _parentUiEventHandler.HandleEvent(uiEvent);
+            Debug.Log("MetaTrainUnits train unit" + message.UnitType);
+            this.SendHierarchy(message);
         }
-        public void Handle(TrainUiEvent uiEvent)
-        {
-            _parentUiEventHandler.HandleEvent(uiEvent);
-        }
-
 
         private void FillUnits()
         {
@@ -107,7 +91,7 @@ namespace MetaUi
             _elemsData = new List<TrainElemData>(_elemsView.Count);
             foreach (var trainElem in _elemsView)
             {
-                var viewData = new TrainElemData {ParentEventHandler = this};
+                var viewData = new TrainElemData();
                 _elemsData.Add(viewData);
                 trainElem.SetData(viewData);
             }
@@ -150,7 +134,5 @@ namespace MetaUi
             }
             elemData.CountAndLimit = $"{unitCount}/{unitLimit}";
         }
-
- 
     }
 }

@@ -2,9 +2,31 @@
 using Meta.Models;
 using Meta.TestConfiguration;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace MetaUi
 {
+    public interface IMessage
+    {
+    }
+    
+    public static class Extensions
+    {
+        public static void SendHierarchy<T, TK>(this T obj, TK message) where T : MonoBehaviour where TK : IMessage
+        {
+            ExecuteEvents.ExecuteHierarchy<IHierarchyHandler<TK>>(obj.transform.parent.gameObject, null,
+                (handler, data) => handler.OnMessage(message));
+        }
+    }
+
+    public interface IHierarchyHandler<in T> : IEventSystemHandler where T : IMessage
+    {
+        void OnMessage(T message);
+    }
+
+
+
+
     /// <summary>
     ///  -Корень компоновки (тут)
     ///  - Презентационная логика (~)
@@ -15,7 +37,7 @@ namespace MetaUi
     /// Корень компоновки собирает все независимые модули приложения.
     /// осуществляется в месте, где требуется интеграция различных модулей
     /// </summary>
-    public class MetaDemoRoot : MonoBehaviour, IUiEventHandler
+    public class MetaDemoRoot : MonoBehaviour
     {
         [SerializeField] private MetaUiRoot _metaUi;
         private MetaModel _metaModel;
@@ -39,9 +61,6 @@ namespace MetaUi
             //UpdateUi
         }
 
-        public void HandleEvent(IUiEvent uiEvent)
-        {
-            throw new System.NotImplementedException();
-        }
+  
     }
 }

@@ -5,23 +5,11 @@ using UnityEngine;
 
 namespace MetaUi
 {
-    public interface IUiEvent { }
-    public interface IUiEventHandler
-    {
-        void HandleEvent(IUiEvent uiEvent);
-    }
-    public interface IUiCustomEventHandler<in TEvent> where TEvent : IUiEvent
-    {
-        void Handle(TEvent uiEvent);
-    }
-    
-    
-    
     
     /// <summary>
     /// Тут нужны юниты, ресурсы, действия и кондишены.  
     /// </summary>
-    public class MetaTrainScreen : MonoBehaviour
+    public class MetaTrainScreen : MonoBehaviour, IHierarchyHandler<TrainUiEvent>
     {
         private IInventory _items;            //topBar
         private IUnits _units;                //unitsContent
@@ -36,7 +24,10 @@ namespace MetaUi
             _actionsGroup = actions;
             return this;
         }
-        
-        
+
+        public void OnMessage(TrainUiEvent message)
+        {
+           Debug.Log("MetaTrainScreen train unit" + message.UnitType);
+        }
     }
 }

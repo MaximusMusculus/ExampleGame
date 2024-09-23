@@ -14,6 +14,7 @@ namespace MetaUi
         [SerializeField] private Button _trainButton;
 
         private TrainElemData _data;
+        private readonly TrainUiEvent _event = new TrainUiEvent();
         
         public void SetData(TrainElemData data)
         {
@@ -32,12 +33,20 @@ namespace MetaUi
         
         public void OnTrainClick()
         {
-            Debug.Log("OnTrainClick");
-            var trainUiEvent = _data.Event;
-            trainUiEvent.UnitType = _data.UnitType;
-            trainUiEvent.UnitPivot = _iconImage.transform;
-            _data.ParentEventHandler.HandleEvent(trainUiEvent);
+           // Debug.Log("OnTrainClick");
+            //_event.UnitType = _data.UnitType;
+            _event.UnitPivot = _iconImage.transform;
+            this.SendHierarchy(_event);
+            //Debug.Break();
         }
+        
+        private void HandleClick()
+        {
+            _event.UnitPivot = _iconImage.transform;
+            this.SendHierarchy(_event);
+            //Debug.Break();
+        }
+
 
     }
 }
