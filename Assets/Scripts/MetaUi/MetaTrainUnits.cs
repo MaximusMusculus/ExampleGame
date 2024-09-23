@@ -16,11 +16,19 @@ namespace MetaUi
         
         public bool ButtonEnabled;
         public Sprite Icon;
+
+        public MetaActionConfig ActionConfig;
     }
-    public class TrainUiEvent : IUiMessage
+    public struct TrainUiEvent : IUiMessage
     {
         public MetaActionConfig Action;
         public Transform UnitPivot;
+
+        public TrainUiEvent(MetaActionConfig action, Transform unitPivot)
+        {
+            Action = action;
+            UnitPivot = unitPivot;
+        }
     }
 
     /// <summary>
@@ -30,24 +38,27 @@ namespace MetaUi
     /// </summary>
     public class MetaTrainUnits : MonoBehaviour
     {
-        private IUnitsController _unitsController;
+        private IUnits _unitsController;
         private IConditionProcessor _conditions;
         private IEnumerable<MetaActionConfig> _trainActions;
         
         private List<TrainElemData> _elemsData;
         [SerializeField] private List<MetaTrainUnit> _elemsView;
 
-        public void Setup(IUnitsController unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions) //это в базовый класс
+        private IActionProcessor _actionProcessor;
+
+        public void Setup(IUnits unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions) //это в базовый класс
         {
             _unitsController = unitsController;
             _conditions = conditions;
             _trainActions = trainActions;
-            FillUnits();
-        }
-
-        private void FillUnits()
-        {
             BindDataToView();
+            ShowUnits();
+        }
+        
+        
+        public void ShowUnits()
+        {
             int i = 0;
             foreach (var trainAction in SelectTrainActions())
             {
@@ -57,11 +68,17 @@ namespace MetaUi
 
             for (var j = 0; j < _elemsView.Count; j++)
             {
-                if (j < i) _elemsView[j].RefreshElem();
-                else _elemsView[j].gameObject.SetActive(false);
+                if (j < i)
+                {
+                    _elemsView[j].RefreshElem();
+                }
+                else
+                {
+                    _elemsView[j].gameObject.SetActive(false);
+                }
             }
         }
-
+        
         private IEnumerable<MetaActionConfig> SelectTrainActions()
         {
             //отбираем только те действия, которые добавляют юнитов
@@ -87,9 +104,9 @@ namespace MetaUi
                 trainElem.SetData(viewData);
             }
         }
-        
         private void FillTrainElemView(MetaActionConfig actionConfig, TrainElemData elemData)
         {
+            elemData.ActionConfig = actionConfig;
             //первая, мучительная процедура распаковки)) экшена.  Далее - либо, буду делать типизированные (классов что ли жалко)
             //либо спец адаптеры.
             

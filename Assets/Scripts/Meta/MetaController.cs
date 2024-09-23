@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using AppRen;
 using Meta.Configs;
 using Meta.Controllers;
@@ -14,6 +13,9 @@ namespace Meta
     {
         public IInventory Inventory => _inventory;
         public IUnits Units => _units;
+        
+        public IConditionProcessor ConditionProcessor => _conditions;
+        public IActionProcessor ActionProcessor => _actions;
 
         
         private readonly IInventoryController _inventory;
@@ -33,8 +35,6 @@ namespace Meta
 
             _actions = controllersFactory.CreateActionProcessor(_inventory, _units);
             _conditions = controllersFactory.CreateConditionProcessor(_inventory, _units);
-            
-            
         }
 
         public void DoAction(Id group, int index)

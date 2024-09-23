@@ -17,22 +17,24 @@ namespace MetaUi
     /// Корень компоновки собирает все независимые модули приложения.
     /// осуществляется в месте, где требуется интеграция различных модулей
     /// </summary>
-    public class MetaDemoRoot : MonoBehaviour
+    public class MetaDemoRoot : MonoBehaviour , IHierarchyHandler<IUiMessage>
     {
-        [SerializeField] private MetaUiRoot _metaUi;
+        [SerializeField] private MetaTrainUnitsScreen _metaTrainUnits;
+        
+        
         private MetaModel _metaModel;
         
         protected void Awake()
         {
             //создание мета модели
-            var gameConfig = new MetaConfigDevelopProvider();
+            var gameConfig = new MetaConfigDevelopProvider().GetConfig();
             var emptyGameData = new MetaDto();
-            var metaControllersFactory = new MetaControllersFactory(gameConfig.GetConfig()); 
-            _metaModel = new MetaModel(gameConfig.GetConfig(), emptyGameData, metaControllersFactory);
+            var metaControllersFactory = new MetaControllersFactory(gameConfig); 
+            _metaModel = new MetaModel(gameConfig, emptyGameData, metaControllersFactory);
             
             //создание мета UI
-
-            //_metaUi.Setup();
+            var testActGroup = gameConfig.ActionsGroups[0];
+            _metaTrainUnits.Setup(_metaModel.Inventory, _metaModel.Units, _metaModel.ConditionProcessor, _metaModel.ActionProcessor, testActGroup);
         }
 
         protected void Update()
@@ -41,6 +43,10 @@ namespace MetaUi
             //UpdateUi
         }
 
-  
+
+        public void HandleMessage(IUiMessage message)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
