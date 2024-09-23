@@ -17,7 +17,7 @@ namespace MetaUi
     /// Корень компоновки собирает все независимые модули приложения.
     /// осуществляется в месте, где требуется интеграция различных модулей
     /// </summary>
-    public class MetaDemoRoot : MonoBehaviour , IHierarchyHandler<IUiMessage>
+    public class MetaDemoRoot : MonoBehaviour
     {
         [SerializeField] private MetaTrainUnitsScreen _metaTrainUnits;
         
@@ -43,10 +43,15 @@ namespace MetaUi
             //UpdateUi
         }
 
-
-        public void HandleMessage(IUiMessage message)
+        private void HandleInputCommand()
         {
-            throw new System.NotImplementedException();
+            //для проверки валидности выполнения, сейф мод, может запустить 2ю модель меты.
+            //перед тем, как применять команды на основную модель, мы применим команды на проверочную. 
+            //в случае эксепшена - можем что то сделать или вывести. Но, это скорее вариант для плавной отладки игры, чем стандартный механизм.
+            //кстати, в случае ошибки, можем сбросить дамп стартового стейта и набора команд. Притом, это должно быть спрятано за интерфейсом
+            //IInputCmdExecutor + Update.  Но это уже более высокий уровень.
         }
+
+
     }
 }
