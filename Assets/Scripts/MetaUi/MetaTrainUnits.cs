@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using AppRen;
 using Meta.Configs;
 using Meta.Configs.Conditions;
 using Meta.Controllers;
@@ -17,12 +16,10 @@ namespace MetaUi
         
         public bool ButtonEnabled;
         public Sprite Icon;
-        
-        public Id UnitType;
     }
-    public class TrainUiEvent : IMessage
+    public class TrainUiEvent : IUiMessage
     {
-        public Id UnitType;
+        public MetaActionConfig Action;
         public Transform UnitPivot;
     }
 
@@ -31,7 +28,7 @@ namespace MetaUi
     /// знает, можно ли купить юнита
     /// знает про список юнитов и их данные
     /// </summary>
-    public class MetaTrainUnits : MonoBehaviour, IHierarchyHandler<TrainUiEvent>
+    public class MetaTrainUnits : MonoBehaviour
     {
         private IUnitsController _unitsController;
         private IConditionProcessor _conditions;
@@ -46,12 +43,6 @@ namespace MetaUi
             _conditions = conditions;
             _trainActions = trainActions;
             FillUnits();
-        }
-        
-        public void OnMessage(TrainUiEvent message)
-        {
-            Debug.Log("MetaTrainUnits train unit" + message.UnitType);
-            this.SendHierarchy(message);
         }
 
         private void FillUnits()
@@ -96,13 +87,15 @@ namespace MetaUi
                 trainElem.SetData(viewData);
             }
         }
-
-
-        //первая, мучительная процедура распаковки)) экшена.  Далее - либо, буду делать типизированные (классов что ли жалко)
-        //либо спец адаптеры.
+        
         private void FillTrainElemView(MetaActionConfig actionConfig, TrainElemData elemData)
         {
-            elemData.ButtonEnabled = _conditions.Check(actionConfig.Require); //если захочется тутор, то кондишен оборачивается доп-но в тутор логику
+            //первая, мучительная процедура распаковки)) экшена.  Далее - либо, буду делать типизированные (классов что ли жалко)
+            //либо спец адаптеры.
+            
+            //если захочется тутор, то кондишен оборачивается доп-но в тутор логику
+            elemData.ButtonEnabled = _conditions.Check(actionConfig.Require);
+            
             // я знаю, что в списке действий - должно быть действие по добавлению юнита
             var addUnitAction = actionConfig.Actions.Untis.FirstOrDefault(s => s.TypeAction == TypeAction.UnitAdd);
             Assert.IsNotNull(addUnitAction);

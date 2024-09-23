@@ -1,12 +1,13 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace MetaUi
 {
-    public class MetaUiRoot : MonoBehaviour, IHierarchyHandler <IMessage>
+    public class MetaUiRoot : MonoBehaviour, IHierarchyHandler <IUiMessage>
     {
-        public void OnMessage(IMessage message)
+        public void HandleMessage(IUiMessage uiMessage)
         {
-            //throw new System.NotImplementedException();
+            throw new ArgumentException("Not handled message type: " + uiMessage.GetType());
         }
     }
 }

@@ -15,7 +15,7 @@ namespace MetaUi
 
         private TrainElemData _data;
         private readonly TrainUiEvent _event = new TrainUiEvent();
-        
+
         public void SetData(TrainElemData data)
         {
             _data = data;
@@ -30,21 +30,11 @@ namespace MetaUi
             _countAndLimitText.text = _data.CountAndLimit;
             _trainButton.interactable = _data.ButtonEnabled;
         }
-        
+
         public void OnTrainClick()
         {
-           // Debug.Log("OnTrainClick");
-            //_event.UnitType = _data.UnitType;
             _event.UnitPivot = _iconImage.transform;
             this.SendHierarchy(_event);
-            //Debug.Break();
-        }
-        
-        private void HandleClick()
-        {
-            _event.UnitPivot = _iconImage.transform;
-            this.SendHierarchy(_event);
-            //Debug.Break();
         }
 
 

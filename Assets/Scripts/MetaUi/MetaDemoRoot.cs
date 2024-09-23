@@ -2,30 +2,10 @@
 using Meta.Models;
 using Meta.TestConfiguration;
 using UnityEngine;
-using UnityEngine.EventSystems;
+
 
 namespace MetaUi
 {
-    public interface IMessage
-    {
-    }
-    
-    public static class Extensions
-    {
-        public static void SendHierarchy<T, TK>(this T obj, TK message) where T : MonoBehaviour where TK : IMessage
-        {
-            ExecuteEvents.ExecuteHierarchy<IHierarchyHandler<TK>>(obj.transform.parent.gameObject, null,
-                (handler, data) => handler.OnMessage(message));
-        }
-    }
-
-    public interface IHierarchyHandler<in T> : IEventSystemHandler where T : IMessage
-    {
-        void OnMessage(T message);
-    }
-
-
-
 
     /// <summary>
     ///  -Корень компоновки (тут)

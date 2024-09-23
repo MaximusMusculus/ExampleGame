@@ -25,9 +25,10 @@ namespace MetaUi
             return this;
         }
 
-        public void OnMessage(TrainUiEvent message)
+        public void HandleMessage(TrainUiEvent message)
         {
-           Debug.Log("MetaTrainScreen train unit" + message.UnitType);
+           //message.UnitType
+           
         }
     }
 }
