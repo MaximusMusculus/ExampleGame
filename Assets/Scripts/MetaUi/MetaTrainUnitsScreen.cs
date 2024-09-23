@@ -12,21 +12,19 @@ namespace MetaUi
         private IInventory _items;            //topBar
         private IUnits _units;                //unitsContent
         private IConditionProcessor _conditionProcessor;//checkRequire
-        private MetaActionsGroupConfig _actionsGroup;   //config
         private IActionProcessor _actionsProcessor;
 
         [SerializeField] private MetaTrainUnits _metaTrainUnits;
         //topBar
         //bottomBar
         
-        public MetaTrainUnitsScreen Setup(IInventory items, IUnits units, IConditionProcessor conditions, IActionProcessor actionsProcessor,  MetaActionsGroupConfig actions)
+        public MetaTrainUnitsScreen Setup(IInventory items, IUnits units, IConditionProcessor conditions, IActionProcessor actionsProcessor, MetaActionsGroupConfig actions)
         {
             _items = items;
             _units = units;
             _conditionProcessor = conditions;
-            _actionsGroup = actions;
             _actionsProcessor = actionsProcessor;
-            _metaTrainUnits.Setup(units, conditions, actions.Actions);
+            _metaTrainUnits.Setup(items, units, conditions, actions.Actions);
             return this;
         }
 

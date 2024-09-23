@@ -47,7 +47,7 @@ namespace MetaUi
 
         private IActionProcessor _actionProcessor;
 
-        public void Setup(IUnits unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions) //это в базовый класс
+        public void Setup(IInventory inventory, IUnits unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions) //это в базовый класс
         {
             _unitsController = unitsController;
             _conditions = conditions;
@@ -128,6 +128,11 @@ namespace MetaUi
                 unitCount = unit.Count;
             }
             
+            // actionConfig.Actions.GetEnumerator()  тут  мне надо обойти список действий, отобрать только те, что снимают ресурс
+            // попробовать вывести это в представление.  Так же проверить, есть ли данный ресурс в нужном колве. Если нет - покрасить интерфейс, залочить кнопку
+            //такие вещи будут происходить достаточно часто. 
+            
+            //--стоимость, это надо переделать в красивую вьюху...
             foreach (var actionsItem in actionConfig.Actions.Items)
             {
                 elemData.Description += $"{actionsItem.TypeItem}:{actionsItem.Count}, ";
