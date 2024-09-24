@@ -17,7 +17,7 @@ namespace MetaUi
     /// Корень компоновки собирает все независимые модули приложения.
     /// осуществляется в месте, где требуется интеграция различных модулей
     /// </summary>
-    public class MetaDemoRoot : MonoBehaviour
+    public class MetaDemoInitializer : MonoBehaviour
     {
         [SerializeField] private MetaTrainUnitsScreen _metaTrainUnits;
         
