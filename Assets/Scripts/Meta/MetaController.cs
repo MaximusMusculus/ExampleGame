@@ -25,11 +25,11 @@ namespace Meta
         //.....
         private readonly IActionProcessor _actions;
         private readonly IConditionProcessor _conditions;
-        private readonly MetaConfig _config;
+        public MetaConfig Config { get; }
         
         public MetaModel(MetaConfig config, MetaDto data, IMetaControllersFactory controllersFactory)
         {
-            _config = config;
+            Config = config;
             _inventory = controllersFactory.CreateInventoryController(data.Items);
             _units = controllersFactory.CreateUnitsController(data.Units);
 
@@ -39,7 +39,7 @@ namespace Meta
 
         public void DoAction(Id group, int index)
         {
-            foreach (var actionsGroup in _config.ActionsGroups)
+            foreach (var actionsGroup in Config.ActionsGroups)
             {
                 if (actionsGroup.TypeGroup.Equals(group))
                 {

@@ -1,3 +1,4 @@
+using Meta;
 using Meta.Configs;
 using Meta.Controllers;
 using UnityEngine;
@@ -7,39 +8,47 @@ namespace MetaUi
     /// <summary>
     /// Тут нужны юниты, ресурсы, действия и кондишены.  
     /// </summary>
-    public class MetaTrainUnitsScreen : MonoBehaviour, IHierarchyHandler<TrainUiEvent>
+    public class MetaTrainUnitsScreen : MonoBehaviour, IHierarchyHandler<UiEventTrainUnit>
     {
-        private IInventory _items;            //topBar
-        private IUnits _units;                //unitsContent
-        private IConditionProcessor _conditionProcessor;//checkRequire
-        private IActionProcessor _actionsProcessor;
-
         [SerializeField] private MetaTrainUnits _metaTrainUnits;
-        //topBar
-        //bottomBar
+        [SerializeField] private MetaItemsBar _metaItemsBar;
         
-        public MetaTrainUnitsScreen Setup(IInventory items, IUnits units, IConditionProcessor conditions, IActionProcessor actionsProcessor, MetaActionsGroupConfig actions)
+        private MetaModel _metaModel;
+        private MetaActionsGroupConfig _actionsGroup;
+        private IConditionProcessor _conditionProcessor;
+        
+        public MetaTrainUnitsScreen Setup(MetaModel metaModel, MetaActionsGroupConfig actions, ISpriteHolderTest spriteHolder)
         {
-            _items = items;
-            _units = units;
-            _conditionProcessor = conditions;
-            _actionsProcessor = actionsProcessor;
-            _metaTrainUnits.Setup(items, units, conditions, actions.Actions);
+            _actionsGroup = actions;
+            _conditionProcessor = metaModel.ConditionProcessor;
+            _metaItemsBar.Setup(metaModel.Inventory, spriteHolder);
+            _metaTrainUnits.Setup(metaModel, actions.Actions, spriteHolder);
             return this;
         }
+        
+        public void UpdateView()
+        {
+            _metaItemsBar.UpdateItems();
+            _metaTrainUnits.UpdateUnits();
+        }
 
-        public void HandleMessage(TrainUiEvent message)
+        public void HandleEvent(UiEventTrainUnit message)
         {
             if (_conditionProcessor.Check(message.Action.Require))
             {
-                //пока пробую менять тут, но будет проброс сообщения с командой наверх.
-                _actionsProcessor.Process(message.Action.Actions);
-                _metaTrainUnits.ShowUnits();
+                this.SendHierarchy(new UiEventRunAction(_actionsGroup.TypeGroup, message.Action));
+                
+                //знаем какого юнита трерируем - знаем его стоимость и тд. Знаем позицию иконки юнита, знаем бар ресурсов и бар армии. 
+                //можем выполнить красивую анимацию с синхронизацией, естественно этого тут нет ;)
+                _metaTrainUnits.UpdateUnits();
+                _metaItemsBar.UpdateItems();
             }
             else
             {
                 Debug.Log("Can't train unit");
             }
         }
+
+
     }
 }

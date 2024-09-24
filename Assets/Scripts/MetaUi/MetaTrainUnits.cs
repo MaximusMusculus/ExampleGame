@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Meta;
 using Meta.Configs;
 using Meta.Configs.Conditions;
 using Meta.Controllers;
@@ -18,16 +19,14 @@ namespace MetaUi
         public Sprite Icon;
 
         public MetaActionConfig ActionConfig;
-    }
-    public struct TrainUiEvent : IUiMessage
-    {
-        public MetaActionConfig Action;
-        public Transform UnitPivot;
 
-        public TrainUiEvent(MetaActionConfig action, Transform unitPivot)
+        public List<ItemViewData> ItemsData = new List<ItemViewData>() {new ItemViewData(), new ItemViewData()};
+        
+        public class ItemViewData
         {
-            Action = action;
-            UnitPivot = unitPivot;
+            public bool IsEnable;
+            public Sprite Icon;
+            public string Text;
         }
     }
 
@@ -44,24 +43,31 @@ namespace MetaUi
         
         private List<TrainElemData> _elemsData;
         [SerializeField] private List<MetaTrainUnit> _elemsView;
-
+        
         private IActionProcessor _actionProcessor;
-
-        public void Setup(IInventory inventory, IUnits unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions) //это в базовый класс
+        private ISpriteHolderTest _spriteHolder;
+        
+        public void Setup(MetaModel metaModel, IEnumerable<MetaActionConfig> trainActions, ISpriteHolderTest spriteHolder)
         {
-            _unitsController = unitsController;
-            _conditions = conditions;
+            _unitsController = metaModel.Units;
+            _conditions = metaModel.ConditionProcessor;
             _trainActions = trainActions;
+            _spriteHolder = spriteHolder;
             BindDataToView();
-            ShowUnits();
+            UpdateUnits();
         }
         
         
-        public void ShowUnits()
+        public void UpdateUnits()
         {
             int i = 0;
             foreach (var trainAction in SelectTrainActions())
             {
+                if (i > _elemsData.Count-1)
+                {
+                    break;
+                }
+                
                 FillTrainElemView(trainAction, _elemsData[i]);
                 i++;
             }
@@ -85,7 +91,7 @@ namespace MetaUi
             //если будет такое часто - передать фильтр
             foreach (var trainAction in _trainActions)
             {
-                foreach (var action in trainAction.Actions)
+                foreach (var action in trainAction.Actions.GetAll())
                 {
                     if (action.TypeAction == TypeAction.UnitAdd)
                     {
@@ -104,6 +110,7 @@ namespace MetaUi
                 trainElem.SetData(viewData);
             }
         }
+        
         private void FillTrainElemView(MetaActionConfig actionConfig, TrainElemData elemData)
         {
             elemData.ActionConfig = actionConfig;
@@ -119,6 +126,7 @@ namespace MetaUi
 
             elemData.Title = "UnitType: " + addUnitAction.TypeUnit;
             elemData.Description = "Description: ";
+            elemData.Icon = _spriteHolder.GetSprite(addUnitAction.TypeUnit);
 
             var unitCount = 0;
             var unitLimit = int.MaxValue;
@@ -131,13 +139,24 @@ namespace MetaUi
             // actionConfig.Actions.GetEnumerator()  тут  мне надо обойти список действий, отобрать только те, что снимают ресурс
             // попробовать вывести это в представление.  Так же проверить, есть ли данный ресурс в нужном колве. Если нет - покрасить интерфейс, залочить кнопку
             //такие вещи будут происходить достаточно часто. 
-            
-            //--стоимость, это надо переделать в красивую вьюху...
+
+
+            Assert.IsTrue(actionConfig.Actions.Items.Count <= elemData.ItemsData.Count);
+            foreach (var data in elemData.ItemsData)
+            {
+                data.IsEnable = false;
+            }
+            int i = 0;
             foreach (var actionsItem in actionConfig.Actions.Items)
             {
-                elemData.Description += $"{actionsItem.TypeItem}:{actionsItem.Count}, ";
+                var priceData = elemData.ItemsData[i];
+                priceData.Icon = _spriteHolder.GetSprite(actionsItem.TypeItem);
+                priceData.Text = actionsItem.Count.ToString();
+                priceData.IsEnable = true;
+                i++;
             }
-
+            
+            
             //ищу условие на лимит юнитов
             foreach (var condition in actionConfig.Require.GetConditions())
             {
@@ -149,5 +168,7 @@ namespace MetaUi
             }
             elemData.CountAndLimit = $"{unitCount}/{unitLimit}";
         }
+
+
     }
 }
