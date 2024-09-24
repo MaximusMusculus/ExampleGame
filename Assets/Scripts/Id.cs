@@ -1,7 +1,7 @@
 using System;
 
 
-public static class DefaultCapacityConst
+public static class ConstDefaultCapacity
 {
     public const int Micro = 8;
     public const int Small = 16;

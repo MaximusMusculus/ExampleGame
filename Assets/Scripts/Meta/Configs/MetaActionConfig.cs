@@ -16,6 +16,7 @@ namespace Meta.Configs
     // Игровое действие, имеет проверки, меняет стейт?
     public class MetaActionConfig
     {
+        //id?
         public ConditionCollectionConfig Require;
         public ActionCollectionConfig Actions;
     }

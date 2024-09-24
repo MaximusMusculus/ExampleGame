@@ -13,27 +13,27 @@ namespace Meta.Configs.Conditions
         //checkUnits
         //checkTechs
         //checkCounters
-        public readonly List<ConditionCollectionConfig> Collection = new List<ConditionCollectionConfig>();
+        public readonly List<ConditionCollectionConfig> Collections = new List<ConditionCollectionConfig>();
         
         //схож с ActionCollectionConfig, там тестирую _enumerator
         private IConditionConfig[] _conditionsHash;
         private void CreateHash()
         {
-            _conditionsHash = new IConditionConfig[CheckItems.Count + Collection.Count];
+            _conditionsHash = new IConditionConfig[CheckItems.Count + Collections.Count];
             var i = 0;
             foreach (var item in CheckItems)
             {
                 _conditionsHash[i] = item;
                 i++;
             }
-            foreach (var item in Collection)
+            foreach (var item in Collections)
             {
                 _conditionsHash[i] = item;
                 i++;
             }
         }
         
-        public IConditionConfig[] Elems()
+        public IConditionConfig[] GetConditions()
         {
             if (_conditionsHash == null)
             {

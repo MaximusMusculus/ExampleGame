@@ -1,35 +1,42 @@
 using AppRen;
 using Meta.Configs;
 using Meta.Controllers;
-using Meta.Controllers.Actions;
-using Meta.Controllers.Conditions;
-using Meta.Controllers.Imp;
 using Meta.Models;
 using UnityEngine.Assertions;
 
 namespace Meta
 {
     /// <summary>
-    /// Model???
+    /// Model-> Wrapped?
     /// </summary>
     public class MetaModel
     {
-        public IInventoryController Inventory { get; }
-        public IUnitsController Units { get; }
+        public IInventory Inventory => _inventory;
+        public IUnits Units => _units;
         
+        public IConditionProcessor ConditionProcessor => _conditions;
+        public IActionProcessor ActionProcessor => _actions;
+
+        
+        private readonly IInventoryController _inventory;
+        private readonly IUnitsController _units;
+        
+        //Events
+        //.....
         private readonly IActionProcessor _actions;
         private readonly IConditionProcessor _conditions;
         private readonly MetaConfig _config;
-        public MetaModel(MetaConfig config, MetaDto data)
+        
+        public MetaModel(MetaConfig config, MetaDto data, IMetaControllersFactory controllersFactory)
         {
             _config = config;
-            Inventory = new InventoryController(config.InventoryItems, data.Items);
-            Units = new UnitsController(config.Units, data.Units);
+            _inventory = controllersFactory.CreateInventoryController(data.Items);
+            _units = controllersFactory.CreateUnitsController(data.Units);
 
-            _actions = new ActionProcessor(Inventory, Units);
-            _conditions = new ConditionProcessor(Inventory, Units);
+            _actions = controllersFactory.CreateActionProcessor(_inventory, _units);
+            _conditions = controllersFactory.CreateConditionProcessor(_inventory, _units);
         }
-        
+
         public void DoAction(Id group, int index)
         {
             foreach (var actionsGroup in _config.ActionsGroups)
@@ -42,17 +49,6 @@ namespace Meta
                 }
             }
         }
-
-        
-        /*public void RunAction(MetaActionConfig actionConfig)
-        {
-            _actions.Process(actionConfig.Actions);
-        }
-
-        public bool CheckRequire(MetaActionConfig actionConfig)
-        {
-            return _conditions.Check(actionConfig.Require);
-        }*/
     }
     
 }

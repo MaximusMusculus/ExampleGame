@@ -21,7 +21,7 @@ namespace Meta
             var config = new MetaConfigProviderTestBig().GetConfig();
             //new MetaConfigDevelopProvider().GetConfig();
             _metaDto = new MetaDto();
-            _model = new MetaModel(config, _metaDto);
+            _model = new MetaModel(config, _metaDto, new MetaControllersFactory(config));
             _actionGroup = MapTestId.GroupBarracs.Id();
             _trainUnit = 0;
             _costUnit = 1;

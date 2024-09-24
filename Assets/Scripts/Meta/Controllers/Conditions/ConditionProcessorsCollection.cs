@@ -13,7 +13,7 @@ namespace Meta.Controllers.Conditions
 
         protected override bool Check(ConditionCollectionConfig conditionsConfig)
         {
-            foreach (var condition in conditionsConfig.Elems())
+            foreach (var condition in conditionsConfig.GetConditions())
             {
                 if (_conditionProcessor.Check(condition))
                 {
@@ -36,7 +36,7 @@ namespace Meta.Controllers.Conditions
 
         protected override bool Check(ConditionCollectionConfig conditionsConfig)
         {
-            foreach (var condition in conditionsConfig.Elems())
+            foreach (var condition in conditionsConfig.GetConditions())
             {
                 if (_conditionProcessor.Check(condition) == false)
                 {
