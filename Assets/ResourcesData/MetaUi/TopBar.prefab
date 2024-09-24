@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 7744128009978779617}
   - component: {fileID: 7744128009978779618}
   m_Layer: 5
-  m_Name: BarElem (1)
+  m_Name: BarElem_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -638,7 +638,7 @@ GameObject:
   - component: {fileID: 7744128010593792972}
   - component: {fileID: 7744128010593792973}
   m_Layer: 5
-  m_Name: BarElem (3)
+  m_Name: BarElem_0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -783,6 +783,7 @@ GameObject:
   - component: {fileID: 7744128010845789478}
   - component: {fileID: 7744128010845789479}
   - component: {fileID: 7744128010845789477}
+  - component: {fileID: 8712781039467995985}
   m_Layer: 5
   m_Name: TopBar
   m_TagString: Untagged
@@ -878,6 +879,32 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &8712781039467995985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7744128010845789465}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ca64961ef514fa594c7869274ab3766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _showList: 
+  _viewElems:
+  - Elem: {fileID: 7744128010593792975}
+    Count: {fileID: 7744128010005653533}
+    Icon: {fileID: 7744128010809406554}
+  - Elem: {fileID: 7744128011094603615}
+    Count: {fileID: 7744128011518105341}
+    Icon: {fileID: 7744128010556591536}
+  - Elem: {fileID: 7744128009978779620}
+    Count: {fileID: 7744128009595025642}
+    Icon: {fileID: 7744128010879324339}
+  - Elem: {fileID: 7744128011584564429}
+    Count: {fileID: 7744128010560453052}
+    Icon: {fileID: 7744128011551924329}
 --- !u!1 &7744128010879324341
 GameObject:
   m_ObjectHideFlags: 0
@@ -1042,7 +1069,7 @@ GameObject:
   - component: {fileID: 7744128011094603612}
   - component: {fileID: 7744128011094603613}
   m_Layer: 5
-  m_Name: BarElem (2)
+  m_Name: BarElem_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1474,7 +1501,7 @@ GameObject:
   - component: {fileID: 7744128011584564427}
   - component: {fileID: 7744128011584564426}
   m_Layer: 5
-  m_Name: BarElem
+  m_Name: BarElem_3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

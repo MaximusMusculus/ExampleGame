@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Meta;
 using Meta.Configs;
 using Meta.Configs.Conditions;
 using Meta.Controllers;
@@ -46,18 +47,20 @@ namespace MetaUi
         [SerializeField] private List<MetaTrainUnit> _elemsView;
 
         private IActionProcessor _actionProcessor;
+        private ISpriteHolderTest _spriteHolder;
 
-        public void Setup(IInventory inventory, IUnits unitsController, IConditionProcessor conditions, IEnumerable<MetaActionConfig> trainActions) //это в базовый класс
+        public void Setup(MetaModel metaModel, IEnumerable<MetaActionConfig> trainActions, ISpriteHolderTest spriteHolder)
         {
-            _unitsController = unitsController;
-            _conditions = conditions;
+            _unitsController = metaModel.Units;
+            _conditions = metaModel.ConditionProcessor;
             _trainActions = trainActions;
+            _spriteHolder = spriteHolder;
             BindDataToView();
-            ShowUnits();
+            UpdateUnits();
         }
         
         
-        public void ShowUnits()
+        public void UpdateUnits()
         {
             int i = 0;
             foreach (var trainAction in SelectTrainActions())
@@ -104,6 +107,7 @@ namespace MetaUi
                 trainElem.SetData(viewData);
             }
         }
+        
         private void FillTrainElemView(MetaActionConfig actionConfig, TrainElemData elemData)
         {
             elemData.ActionConfig = actionConfig;
@@ -119,6 +123,7 @@ namespace MetaUi
 
             elemData.Title = "UnitType: " + addUnitAction.TypeUnit;
             elemData.Description = "Description: ";
+            elemData.Icon = _spriteHolder.GetSprite(addUnitAction.TypeUnit);
 
             var unitCount = 0;
             var unitLimit = int.MaxValue;

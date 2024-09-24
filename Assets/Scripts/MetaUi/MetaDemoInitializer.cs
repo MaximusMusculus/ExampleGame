@@ -6,7 +6,6 @@ using UnityEngine;
 
 namespace MetaUi
 {
-
     /// <summary>
     ///  -Корень компоновки (тут)
     ///  - Презентационная логика (~)
@@ -19,8 +18,7 @@ namespace MetaUi
     /// </summary>
     public class MetaDemoInitializer : MonoBehaviour
     {
-        [SerializeField] private MetaTrainUnitsScreen _metaTrainUnits;
-        
+        [SerializeField] private MetaUiRoot _metaUi;
         
         private MetaModel _metaModel;
         
@@ -33,8 +31,7 @@ namespace MetaUi
             _metaModel = new MetaModel(gameConfig, emptyGameData, metaControllersFactory);
             
             //создание мета UI
-            var testActGroup = gameConfig.ActionsGroups[0];
-            _metaTrainUnits.Setup(_metaModel.Inventory, _metaModel.Units, _metaModel.ConditionProcessor, _metaModel.ActionProcessor, testActGroup);
+            _metaUi.Setup(_metaModel);
         }
 
         protected void Update()

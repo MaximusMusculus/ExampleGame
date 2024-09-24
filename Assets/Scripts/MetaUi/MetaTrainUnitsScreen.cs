@@ -1,3 +1,4 @@
+using Meta;
 using Meta.Configs;
 using Meta.Controllers;
 using UnityEngine;
@@ -9,22 +10,19 @@ namespace MetaUi
     /// </summary>
     public class MetaTrainUnitsScreen : MonoBehaviour, IHierarchyHandler<TrainUiEvent>
     {
-        private IInventory _items;            //topBar
-        private IUnits _units;                //unitsContent
         private IConditionProcessor _conditionProcessor;//checkRequire
         private IActionProcessor _actionsProcessor;
 
         [SerializeField] private MetaTrainUnits _metaTrainUnits;
-        //topBar
-        //bottomBar
+        [SerializeField] private MetaItemsBar _metaItemsBar;
+        private MetaModel _metaModel;
         
-        public MetaTrainUnitsScreen Setup(IInventory items, IUnits units, IConditionProcessor conditions, IActionProcessor actionsProcessor, MetaActionsGroupConfig actions)
+        public MetaTrainUnitsScreen Setup(MetaModel metaModel, MetaActionsGroupConfig actions, ISpriteHolderTest spriteHolder)
         {
-            _items = items;
-            _units = units;
-            _conditionProcessor = conditions;
-            _actionsProcessor = actionsProcessor;
-            _metaTrainUnits.Setup(items, units, conditions, actions.Actions);
+            _metaItemsBar.Setup(metaModel.Inventory, spriteHolder);
+            _conditionProcessor = metaModel.ConditionProcessor;
+            _actionsProcessor = metaModel.ActionProcessor;
+            _metaTrainUnits.Setup(metaModel, actions.Actions, spriteHolder);
             return this;
         }
 
@@ -34,7 +32,10 @@ namespace MetaUi
             {
                 //пока пробую менять тут, но будет проброс сообщения с командой наверх.
                 _actionsProcessor.Process(message.Action.Actions);
-                _metaTrainUnits.ShowUnits();
+                
+                //синхронизация анимаций
+                _metaTrainUnits.UpdateUnits();
+                _metaItemsBar.UpdateItems();
             }
             else
             {
