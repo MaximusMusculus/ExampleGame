@@ -267,7 +267,7 @@ namespace Meta.TestConfiguration
             if (unitLimit != int.MaxValue)
             {
                 SetRequire(_conditions.NewCollection(TypeCollection.And)
-                    .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.Less, unitLimit)
+                    .UnitCountCondition(unitType, TypeCompare.Less, unitLimit)
                     .Build());
             }
             return this;

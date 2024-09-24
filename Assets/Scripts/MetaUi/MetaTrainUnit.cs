@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -13,6 +14,7 @@ namespace MetaUi
         [SerializeField] private Image _iconImage;
         [SerializeField] private Button _trainButton;
 
+        [SerializeField] private List<ItemViewElem> _priceView;
         private TrainElemData _data;
         
 
@@ -29,13 +31,27 @@ namespace MetaUi
             _descriptionText.text = _data.Description;
             _countAndLimitText.text = _data.CountAndLimit;
             _trainButton.interactable = _data.ButtonEnabled;
+            FillPrice();
         }
-
+        private void FillPrice()
+        {
+            for (var i = 0; i < _priceView.Count; i++)
+            {
+                if (_data.ItemsData.Count > i)
+                {
+                    var elemData = _data.ItemsData[i];
+                    _priceView[i].SetEnable(elemData.IsEnable).SetIcon(elemData.Icon).SetText(elemData.Text);
+                }
+                else
+                {
+                    _priceView[i].SetEnable(false);
+                }
+            }
+        }
+        
         public void OnTrainClick()
         {
             this.SendHierarchy(new TrainUiEvent(_data.ActionConfig, _iconImage.transform));
         }
-
-
     }
 }

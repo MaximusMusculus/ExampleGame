@@ -50,8 +50,8 @@ namespace Meta.TestConfiguration
 
             _metaBuilder
                 .AddItemConfig(MapTestId.Hard.Id(), 50)
-                .AddItemConfig(MapTestId.Scrup.Id(), 500, 500)
-                .AddItemConfig(MapTestId.Recruts.Id(), 150, 150)
+                .AddItemConfig(MapTestId.Scrup.Id(), 5000, 5000)
+                .AddItemConfig(MapTestId.Recruts.Id(), 1500, 1500)
 
                 .AddUnitConfig(_unit.NewUnit(MapTestId.UnitGunner.Id()).SetCanUpgrade().Build())
                 .AddUnitConfig(_unit.NewUnit(MapTestId.UnitScout.Id()).SetCanUpgrade().Progression(1, 1, 1).Build())

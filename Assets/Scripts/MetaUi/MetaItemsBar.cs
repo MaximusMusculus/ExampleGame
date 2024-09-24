@@ -17,7 +17,7 @@ namespace MetaUi
     {
         private HashSet<Id> _canShowResources;
         [SerializeField] private List<MapTestId> _showList = new List<MapTestId>();
-        [SerializeField] private List<ViewElem> _viewElems = new List<ViewElem>(); 
+        [SerializeField] private List<ItemViewElem> _viewElems = new List<ItemViewElem>(); 
 
         private IInventory _inventory;
         private ISpriteHolderTest _spriteHolder;
@@ -46,43 +46,40 @@ namespace MetaUi
                 var view = _viewElems[i];
                 view.SetEnable(true);
                 view.SetIcon(_spriteHolder.GetSprite(typeItem.Id()));
-                view.SetCount(_inventory.GetCount(typeItem.Id()).ToString());
+                view.SetText(_inventory.GetCount(typeItem.Id()).ToString());
             }
         }
-
         public void UpdateItems()
         {
             for (var i = 0; i < _showList.Count && i < _viewElems.Count; i++)
             {
-                _viewElems[i].SetCount(_inventory.GetCount(_showList[i].Id()).ToString());
+                _viewElems[i].SetText(_inventory.GetCount(_showList[i].Id()).ToString());
             }
         }
-        
-        
-        
-        [Serializable]
-        private class ViewElem
+    }
+    
+    [Serializable]
+    public class ItemViewElem
+    {
+        public GameObject Elem;
+        public TextMeshProUGUI Text;
+        public Image Icon;
+        public ItemViewElem SetIcon(Sprite icon)
         {
-            public GameObject Elem;
-            public TextMeshProUGUI Count;
-            public Image Icon;
-            public ViewElem SetIcon(Sprite icon)
-            {
-                Icon.sprite = icon;
-                return this;
-            }
+            Icon.sprite = icon;
+            return this;
+        }
 
-            public ViewElem SetCount(string count)
-            {
-                Count.text = count;
-                return this;
-            }
+        public ItemViewElem SetText(string count)
+        {
+            Text.text = count;
+            return this;
+        }
 
-            public ViewElem SetEnable(bool isEnable)
-            {
-                Elem.SetActive(isEnable);
-                return this;
-            }
+        public ItemViewElem SetEnable(bool isEnable)
+        {
+            Elem.SetActive(isEnable);
+            return this;
         }
     }
 }

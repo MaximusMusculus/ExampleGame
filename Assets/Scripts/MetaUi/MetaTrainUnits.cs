@@ -4,6 +4,7 @@ using Meta;
 using Meta.Configs;
 using Meta.Configs.Conditions;
 using Meta.Controllers;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -19,6 +20,16 @@ namespace MetaUi
         public Sprite Icon;
 
         public MetaActionConfig ActionConfig;
+
+        public List<ItemViewData> ItemsData = new List<ItemViewData>() {new ItemViewData(), new ItemViewData()};
+        
+        public class ItemViewData
+        {
+            public bool IsEnable;
+            public Sprite Icon;
+            public string Text;
+        }
+        
     }
     public struct TrainUiEvent : IUiMessage
     {
@@ -45,10 +56,10 @@ namespace MetaUi
         
         private List<TrainElemData> _elemsData;
         [SerializeField] private List<MetaTrainUnit> _elemsView;
-
+        
         private IActionProcessor _actionProcessor;
         private ISpriteHolderTest _spriteHolder;
-
+        
         public void Setup(MetaModel metaModel, IEnumerable<MetaActionConfig> trainActions, ISpriteHolderTest spriteHolder)
         {
             _unitsController = metaModel.Units;
@@ -136,13 +147,24 @@ namespace MetaUi
             // actionConfig.Actions.GetEnumerator()  тут  мне надо обойти список действий, отобрать только те, что снимают ресурс
             // попробовать вывести это в представление.  Так же проверить, есть ли данный ресурс в нужном колве. Если нет - покрасить интерфейс, залочить кнопку
             //такие вещи будут происходить достаточно часто. 
-            
-            //--стоимость, это надо переделать в красивую вьюху...
+
+
+            Assert.IsTrue(actionConfig.Actions.Items.Count <= elemData.ItemsData.Count);
+            foreach (var data in elemData.ItemsData)
+            {
+                data.IsEnable = false;
+            }
+            int i = 0;
             foreach (var actionsItem in actionConfig.Actions.Items)
             {
-                elemData.Description += $"{actionsItem.TypeItem}:{actionsItem.Count}, ";
+                var priceData = elemData.ItemsData[i];
+                priceData.Icon = _spriteHolder.GetSprite(actionsItem.TypeItem);
+                priceData.Text = actionsItem.Count.ToString();
+                priceData.IsEnable = true;
+                i++;
             }
-
+            
+            
             //ищу условие на лимит юнитов
             foreach (var condition in actionConfig.Require.GetConditions())
             {
@@ -154,5 +176,7 @@ namespace MetaUi
             }
             elemData.CountAndLimit = $"{unitCount}/{unitLimit}";
         }
+
+
     }
 }
