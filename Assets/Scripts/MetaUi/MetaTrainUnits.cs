@@ -31,12 +31,12 @@ namespace MetaUi
         }
         
     }
-    public struct TrainUiEvent : IUiMessage
+    public struct UiEventTrainUnit : IUiMessage
     {
         public MetaActionConfig Action;
         public Transform UnitPivot;
 
-        public TrainUiEvent(MetaActionConfig action, Transform unitPivot)
+        public UiEventTrainUnit(MetaActionConfig action, Transform unitPivot)
         {
             Action = action;
             UnitPivot = unitPivot;

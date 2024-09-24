@@ -51,7 +51,7 @@ namespace MetaUi
         
         public void OnTrainClick()
         {
-            this.SendHierarchy(new TrainUiEvent(_data.ActionConfig, _iconImage.transform));
+            this.SendHierarchy(new UiEventTrainUnit(_data.ActionConfig, _iconImage.transform));
         }
     }
 }

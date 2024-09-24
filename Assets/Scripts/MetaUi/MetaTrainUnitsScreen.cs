@@ -1,3 +1,4 @@
+using System;
 using Meta;
 using Meta.Configs;
 using Meta.Controllers;
@@ -8,7 +9,7 @@ namespace MetaUi
     /// <summary>
     /// Тут нужны юниты, ресурсы, действия и кондишены.  
     /// </summary>
-    public class MetaTrainUnitsScreen : MonoBehaviour, IHierarchyHandler<TrainUiEvent>
+    public class MetaTrainUnitsScreen : MonoBehaviour, IHierarchyHandler<UiEventTrainUnit>
     {
         private IConditionProcessor _conditionProcessor;//checkRequire
         private IActionProcessor _actionsProcessor;
@@ -25,8 +26,14 @@ namespace MetaUi
             _metaTrainUnits.Setup(metaModel, actions.Actions, spriteHolder);
             return this;
         }
+        
+        public void UpdateView()
+        {
+            _metaItemsBar.UpdateItems();
+            _metaTrainUnits.UpdateUnits();
+        }
 
-        public void HandleMessage(TrainUiEvent message)
+        public void HandleMessage(UiEventTrainUnit message)
         {
             if (_conditionProcessor.Check(message.Action.Require))
             {
@@ -42,5 +49,7 @@ namespace MetaUi
                 Debug.Log("Can't train unit");
             }
         }
+
+
     }
 }

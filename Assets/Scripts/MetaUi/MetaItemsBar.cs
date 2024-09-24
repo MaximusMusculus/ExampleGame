@@ -30,6 +30,7 @@ namespace MetaUi
             ShowEnabledViews();
             UpdateItems();
         }
+        
 
         private void HideAllView()
         {

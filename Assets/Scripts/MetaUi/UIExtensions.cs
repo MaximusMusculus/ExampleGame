@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace MetaUi
@@ -16,8 +17,17 @@ namespace MetaUi
     {
         public static void SendHierarchy<T, TK>(this T obj, TK message) where T : MonoBehaviour where TK : IUiMessage
         {
-            ExecuteEvents.ExecuteHierarchy<IHierarchyHandler<TK>>(obj.transform.parent.gameObject, null,
-                (handler, data) => handler.HandleMessage(message));
+            var isHandled = false;
+            ExecuteEvents.ExecuteHierarchy<IHierarchyHandler<TK>>(obj.transform.parent.gameObject, null, (handler, data) =>
+            {
+                handler.HandleMessage(message);
+                isHandled = true;
+            });
+            
+            if (!isHandled)
+            {
+                throw new InvalidOperationException($"No handler found for message of type {typeof(TK).Name}");
+            }
         }
     }
 }
