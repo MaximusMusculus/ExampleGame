@@ -88,7 +88,7 @@ namespace Meta.Controllers.Actions
 
         protected override void Process(ActionCollectionConfig args)
         {
-            foreach (var anyAction in args)//.GetActions())
+            foreach (var anyAction in args.GetAll())
             {
                 _actionProcessor.Process(anyAction);
             }

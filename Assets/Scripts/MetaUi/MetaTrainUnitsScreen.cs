@@ -1,4 +1,3 @@
-using System;
 using Meta;
 using Meta.Configs;
 using Meta.Controllers;
@@ -11,18 +10,18 @@ namespace MetaUi
     /// </summary>
     public class MetaTrainUnitsScreen : MonoBehaviour, IHierarchyHandler<UiEventTrainUnit>
     {
-        private IConditionProcessor _conditionProcessor;//checkRequire
-        private IActionProcessor _actionsProcessor;
-
         [SerializeField] private MetaTrainUnits _metaTrainUnits;
         [SerializeField] private MetaItemsBar _metaItemsBar;
+        
         private MetaModel _metaModel;
+        private MetaActionsGroupConfig _actionsGroup;
+        private IConditionProcessor _conditionProcessor;
         
         public MetaTrainUnitsScreen Setup(MetaModel metaModel, MetaActionsGroupConfig actions, ISpriteHolderTest spriteHolder)
         {
-            _metaItemsBar.Setup(metaModel.Inventory, spriteHolder);
+            _actionsGroup = actions;
             _conditionProcessor = metaModel.ConditionProcessor;
-            _actionsProcessor = metaModel.ActionProcessor;
+            _metaItemsBar.Setup(metaModel.Inventory, spriteHolder);
             _metaTrainUnits.Setup(metaModel, actions.Actions, spriteHolder);
             return this;
         }
@@ -33,14 +32,14 @@ namespace MetaUi
             _metaTrainUnits.UpdateUnits();
         }
 
-        public void HandleMessage(UiEventTrainUnit message)
+        public void HandleEvent(UiEventTrainUnit message)
         {
             if (_conditionProcessor.Check(message.Action.Require))
             {
-                //пока пробую менять тут, но будет проброс сообщения с командой наверх.
-                _actionsProcessor.Process(message.Action.Actions);
+                this.SendHierarchy(new UiEventRunAction(_actionsGroup.TypeGroup, message.Action));
                 
-                //синхронизация анимаций
+                //знаем какого юнита трерируем - знаем его стоимость и тд. Знаем позицию иконки юнита, знаем бар ресурсов и бар армии. 
+                //можем выполнить красивую анимацию с синхронизацией, естественно этого тут нет ;)
                 _metaTrainUnits.UpdateUnits();
                 _metaItemsBar.UpdateItems();
             }

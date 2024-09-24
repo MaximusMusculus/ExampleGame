@@ -13,35 +13,35 @@ namespace MetaUi
         Sprite GetSprite(Id typeEntity);
     }
     
-    public class MetaUiRoot : MonoBehaviour, IHierarchyHandler <UiEventSwitchScreen>, ISpriteHolderTest
+    public enum MetaScreenType
     {
-        [SerializeField]
-        private List<SpriteMapElem> _spriteMap = new List<SpriteMapElem>();
+        None,
+        Units,
+        Play
+    }
+
+    public class MetaUiRoot : MonoBehaviour, IHierarchyHandler <UiEventSwitchScreen>, IHierarchyHandler<UiEventRunAction>, ISpriteHolderTest
+    {
+        [SerializeField] private List<SpriteMapElem> _spriteMap = new List<SpriteMapElem>();
         [SerializeField] private MetaTrainUnitsScreen _metaTrainUnits;
         [SerializeField] private MetaPlayScreen _metaPlayScreen;
 
-        public void Setup(MetaModel metaModel)
+        private ITestInputCmdExecutor _inputCmdExecutor;
+        public void Setup(MetaModel metaModel, ITestInputCmdExecutor inputCmdExecutor)
         {
+            _inputCmdExecutor = inputCmdExecutor;
             _metaPlayScreen.Setup(metaModel, this);
             _metaTrainUnits.Setup(metaModel, metaModel.Config.ActionsGroups[0], this);
-            
-            //переключение скринов.
-            //при переключении(перед переключением) - активация с обновлением.
         }
         
-        [Serializable]
-        private class SpriteMapElem
+        public void HandleEvent(UiEventRunAction message)
         {
-            public MapTestId TypeEntity;
-            public Sprite Icon;
-        }
-        public Sprite GetSprite(Id typeEntity)
-        {
-            return _spriteMap.FirstOrDefault(s => typeEntity.Equals((ushort) s.TypeEntity))?.Icon;
+            _inputCmdExecutor.Execute(message);
         }
         
-        public void HandleMessage(UiEventSwitchScreen message)
+        public void HandleEvent(UiEventSwitchScreen message)
         {
+            //перед переключением - активация с обновлением.
             switch (message.ScreenType)
             {
                 case MetaScreenType.Units:
@@ -57,6 +57,20 @@ namespace MetaUi
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+
+
+        //----
+        [Serializable]
+        private class SpriteMapElem
+        {
+            public MapTestId TypeEntity;
+            public Sprite Icon;
+        }
+        public Sprite GetSprite(Id typeEntity)
+        {
+            return _spriteMap.FirstOrDefault(s => typeEntity.Equals((ushort) s.TypeEntity))?.Icon;
         }
     }
 }

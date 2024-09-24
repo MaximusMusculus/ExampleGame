@@ -4,7 +4,6 @@ using Meta;
 using Meta.Configs;
 using Meta.Configs.Conditions;
 using Meta.Controllers;
-using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,18 +27,6 @@ namespace MetaUi
             public bool IsEnable;
             public Sprite Icon;
             public string Text;
-        }
-        
-    }
-    public struct UiEventTrainUnit : IUiMessage
-    {
-        public MetaActionConfig Action;
-        public Transform UnitPivot;
-
-        public UiEventTrainUnit(MetaActionConfig action, Transform unitPivot)
-        {
-            Action = action;
-            UnitPivot = unitPivot;
         }
     }
 
@@ -76,6 +63,11 @@ namespace MetaUi
             int i = 0;
             foreach (var trainAction in SelectTrainActions())
             {
+                if (i > _elemsData.Count-1)
+                {
+                    break;
+                }
+                
                 FillTrainElemView(trainAction, _elemsData[i]);
                 i++;
             }
@@ -99,7 +91,7 @@ namespace MetaUi
             //если будет такое часто - передать фильтр
             foreach (var trainAction in _trainActions)
             {
-                foreach (var action in trainAction.Actions)
+                foreach (var action in trainAction.Actions.GetAll())
                 {
                     if (action.TypeAction == TypeAction.UnitAdd)
                     {

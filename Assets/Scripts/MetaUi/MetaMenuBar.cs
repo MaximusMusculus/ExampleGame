@@ -2,21 +2,6 @@
 
 namespace MetaUi
 {
-    public enum MetaScreenType
-    {
-        None,
-        Units,
-        Play
-    }
-    public struct UiEventSwitchScreen : IUiMessage
-    {
-        public readonly MetaScreenType ScreenType;
-        public UiEventSwitchScreen(MetaScreenType screenType)
-        {
-            ScreenType = screenType;
-        }
-    }
-    
     public class MetaMenuBar  : MonoBehaviour
     {
         public void Setup()

@@ -34,31 +34,33 @@ namespace Meta.Configs.Actions
         public readonly List<ItemActionConfig> Items = new List<ItemActionConfig>();
         
         //схож с ConditionCollectionConfig, там тестирую массив
+        private IActionConfig[] _actionsHash;
         
-        private IEnumerator<IActionConfig> _enumerator;
-        private IEnumerator<IActionConfig> CreateHash()
+        private void CreateHash()
         {
-            var actionConfigs = new List<IActionConfig>(Items.Count + Untis.Count);
-            actionConfigs.AddRange(Items);
-            actionConfigs.AddRange(Untis);
-            _enumerator = actionConfigs.GetEnumerator();
-            return _enumerator;
+            _actionsHash = new IActionConfig[Items.Count + Untis.Count];
+            int i = 0;
+            
+            foreach (var item in Items)
+            {
+                _actionsHash[i] = item;
+                i++;
+            }
+            foreach (var unit in Untis)
+            {
+                _actionsHash[i]= unit;
+                i++;
+            }
         }
 
         //получение и использование в абстракции.
-        public IEnumerator<IActionConfig> GetEnumerator()
+        public IActionConfig[] GetAll()
         {
-            if (_enumerator == null)
+            if (_actionsHash == null)
             {
-                _enumerator = CreateHash();
+                CreateHash();
             }
-            else
-            {
-                Assert.IsFalse(_enumerator.MoveNext(), "Enumerator is not reset");
-            }
-
-            _enumerator.Reset();
-            return _enumerator;
+            return _actionsHash;
         }
     }
 }

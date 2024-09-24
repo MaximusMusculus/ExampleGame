@@ -4,29 +4,29 @@ using UnityEngine.EventSystems;
 
 namespace MetaUi
 {
-    public interface IUiMessage
+    public interface IUiEvent
     {
     }
 
-    public interface IHierarchyHandler<in T> : IEventSystemHandler where T : IUiMessage
+    public interface IHierarchyHandler<in T> : IEventSystemHandler where T : IUiEvent
     {
-        void HandleMessage(T message);
+        void HandleEvent(T message);
     }
     
     public static class UIExtensions
     {
-        public static void SendHierarchy<T, TK>(this T obj, TK message) where T : MonoBehaviour where TK : IUiMessage
+        public static void SendHierarchy<T, TK>(this T obj, TK uiEvent) where T : MonoBehaviour where TK : IUiEvent
         {
             var isHandled = false;
             ExecuteEvents.ExecuteHierarchy<IHierarchyHandler<TK>>(obj.transform.parent.gameObject, null, (handler, data) =>
             {
-                handler.HandleMessage(message);
+                handler.HandleEvent(uiEvent);
                 isHandled = true;
             });
             
             if (!isHandled)
             {
-                throw new InvalidOperationException($"No handler found for message of type {typeof(TK).Name}");
+                throw new InvalidOperationException($"No handler found for event of type {typeof(TK).Name}");
             }
         }
     }

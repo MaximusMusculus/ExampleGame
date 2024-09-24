@@ -1,54 +1,50 @@
-﻿using Meta;
+﻿using System;
+using Meta;
 using Meta.Models;
 using Meta.TestConfiguration;
 using UnityEngine;
 
-
 namespace MetaUi
 {
-    /// <summary>
-    ///  -Корень компоновки (тут)
-    ///  - Презентационная логика (~)
-    ///  - Модель домена
-    ///  - Данные
-    ///
-    /// Во время исполнения все начинается с компоновки объекта.
-    /// Корень компоновки собирает все независимые модули приложения.
-    /// осуществляется в месте, где требуется интеграция различных модулей
-    /// </summary>
-    public class MetaDemoInitializer : MonoBehaviour
+    public interface ITestInputCmdExecutor
+    {
+        void Execute(UiEventRunAction command);
+    }
+    
+    public class MetaDemoInitializer : MonoBehaviour, ITestInputCmdExecutor  //для теста
     {
         [SerializeField] private MetaUiRoot _metaUi;
-        
         private MetaModel _metaModel;
         
         protected void Awake()
         {
-            //создание мета модели
             var gameConfig = new MetaConfigDevelopProvider().GetConfig();
             var emptyGameData = new MetaDto();
             var metaControllersFactory = new MetaControllersFactory(gameConfig); 
             _metaModel = new MetaModel(gameConfig, emptyGameData, metaControllersFactory);
             
-            //создание мета UI
-            _metaUi.Setup(_metaModel);
+            _metaUi.Setup(_metaModel, this);
         }
-
-        protected void Update()
+        
+        public void Execute(UiEventRunAction command)
         {
-            //UpdateMeta
-            //UpdateUi
-        }
-
-        private void HandleInputCommand()
-        {
+            try
+            {
+                _metaModel.ActionProcessor.Process(command.ActionConfig.Actions);
+            }
+            catch (Exception e)
+            {
+                //тут можно записать накопенные команды в лог, чтобы потом воспроизвести
+                //имея конфиг, стартовый стейт и набор команд со временем их применения, можем воспроизводить ошибку.
+                Debug.LogError(e);
+            }
+            
+            //вместо моментального выполнения, можно создавать команды. Вести историю и т.д.
             //для проверки валидности выполнения, сейф мод, может запустить 2ю модель меты.
             //перед тем, как применять команды на основную модель, мы применим команды на проверочную. 
-            //в случае эксепшена - можем что то сделать или вывести. Но, это скорее вариант для плавной отладки игры, чем стандартный механизм.
-            //кстати, в случае ошибки, можем сбросить дамп стартового стейта и набора команд. Притом, это должно быть спрятано за интерфейсом
-            //IInputCmdExecutor + Update.  Но это уже более высокий уровень.
+            //в случае ошибки, можем сбросить дамп стартового стейта и набора команд. Притом, это должно быть спрятано за интерфейсом
+            //IInputCmdExecutor + Update. Но это уже более высокий уровень
         }
-
-
+        
     }
 }
