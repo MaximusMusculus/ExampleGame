@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using AppRen;
+
 
 namespace Meta.Models
 {
@@ -9,12 +11,61 @@ namespace Meta.Models
         public List<UnitDto> Units = new List<UnitDto>(); //unitCollection
         
         public List<ExchangeItemDto> PurchaseItems = new List<ExchangeItemDto>();
-        
+        public QuestCollectionDto Quests = new QuestCollectionDto();
 
         //public List<PerkDto> Perks;
         //public List<TaskDto> Tasks;
         //public List<BuildingDto> Buildings;
     }
+    
+    
+    public class QuestDto
+    {
+        public Id QuestId;
+        public bool IsCompleted;
+        public bool IsRewarded;
+    }
+
+    public class QuestCounterDto : QuestDto
+    {
+        public int Value;
+    }
+
+
+
+    public class QuestCollectionDto
+    {
+        public List<QuestDto> ConditionalQuest = new List<QuestDto>();
+        public List<QuestCounterDto> CountBasedQuest = new List<QuestCounterDto>();
+
+        public IEnumerable<QuestDto> GetAll()
+        {
+            foreach (var questCounterDto in CountBasedQuest)
+            {
+                yield return questCounterDto;
+            }
+
+            foreach (var questDto in ConditionalQuest)
+            {
+                yield return questDto;
+            }
+        }
+
+        //Спрячу реализацию внутри, это сделано для оптимизации
+        //и никто не будет знать ^_^
+        public void Add(QuestDto questDto)
+        {
+            if (questDto is QuestCounterDto counter)
+            {
+                CountBasedQuest.Add(counter);
+            }
+            else
+            {
+                ConditionalQuest.Add(questDto);
+            }
+        }
+    }
+
     /*
  //Копилот торопит события. ^_^
  public class PlayerDto
@@ -49,4 +100,5 @@ namespace Meta.Models
     public List<PlayerShopItemStyleDto> ShopItemStyles;
     public List<PlayerPaymentItemDto> Payment
 }*/
+    
 }

@@ -93,7 +93,7 @@ namespace MetaUi
             {
                 foreach (var action in trainAction.Actions.GetAll())
                 {
-                    if (action.TypeAction == TypeAction.UnitAdd)
+                    if (action.TypeMetaAction == TypeMetaAction.UnitAdd)
                     {
                         yield return trainAction;
                     }
@@ -121,7 +121,7 @@ namespace MetaUi
             elemData.ButtonEnabled = _conditions.Check(actionConfig.Require);
             
             // я знаю, что в списке действий - должно быть действие по добавлению юнита
-            var addUnitAction = actionConfig.Actions.Untis.FirstOrDefault(s => s.TypeAction == TypeAction.UnitAdd);
+            var addUnitAction = actionConfig.Actions.Untis.FirstOrDefault(s => s.TypeMetaAction == TypeMetaAction.UnitAdd);
             Assert.IsNotNull(addUnitAction);
 
             elemData.Title = "UnitType: " + addUnitAction.TypeUnit;

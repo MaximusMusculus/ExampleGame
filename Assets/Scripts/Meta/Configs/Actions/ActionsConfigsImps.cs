@@ -1,24 +1,24 @@
 using System.Collections.Generic;
 using AppRen;
 using Meta.Models;
-using UnityEngine.Assertions;
 
 namespace Meta.Configs.Actions
 {
     public class ItemActionConfig : IActionConfig
     {
-        public TypeAction TypeAction => Action;
+        public TypeMetaAction TypeMetaAction => MetaAction;
 
-        public TypeAction Action; //availableList?
+        public TypeMetaAction MetaAction; //availableList?
         public Id TypeItem;
         public int Count;
     }
 
+    //наследоваться от ItemActionConfig? с добавлением Progression
     public class UnitActionConfig : IActionConfig
     {
-        public TypeAction TypeAction => Action;
+        public TypeMetaAction TypeMetaAction => MetaAction;
 
-        public TypeAction Action;
+        public TypeMetaAction MetaAction;
         public Id TypeUnit;
         public UnitProgressionDto Progression;
         public int Count;
@@ -26,7 +26,7 @@ namespace Meta.Configs.Actions
 
     public class ActionCollectionConfig : IActionConfig
     {
-        public TypeAction TypeAction => TypeAction.Collection;
+        public TypeMetaAction TypeMetaAction => TypeMetaAction.Collection;
 
         //хранение набора коллекции в типизированном виде
         //для удобной читаемости и сериализации/десериализации

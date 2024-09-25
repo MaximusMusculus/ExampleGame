@@ -1,25 +1,25 @@
 namespace Meta.Configs
 {
-    public enum TypeAction
+    public enum TypeMetaAction
     {
         None,
         Collection,
         
-        InventoryItemAdd,
-        InventoryItemSpend,
-        InventoryItemExpandLimit,
+        InventoryItemAdd,           //ItemActionConfig
+        InventoryItemSpend,         //ItemActionConfig
+        InventoryItemExpandLimit,   //ItemActionConfig
 
-        UnitAdd,
-        UnitSpend,
+        UnitAdd,        //UnitActionConfig
+        UnitSpend,      //UnitActionConfig
         
         
         //допустим
-        EventStart,
-        EventStop,
+        EventStart, //targetEventId?
+        EventStop,  //targetEventId?
     }
 
     public interface IActionConfig
     {
-        TypeAction TypeAction { get; }
+        TypeMetaAction TypeMetaAction { get; }
     }
 }

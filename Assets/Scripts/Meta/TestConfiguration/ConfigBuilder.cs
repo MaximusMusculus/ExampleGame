@@ -103,31 +103,31 @@ namespace Meta.TestConfiguration
         
         public ActionCollectionConfigBuilder UnitAdd(UnitConfig unit, int count)
         {
-            _config.Untis.Add(new UnitActionConfig {Action = TypeAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(new UnitActionConfig {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
         public ActionCollectionConfigBuilder UnitSpend(UnitConfig unit, int count)
         {
-            _config.Untis.Add(new UnitActionConfig {Action = TypeAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(new UnitActionConfig {MetaAction = TypeMetaAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
         public ActionCollectionConfigBuilder InventoryItemAdd(Id itemId, int count)
         {
-            _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemAdd, TypeItem = itemId, Count = count});
+            _config.Items.Add(new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemAdd, TypeItem = itemId, Count = count});
             return this;
         }
 
         public ActionCollectionConfigBuilder InventoryItemSpend(Id itemId, int count)
         {
-            _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemSpend, TypeItem = itemId, Count = count});
+            _config.Items.Add(new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemSpend, TypeItem = itemId, Count = count});
             return this;
         }
 
         public ActionCollectionConfigBuilder InventoryItemExpandLimit(Id itemId, int count)
         {
-            _config.Items.Add(new ItemActionConfig {Action = TypeAction.InventoryItemExpandLimit, TypeItem = itemId, Count = count});
+            _config.Items.Add(new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemExpandLimit, TypeItem = itemId, Count = count});
             return this;
         }
 
