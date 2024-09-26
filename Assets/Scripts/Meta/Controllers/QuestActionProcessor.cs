@@ -198,6 +198,8 @@ namespace Meta.Controllers
             var quest = _quests.Quests.FirstOrDefault(c => c.Id .Equals(questId));
             Assert.IsNotNull(quest);
             Assert.IsTrue(quest.IsCompleted);
+            Assert.IsFalse(quest.IsRewarded);
+            
             var questConfig = _config.GetAll().First(s => s.QuestId.Equals(quest.ConfigId));
             _actionProcessor.Process(questConfig.Reward);
             quest.IsRewarded = true;

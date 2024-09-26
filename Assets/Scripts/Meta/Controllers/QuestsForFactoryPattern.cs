@@ -145,6 +145,7 @@ namespace Meta.Controllers
     {
         private readonly QuestCountBasedConfig _config;
         private readonly QuestCounterDto _data;
+        private readonly IQuestsController _questsController;
 
         public QuestCountBasedItemController(QuestCountBasedConfig config, QuestCounterDto data)
         {

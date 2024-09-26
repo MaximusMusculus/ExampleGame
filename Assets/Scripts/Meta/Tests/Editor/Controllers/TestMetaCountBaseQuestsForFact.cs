@@ -27,6 +27,7 @@ namespace Meta.Tests.Editor.Controllers
         private QuestCollectionDto _questsData;
         private QuestsController _questsController;
         
+        
         [SetUp]
         public void SetUp()
         {
@@ -49,15 +50,13 @@ namespace Meta.Tests.Editor.Controllers
                 TriggerAction = TypeMetaAction.InventoryItemSpend,
                 TargetEntityId = MapTestId.Recruts.Id(),
                 Reward = new UnitActionConfig {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = MapTestId.UnitAssault.Id(), Count = 1}
-                //Reward = new ItemActionConfig {MetaAction = TypeMetaAction.UnitAdd, TypeItem = MapTestId.UnitAssault.Id(), Count = 1} - неудобно
             });
-
 
 
             var actionProcessor = new ActionProcessor(_inventory, _units);
             var fact = new QuestControllerControllerFactory(new ConditionProcessor(_inventory, _units));
             _questsController = new QuestsController(_questsData, questsConfig, fact, actionProcessor);
-            _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController);
+            _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController, null);
         }
         
         
