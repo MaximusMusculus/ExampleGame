@@ -5,18 +5,18 @@ using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
 using Meta.Models;
+using UnityEngine.Assertions;
 
 namespace Meta.Controllers
 {
-    //стратегия пресозданных процессоров.
-    
+    //1й способ (лучше скорость и кеш, но хуже контроль и расширение) Профит тем выше ,чем больше квестов. 100++
     public class QuestMetaConditionalProcessor : IActionProcessor
     {
         private readonly Dictionary<Id, QuestConditionalConfig> _config;
         private readonly IConditionProcessor _conditionProcessor;
-        private readonly List<QuestDto> _data;
+        private readonly QuestsDto _data;
 
-        public QuestMetaConditionalProcessor(List<QuestDto> data, List<QuestConditionalConfig> questConfigs, IConditionProcessor conditionProcessor)
+        public QuestMetaConditionalProcessor(List<QuestConditionalConfig> questConfigs, QuestsDto data, IConditionProcessor conditionProcessor)
         {
             _data = data;
             _conditionProcessor = conditionProcessor;
@@ -26,38 +26,38 @@ namespace Meta.Controllers
                 _config[questConfig.QuestId] = questConfig;
             }
         }
-        
+
         public void Process(IActionConfig actionConfig)
         {
-            foreach (var questDto in _data)
+            foreach (var questDto in _data.Quests)
             {
-                var config = _config[questDto.QuestId];
+                var config = _config[questDto.ConfigId];
                 if (!config.Triggers.Contains(actionConfig.TypeMetaAction))
                 {
                     continue;
                 }
+
                 var isCompleted = _conditionProcessor.Check(config.Condition);
                 questDto.IsCompleted = isCompleted;
             }
         }
     }
-    
     public class QuestMetaCountBasedProcessor : IActionProcessor
     {
         private readonly Dictionary<TypeMetaAction, IActionProcessor> _questProcessors;
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
 
-        public QuestMetaCountBasedProcessor(List<QuestCountBasedConfig> questConfigs, List<QuestCounterDto> data)
+        public QuestMetaCountBasedProcessor(List<QuestCountBasedConfig> questConfigs, QuestsDto data)
         {
-             _config = new Dictionary<Id, QuestCountBasedConfig>(questConfigs.Count);
+            _config = new Dictionary<Id, QuestCountBasedConfig>(questConfigs.Count);
             foreach (var questConfig in questConfigs)
             {
                 _config.Add(questConfig.QuestId, questConfig);
             }
-            
+
             var itemQuestProcessor = new QuestActionItemProcessor(_config, data);
             var unitQuestProcessor = new QuestActionUnitProcessor(_config, data);
-            
+
             _questProcessors = new Dictionary<TypeMetaAction, IActionProcessor>();
             _questProcessors[TypeMetaAction.InventoryItemAdd] = itemQuestProcessor;
             _questProcessors[TypeMetaAction.InventoryItemSpend] = itemQuestProcessor;
@@ -73,16 +73,17 @@ namespace Meta.Controllers
             {
                 throw new ArgumentException($"Action {actionConfig.TypeMetaAction} not found");
             }
+
             action.Process(actionConfig);
         }
     }
-    
+
     public class QuestActionItemProcessor : ActionAbstract<ItemActionConfig>
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
-        private readonly List<QuestCounterDto> _data;
+        private readonly QuestsDto _data;
 
-        public QuestActionItemProcessor(Dictionary<Id, QuestCountBasedConfig> config, List<QuestCounterDto> data)
+        public QuestActionItemProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
         {
             _config = config;
             _data = data;
@@ -90,14 +91,14 @@ namespace Meta.Controllers
 
         protected override void Process(ItemActionConfig args)
         {
-            foreach (var questCounter in _data)
+            foreach (var questDto in _data.Quests)
             {
-                var config = _config[questCounter.QuestId];
+                var config = _config[questDto.ConfigId];
                 if (config.TargetAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeItem))
                 {
-                    var sumValue = questCounter.Value + args.Count;
-                    questCounter.Value = Math.Clamp(sumValue, 0, config.TargetValue);
-                    questCounter.IsCompleted = questCounter.Value >= config.TargetValue;
+                    _data.Counters[questDto.Id] += args.Count;
+                    _data.Counters[questDto.Id] = Math.Clamp(_data.Counters[questDto.Id], 0, config.TargetValue);
+                    questDto.IsCompleted = _data.Counters[questDto.Id] >= config.TargetValue;
                 }
             }
         }
@@ -105,9 +106,9 @@ namespace Meta.Controllers
     public class QuestActionUnitProcessor : ActionAbstract<UnitActionConfig>
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
-        private readonly List<QuestCounterDto> _data;
+        private readonly QuestsDto _data;
 
-        public QuestActionUnitProcessor(Dictionary<Id, QuestCountBasedConfig> config, List<QuestCounterDto> data)
+        public QuestActionUnitProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
         {
             _config = config;
             _data = data;
@@ -115,197 +116,85 @@ namespace Meta.Controllers
 
         protected override void Process(UnitActionConfig args)
         {
-            foreach (var questCounter in _data)
+            foreach (var questCounterDto in _data.Quests)
             {
-                var config = _config[questCounter.QuestId];
+                var config = _config[questCounterDto.ConfigId];
                 if (config.TargetAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeUnit))
                 {
-                    var sumValue = questCounter.Value + args.Count;
-                    questCounter.Value = Math.Clamp(sumValue, 0, config.TargetValue);
-                    questCounter.IsCompleted = questCounter.Value >= config.TargetValue;
+                    _data.Counters[questCounterDto.Id] += args.Count;
+                    _data.Counters[questCounterDto.Id] = Math.Clamp(_data.Counters[questCounterDto.Id], 0, config.TargetValue);
+                    questCounterDto.IsCompleted = _data.Counters[questCounterDto.Id] >= config.TargetValue;
                 }
             }
         }
     }
     
     
-    //2й способ
-    public interface IQuestControllerFactory
+    /// <summary>
+    /// Квест контроллер. Оперирует квестами:
+    /// Создает, удаляет и выдает награду  
+    /// </summary>
+    public class QuestController : IQuestsController, IQuests
     {
-        QuestDto CreateData(IQuestConfig config);
-        IActionProcessor CreateController(IQuestConfig config, QuestDto dto);
-    }
+        private readonly QuestCollectionConfig _config;
+        private readonly QuestsDto _quests;
+        private readonly IIdProvider _idProvider;
+        private readonly IActionProcessor _actionProcessor;
 
-    public class QuestControllerControllerFactory : IQuestControllerFactory
-    {
-        private readonly IConditionProcessor _conditionProcessor;
+        private readonly Dictionary<Id, QuestDto> _questsHash;
 
-        public QuestControllerControllerFactory(IConditionProcessor conditionProcessor)
+        public QuestController(QuestCollectionConfig config, QuestsDto quests, IIdProvider idProvider, IActionProcessor actionProcessor)
         {
-            _conditionProcessor = conditionProcessor;
-        }
+            _config = config;
+            _quests = quests;
+            _idProvider = idProvider;
+            _actionProcessor = actionProcessor;
 
-        public QuestDto CreateData(IQuestConfig config)
-        {
-            return config.TypeQuest switch
+            _questsHash = new Dictionary<Id, QuestDto>(quests.Quests.Count + ConstDefaultCapacity.Small);
+            foreach (var questDto in _quests.Quests)
             {
-                TypeQuest.CountBased => new QuestCounterDto {QuestId = config.QuestId},
-                TypeQuest.Conditional => new QuestDto {QuestId = config.QuestId},
-                _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuest)
-            };
-        }
-
-        public IActionProcessor CreateController(IQuestConfig config, QuestDto data)
-        {
-            return config.TypeQuest switch
-            {
-                TypeQuest.CountBased => CreateQuestController((QuestCountBasedConfig) config, (QuestCounterDto) data),
-                TypeQuest.Conditional => new QuestConditionalController((QuestConditionalConfig) config, data, _conditionProcessor),
-                _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuest)
-            };
-        }
-
-        private IActionProcessor CreateQuestController(QuestCountBasedConfig config, QuestCounterDto data)
-        {
-            return config.TargetAction switch
-            {
-                TypeMetaAction.InventoryItemAdd => new QuestCountBasedItemController(config, data),
-                TypeMetaAction.InventoryItemSpend => new QuestCountBasedItemController(config, data),
-                TypeMetaAction.InventoryItemExpandLimit => new QuestCountBasedItemController(config, data),
-                TypeMetaAction.UnitAdd => new QuestCountBasedUnitController(config, data),
-                TypeMetaAction.UnitSpend => new QuestCountBasedUnitController(config, data),
-                _ => throw new ArgumentException("Unknown CountBased quest type:" + config.TargetAction)
-            };
-        }
-    }
-    
-    
-    public class QuestsController : IActionProcessor
-    {
-        private readonly List<IActionProcessor> _questControllers = new List<IActionProcessor>(ConstDefaultCapacity.Small);
-        private readonly IQuestControllerFactory _questsControllerFactory;
-        private readonly Dictionary<Id, IQuestConfig> _configs;
-        private readonly QuestCollectionDto _questData;
-
-        public QuestsController(QuestCollectionDto questData, QuestCollectionConfig questConfig, IQuestControllerFactory questsControllerFactory)
-        {
-            _questData = questData;
-            _questsControllerFactory = questsControllerFactory;
-
-            var count = questConfig.GetAll().Count();
-            _configs = new Dictionary<Id, IQuestConfig>(count);
-            foreach (var config in questConfig.GetAll())
-            {
-                _configs.Add(config.QuestId, config);
-            }
-
-            foreach (var questDto in _questData.GetAll())
-            {
-                var config = _configs[questDto.QuestId];
-                var questEntity = _questsControllerFactory.CreateController(config, questDto);
-                _questControllers.Add(questEntity);
+                _questsHash.Add(questDto.Id, questDto);
             }
         }
 
-        public void AddNewQuest(Id questId)
+        public void AddNewQuest(Id configId)
         {
-            AddNewQuest(_configs[questId]);
+            var questData = new QuestDto(configId, _idProvider.GetId());
+            _questsHash.Add(questData.Id, questData);
+            _quests.Add(questData);
         }
-
-        public void AddNewQuest(IQuestConfig questConfig)
-        {
-            var questDto = _questsControllerFactory.CreateData(questConfig);
-            _questData.Add(questDto);
-            var questActionController = _questsControllerFactory.CreateController(questConfig, questDto); 
-            _questControllers.Add(questActionController);
-        }
-
-        public void ClaimReward()//quest id?
-        {
-        }
-
-        public void RemoveQuest()
-        {
-            //_questData.Remove()
-        }
-
         
+        public void ClaimReward(Id questId)
+        {
+            var quest = _quests.Quests.FirstOrDefault(c => c.Id .Equals(questId));
+            Assert.IsNotNull(quest);
+            Assert.IsTrue(quest.IsCompleted);
+            var questConfig = _config.GetAll().First(s => s.QuestId.Equals(quest.ConfigId));
+            _actionProcessor.Process(questConfig.Reward);
+            quest.IsRewarded = true;
+        }
         
-        /// <summary>
-        /// Process ActionBasedQuests
-        /// </summary>
-        public void Process(IActionConfig actionConfig)
+        public void RemoveQuest(Id questId)
         {
-            foreach (var questController in _questControllers)
-            {
-                questController.Process(actionConfig);
-            }
+            _questsHash.TryGetValue(questId, out var quest);
+            Assert.IsNotNull(quest);
+            _quests.Remove(quest);
+        }
+        
+        //-- 
+        public IEnumerable<IQuest> GetAll()
+        {
+            return _quests.Quests;
+        }
+        public bool TryGet(Id id, out IQuest quest)
+        {
+            var isTryGet = _questsHash.TryGetValue(id, out var questDto);
+            quest = questDto;
+            return isTryGet;
+        }
+        public bool TryGetCount(Id id, out int count) //Quest?
+        {
+            return _quests.Counters.TryGetValue(id, out count);
         }
     }
-
-    public class QuestCountBasedItemController : ActionAbstract<ItemActionConfig>
-    {
-        private readonly QuestCountBasedConfig _config;
-        private readonly QuestCounterDto _data;
-
-        public QuestCountBasedItemController(QuestCountBasedConfig config, QuestCounterDto data)
-        {
-            _config = config;
-            _data = data;
-        }
-
-        protected override void Process(ItemActionConfig args)
-        {
-            if (_config.TargetAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeItem))
-            {
-                var sumValue = _data.Value + args.Count;
-                _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
-                _data.IsCompleted = _data.Value >= _config.TargetValue;
-            }
-        }
-    }
-    public class QuestCountBasedUnitController : ActionAbstract<UnitActionConfig>
-    {
-        private readonly QuestCountBasedConfig _config;
-        private readonly QuestCounterDto _data;
-
-        public QuestCountBasedUnitController(QuestCountBasedConfig config, QuestCounterDto data)
-        {
-            _config = config;
-            _data = data;
-        }
-
-        protected override void Process(UnitActionConfig args)
-        {
-            if (_config.TargetAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeUnit))
-            {
-                var sumValue = _data.Value + args.Count;
-                _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
-                _data.IsCompleted = _data.Value >= _config.TargetValue;
-            }
-        }
-    }
-    public class QuestConditionalController : IActionProcessor
-    {
-        private readonly QuestConditionalConfig _config;
-        private readonly QuestDto _data;
-        private readonly IConditionProcessor _conditionProcessor;
-
-        public QuestConditionalController(QuestConditionalConfig config, QuestDto data, IConditionProcessor conditionProcessor)
-        {
-            _config = config;
-            _data = data;
-            _conditionProcessor = conditionProcessor;
-        }
-
-        public void Process(IActionConfig actionConfig)
-        {
-            if (_config.Triggers.Contains(actionConfig.TypeMetaAction))
-            {
-                var isCompleted = _conditionProcessor.Check(_config.Condition);
-                _data.IsCompleted = isCompleted;
-            }
-        }
-    }
-
 }

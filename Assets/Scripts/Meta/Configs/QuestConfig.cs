@@ -34,6 +34,7 @@ namespace Meta.Configs
     {
         public Id QuestId { get; }
         public TypeQuest TypeQuest { get; }
+        IActionConfig Reward { get; set; }
     }
     
     
@@ -60,6 +61,8 @@ namespace Meta.Configs
         public TypeMetaAction TargetAction;
         public Id TargetEntityId;
         public int TargetValue;
+        
+        public IActionConfig Reward { get; set; }
     }
 
 
@@ -72,6 +75,8 @@ namespace Meta.Configs
         public Id QuestId { get; set;}
         public HashSet<TypeMetaAction> Triggers = new HashSet<TypeMetaAction>();
         public CountConditionConfig Condition;
+        
+        public IActionConfig Reward { get; set; }
     }
     
     
