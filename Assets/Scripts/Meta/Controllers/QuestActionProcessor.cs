@@ -4,6 +4,7 @@ using System.Linq;
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
+using Meta.Controllers.Actions;
 using Meta.Models;
 using UnityEngine.Assertions;
 
@@ -31,7 +32,11 @@ namespace Meta.Controllers
         {
             foreach (var questDto in _data.Quests)
             {
-                var config = _config[questDto.ConfigId];
+                if(_config.TryGetValue(questDto.ConfigId, out var config) == false)
+                {
+                    continue;
+                }
+                
                 if (!config.Triggers.Contains(actionConfig.TypeMetaAction))
                 {
                     continue;
@@ -59,6 +64,8 @@ namespace Meta.Controllers
             var unitQuestProcessor = new QuestActionUnitProcessor(_config, data);
 
             _questProcessors = new Dictionary<TypeMetaAction, IActionProcessor>();
+            _questProcessors[TypeMetaAction.Collection] = new ActionCollectionProcessor(this);
+            
             _questProcessors[TypeMetaAction.InventoryItemAdd] = itemQuestProcessor;
             _questProcessors[TypeMetaAction.InventoryItemSpend] = itemQuestProcessor;
             _questProcessors[TypeMetaAction.InventoryItemExpandLimit] = itemQuestProcessor;
@@ -76,6 +83,9 @@ namespace Meta.Controllers
 
             action.Process(actionConfig);
         }
+
+
+
     }
 
     public class QuestActionItemProcessor : ActionAbstract<ItemActionConfig>
@@ -93,9 +103,19 @@ namespace Meta.Controllers
         {
             foreach (var questDto in _data.Quests)
             {
-                var config = _config[questDto.ConfigId];
-                if (config.TargetAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeItem))
+                if(_config.TryGetValue(questDto.ConfigId, out var config) == false)
                 {
+                    continue;
+                }
+
+                
+                if (config.TriggerAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeItem))
+                {
+                    if(_data.Counters.TryGetValue(questDto.Id, out var count) == false)
+                    {
+                        _data.Counters[questDto.Id] = 0;
+                    }
+                    
                     _data.Counters[questDto.Id] += args.Count;
                     _data.Counters[questDto.Id] = Math.Clamp(_data.Counters[questDto.Id], 0, config.TargetValue);
                     questDto.IsCompleted = _data.Counters[questDto.Id] >= config.TargetValue;
@@ -118,9 +138,18 @@ namespace Meta.Controllers
         {
             foreach (var questCounterDto in _data.Quests)
             {
-                var config = _config[questCounterDto.ConfigId];
-                if (config.TargetAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeUnit))
+                if (_config.TryGetValue(questCounterDto.ConfigId, out var config) == false)
                 {
+                    continue;
+                }
+
+                if (config.TriggerAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeUnit))
+                {
+                    if(_data.Counters.TryGetValue(questCounterDto.Id, out var count) == false)
+                    {
+                        _data.Counters[questCounterDto.Id] = 0;
+                    }
+                    
                     _data.Counters[questCounterDto.Id] += args.Count;
                     _data.Counters[questCounterDto.Id] = Math.Clamp(_data.Counters[questCounterDto.Id], 0, config.TargetValue);
                     questCounterDto.IsCompleted = _data.Counters[questCounterDto.Id] >= config.TargetValue;

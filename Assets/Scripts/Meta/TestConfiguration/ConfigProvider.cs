@@ -20,16 +20,10 @@ namespace Meta.TestConfiguration
         UnitAssault = 24,
         
         GroupBarracs = 31, //barracks
-        GroupShop = 32, //shop
-        GroupLaboratory = 33, //lab
-        
         
         QuestSpendRecruts = 41,
-        QuestSpendScrup = 42,
         QuestAddUnitGunner = 43,
-        QuestAddUnitScout = 44,
-        QuestAddUnitAssault = 45,
-        
+        QuestCollectGunners = 47,
     }
     
     public static class MapEntityIdExtensions

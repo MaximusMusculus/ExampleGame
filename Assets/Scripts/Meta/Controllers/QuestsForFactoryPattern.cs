@@ -46,14 +46,14 @@ namespace Meta.Controllers
 
         private IQuestController CreateQuestController(QuestCountBasedConfig config, QuestCounterDto data)
         {
-            return config.TargetAction switch
+            return config.TriggerAction switch
             {
                 TypeMetaAction.InventoryItemAdd => new QuestCountBasedItemController(config, data),
                 TypeMetaAction.InventoryItemSpend => new QuestCountBasedItemController(config, data),
                 TypeMetaAction.InventoryItemExpandLimit => new QuestCountBasedItemController(config, data),
                 TypeMetaAction.UnitAdd => new QuestCountBasedUnitController(config, data),
                 TypeMetaAction.UnitSpend => new QuestCountBasedUnitController(config, data),
-                _ => throw new ArgumentException("Unknown CountBased quest type:" + config.TargetAction)
+                _ => throw new ArgumentException("Unknown CountBased quest type:" + config.TriggerAction)
             };
         }
     }
@@ -149,7 +149,7 @@ namespace Meta.Controllers
 
         protected override void Process(ItemActionConfig args)
         {
-            if (_config.TargetAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeItem))
+            if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeItem))
             {
                 var sumValue = _data.Value + args.Count;
                 _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
@@ -171,7 +171,7 @@ namespace Meta.Controllers
 
         protected override void Process(UnitActionConfig args)
         {
-            if (_config.TargetAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeUnit))
+            if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeUnit))
             {
                 var sumValue = _data.Value + args.Count;
                 _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);

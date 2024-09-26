@@ -1,4 +1,5 @@
 ﻿using Meta.Configs;
+using Meta.Configs.Conditions;
 
 namespace Meta.TestConfiguration
 {
@@ -8,6 +9,9 @@ namespace Meta.TestConfiguration
         private readonly UnitConfigBuilder _unit = new UnitConfigBuilder();
         private readonly MetaActionConfigBuilder _metaActions = new MetaActionConfigBuilder();
         private readonly MetaActionGroupConfigBuilder _actionGroup = new MetaActionGroupConfigBuilder();
+        private readonly MetaQuestConfigBuilder _questBuilder = new MetaQuestConfigBuilder();
+        private readonly ConditionsConfigBuilder _condition = new ConditionsConfigBuilder();
+
 
         public MetaConfig GetConfig()
         {
@@ -32,7 +36,31 @@ namespace Meta.TestConfiguration
                     .AddAction(_metaActions.NewAction().AddTrainUnit(MapTestId.UnitGunner.Id(), 30, 100, 10).Build())
                     .AddAction(_metaActions.NewAction().AddTrainUnit(MapTestId.UnitAssault.Id(), 50, 150, 5).Build())
                     .SetDialogName("ViewBarracks")
+                    .Build())
+
+
+                .AddQuestConfig(_questBuilder
+                    .NewCountQuest(MapTestId.QuestAddUnitGunner.Id(), MapTestId.UnitGunner.Id(), 20)
+                    .SetTrigger(TypeMetaAction.UnitAdd)
+                    .SetItemReward(MapTestId.Hard.Id(), 50)
+                    .Build())
+
+                .AddQuestConfig(_questBuilder
+                    .NewCountQuest(MapTestId.QuestSpendRecruts.Id(), MapTestId.Recruts.Id(), 200)
+                    .SetTrigger(TypeMetaAction.InventoryItemSpend)
+                    .SetItemReward(MapTestId.Hard.Id(), 55)
+                    .Build())
+
+                .AddQuestConfig(_questBuilder.NewConditionalQuest(MapTestId.QuestCollectGunners.Id(), 
+                        _condition
+                            .NewCollection(TypeCollection.And)
+                            .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.GreaterOrEqual, 10)
+                            .Build())
+                    .SetTrigger(TypeMetaAction.UnitAdd)
+                    .SetItemReward(MapTestId.Recruts.Id(), 100)
                     .Build());
+
+
 
             return _metaBuilder.Build();
         }

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
 using Meta.Configs.Conditions;
 using Meta.Models;
+using UnityEngine.Assertions;
 
 namespace Meta.TestConfiguration
 {
@@ -34,16 +36,22 @@ namespace Meta.TestConfiguration
             _config.InventoryItems.Add(new ItemConfig() {Item = id, DefaultCount = startCount, MaxCount = limit});
             return this;
         }
-        
+
         public MetaConfigBuilder AddActionGroup(MetaActionsGroupConfig groupConfig)
         {
             _config.ActionsGroups.Add(groupConfig);
             return this;
         }
-        
+
         public MetaConfigBuilder AddUnitConfig(UnitConfig unit)
         {
             _config.Units.Add(unit);
+            return this;
+        }
+
+        public MetaConfigBuilder AddQuestConfig(IQuestConfig questConfig)
+        {
+            _config.Quests.Add(questConfig);
             return this;
         }
 
@@ -53,7 +61,7 @@ namespace Meta.TestConfiguration
             _config = null;
             return metaConfig;
         }
-        
+
     }
 
     public class UnitConfigBuilder
@@ -90,26 +98,28 @@ namespace Meta.TestConfiguration
             return result;
         }
     }
-    
+
     public class ActionCollectionConfigBuilder
     {
         private ActionCollectionConfig _config;
-        
+
         public ActionCollectionConfigBuilder NewAction()
         {
             _config = new ActionCollectionConfig();
             return this;
         }
-        
+
         public ActionCollectionConfigBuilder UnitAdd(UnitConfig unit, int count)
         {
-            _config.Untis.Add(new UnitActionConfig {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(new UnitActionConfig
+                {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
         public ActionCollectionConfigBuilder UnitSpend(UnitConfig unit, int count)
         {
-            _config.Untis.Add(new UnitActionConfig {MetaAction = TypeMetaAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(new UnitActionConfig
+                {MetaAction = TypeMetaAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
             return this;
         }
 
@@ -138,15 +148,17 @@ namespace Meta.TestConfiguration
             return result;
         }
     }
-    
+
     public enum TypeCollection
     {
         And,
         Or,
     }
+
     public class ConditionsConfigBuilder
     {
         private ConditionCollectionConfig _config;
+
         private readonly Dictionary<TypeCollection, TypeCondition> _map = new Dictionary<TypeCollection, TypeCondition>
         {
             {TypeCollection.And, TypeCondition.AndCollection},
@@ -165,13 +177,13 @@ namespace Meta.TestConfiguration
             _config.CheckItems.Add(new CountConditionConfig
             {
                 Condition = TypeCondition.InventoryItemsCount,
-                TypeItem = itemId, 
+                TypeItem = itemId,
                 CompareType = compareType,
                 Value = value
             });
             return this;
         }
-        
+
         public ConditionsConfigBuilder UnitCountCondition(Id id, TypeCompare compareType, int value)
         {
             _config.CheckItems.Add(new CountConditionConfig()
@@ -183,31 +195,31 @@ namespace Meta.TestConfiguration
             });
             return this;
         }
-        
+
         public ConditionsConfigBuilder InventoryItemHas(Id itemId, int value)
         {
             _config.CheckItems.Add(new CountConditionConfig
             {
                 Condition = TypeCondition.InventoryItemsCount,
-                TypeItem = itemId, 
+                TypeItem = itemId,
                 CompareType = TypeCompare.GreaterOrEqual,
                 Value = value
             });
             return this;
         }
-        
+
         public ConditionsConfigBuilder ItemLimitCondition(Id itemId, TypeCompare compareType, int value)
         {
             _config.CheckItems.Add(new CountConditionConfig
             {
                 Condition = TypeCondition.InventoryItemsLimit,
-                TypeItem = itemId, 
+                TypeItem = itemId,
                 CompareType = compareType,
                 Value = value
             });
             return this;
         }
-        
+
 
         public ConditionsConfigBuilder AddCollection(ConditionCollectionConfig config)
         {
@@ -229,32 +241,42 @@ namespace Meta.TestConfiguration
         private readonly ActionCollectionConfigBuilder _actionCollection = new ActionCollectionConfigBuilder();
         private readonly ConditionsConfigBuilder _conditions = new ConditionsConfigBuilder();
         private readonly UnitConfigBuilder _unit = new UnitConfigBuilder();
-        
-        
+
+
         public MetaActionConfigBuilder NewAction()
         {
             _config = new MetaActionConfig();
             return this;
         }
+
         public MetaActionConfigBuilder SetRequire(ConditionCollectionConfig config)
         {
             if (_config.Require != null)
             {
                 throw new ArgumentException("Require already set");
             }
+
             _config.Require = config;
             return this;
         }
+
         public MetaActionConfigBuilder SetActions(ActionCollectionConfig config)
         {
             if (_config.Actions != null)
             {
                 throw new ArgumentException("Actions already set");
             }
+
             _config.Actions = config;
             return this;
         }
-        
+
+
+        public MetaActionConfigBuilder AddItem(Id item, int count)
+        {
+            SetActions(_actionCollection.NewAction().InventoryItemAdd(item, count).Build());
+            return this;
+        }
 
         public MetaActionConfigBuilder AddTrainUnit(Id unitType, int recruts, int scrub, int unitLimit = int.MaxValue)
         {
@@ -270,6 +292,7 @@ namespace Meta.TestConfiguration
                     .UnitCountCondition(unitType, TypeCompare.Less, unitLimit)
                     .Build());
             }
+
             return this;
         }
 
@@ -286,7 +309,7 @@ namespace Meta.TestConfiguration
     {
         private MetaActionsGroupConfig _config;
         private MetaActionGroupConfigBuilder _actionGroup;
-        
+
 
 
         public MetaActionGroupConfigBuilder New(Id id)
@@ -294,19 +317,19 @@ namespace Meta.TestConfiguration
             _config = new MetaActionsGroupConfig {TypeGroup = id};
             return this;
         }
-        
+
         public MetaActionGroupConfigBuilder SetDialogName(string name)
         {
             _config.DialogName = name;
             return this;
         }
-        
+
         public MetaActionGroupConfigBuilder AddAction(MetaActionConfig action)
         {
             _config.Actions.Add(action);
             return this;
         }
-        
+
 
 
         public MetaActionsGroupConfig Build()
@@ -314,6 +337,164 @@ namespace Meta.TestConfiguration
             var result = _config;
             _config = null;
             return result;
+        }
+    }
+
+    public class MetaQuestConfigBuilder
+    {
+        private ActionCollectionConfigBuilder _actionBuilder = new ActionCollectionConfigBuilder();
+        private ConditionsConfigBuilder _conditionsBuilder = new ConditionsConfigBuilder();
+
+        private ActionCollectionConfig _rewardAction;
+        private ConditionCollectionConfig _conditions;
+        private readonly HashSet<TypeMetaAction> _triggers = new HashSet<TypeMetaAction>();
+        private Id _questId;
+        private Id _targetEntityId;
+        private int _targetCount;
+
+        private TypeQuest _typeQuest;
+
+        public MetaQuestConfigBuilder NewQuest(Id questId)
+        {
+            _questId = questId;
+            return this;
+        }
+
+        public MetaQuestConfigBuilder NewCountQuest(Id questId, Id targetEntityId, int target)
+        {
+            NewQuest(questId);
+            SetTypeQuest(TypeQuest.CountBased);
+            SetCountBased(targetEntityId, target);
+            return this;
+        }
+
+        public MetaQuestConfigBuilder NewConditionalQuest(Id questId, ConditionCollectionConfig condition)
+        {
+            NewQuest(questId);
+            SetTypeQuest(TypeQuest.Conditional);
+            SetCondition(condition);
+            return this;
+        }
+        
+
+        public MetaQuestConfigBuilder SetTrigger(params TypeMetaAction[] triggers)
+        {
+            if (_triggers.Count > 0)
+            {
+                throw new ArgumentException("Triggers already set");
+            }
+
+            foreach (var trigger in triggers)
+            {
+                _triggers.Add(trigger);
+            }
+
+            return this;
+        }
+
+
+        public MetaQuestConfigBuilder SetTypeQuest(TypeQuest typeQuest)
+        {
+            _typeQuest = typeQuest;
+            return this;
+        }
+
+        public MetaQuestConfigBuilder SetCondition(ConditionCollectionConfig condition)
+        {
+            if (_conditions != null)
+            {
+                throw new ArgumentException("Conditions already set");
+            }
+
+            _conditions = condition;
+            return this;
+        }
+
+        public MetaQuestConfigBuilder SetItemReward(Id item, int count)
+        {
+            _rewardAction = _actionBuilder.NewAction().InventoryItemAdd(item, count).Build();
+            return this;
+        }
+        
+
+        public MetaQuestConfigBuilder SetReward(ActionCollectionConfig rewardAction)
+        {
+            if (_rewardAction != null)
+            {
+                throw new ArgumentException("Reward already set");
+            }
+
+            _rewardAction = rewardAction;
+            return this;
+        }
+
+        public MetaQuestConfigBuilder SetCountBased(Id targetEntityId, int targetCount)
+        {
+            _targetEntityId = targetEntityId;
+            _targetCount = targetCount;
+            return this;
+        }
+
+        public IQuestConfig Build()
+        {
+            IQuestConfig result = _typeQuest switch
+            {
+                TypeQuest.Conditional => CreateQuestMetaConditional(),
+                TypeQuest.CountBased => CreateQuestMetaCountBased(),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            ClearBuilder();
+            
+            if (result == null)
+            {
+                throw new ArgumentException("Quest not set");
+            }
+            return result;
+        }
+
+        private void ClearBuilder()
+        {
+            _questId = 0;
+            _targetEntityId = 0;
+            _targetCount = 0;
+            _typeQuest = TypeQuest.None;
+            _rewardAction = null;
+            _conditions = null;
+            _triggers.Clear();
+        }
+
+        private IQuestConfig CreateQuestMetaCountBased()
+        {
+            Assert.IsTrue(_questId > 0);
+            Assert.IsTrue(_targetEntityId > 0);
+            Assert.IsTrue(_targetCount > 0);
+            Assert.IsNotNull(_rewardAction);
+            Assert.IsTrue(_triggers.Count == 1);
+
+            return new QuestCountBasedConfig
+            {
+                QuestId = _questId,
+                TriggerAction = _triggers.First(),
+                TargetEntityId = _targetEntityId,
+                TargetValue = _targetCount,
+                Reward = _rewardAction
+            };
+        }
+
+        private IQuestConfig CreateQuestMetaConditional()
+        {
+            Assert.IsTrue(_questId > 0);
+            Assert.IsNotNull(_conditions);
+            Assert.IsNotNull(_rewardAction);
+            Assert.IsTrue(_triggers.Count > 0);
+            
+            return new QuestConditionalConfig
+            {
+                QuestId = _questId,
+                Triggers = _triggers,
+                Condition = _conditions,
+                Reward =  _rewardAction,
+            };
         }
     }
 

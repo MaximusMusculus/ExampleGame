@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AppRen;
 using Meta.Configs.Conditions;
 
@@ -20,6 +21,22 @@ namespace Meta.Configs
             {
                 yield return quest;
             }
+        }
+
+        public void Add(IQuestConfig questConfig)
+        {
+            if (questConfig is QuestCountBasedConfig countBasedConfig)
+            {
+                CountBased.Add(countBasedConfig);
+                return;
+            }
+            if (questConfig is QuestConditionalConfig conditionalQuest)
+            {
+                ConditionBased.Add(conditionalQuest);
+                return;
+            }
+            
+            throw new ArgumentException("Unknown quest type:" + questConfig.TypeQuest);
         }
     } 
     
@@ -58,7 +75,7 @@ namespace Meta.Configs
     {
         public TypeQuest TypeQuest => TypeQuest.CountBased;
         public Id QuestId { get; set; }
-        public TypeMetaAction TargetAction;
+        public TypeMetaAction TriggerAction;
         public Id TargetEntityId;
         public int TargetValue;
         
@@ -74,7 +91,7 @@ namespace Meta.Configs
         
         public Id QuestId { get; set;}
         public HashSet<TypeMetaAction> Triggers = new HashSet<TypeMetaAction>();
-        public CountConditionConfig Condition;
+        public ConditionCollectionConfig Condition;
         
         public IActionConfig Reward { get; set; }
     }
