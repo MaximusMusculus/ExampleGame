@@ -6,7 +6,11 @@ using Meta.Configs.Conditions;
 
 namespace Meta.Configs
 {
-    public class QuestCollectionConfig
+    public interface IQuestCollectionConfig
+    {
+        IEnumerable<IQuestConfig> GetAll();
+    }
+    public class QuestCollectionConfig : IQuestCollectionConfig
     {
         public List<QuestCountBasedConfig> CountBased = new List<QuestCountBasedConfig>();
         public List<QuestConditionalConfig> ConditionBased = new List<QuestConditionalConfig>();

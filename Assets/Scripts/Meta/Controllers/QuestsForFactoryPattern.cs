@@ -70,10 +70,13 @@ namespace Meta.Controllers
         private readonly IQuestControllerFactory _questsControllerFactory;
         private readonly Dictionary<Id, IQuestConfig> _configs;
         private readonly QuestCollectionDto _questData;
+        private readonly IActionProcessor _rewardProcessor;
 
-        public QuestsController(QuestCollectionDto questData, QuestCollectionConfig questConfig, IQuestControllerFactory questsControllerFactory)
+        public QuestsController(QuestCollectionDto questData, QuestCollectionConfig questConfig,
+            IQuestControllerFactory questsControllerFactory, IActionProcessor rewardProcessor)
         {
             _questData = questData;
+            _rewardProcessor = rewardProcessor;
             _questsControllerFactory = questsControllerFactory;
 
             var count = questConfig.GetAll().Count();
@@ -104,9 +107,11 @@ namespace Meta.Controllers
             _metaQuestControllers.Add(questActionController);
         }
 
-        public void ClaimReward() //quest id?
+        public void ClaimReward(IQuest quest)
         {
-
+            var rewardAction = _configs[quest.ConfigId].Reward;
+            _questData.GetAll().First(s => s.Id.Equals(quest.Id)).IsRewarded = true;
+            _rewardProcessor.Process(rewardAction);
         }
 
         public void RemoveQuest()
