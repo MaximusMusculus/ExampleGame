@@ -3,16 +3,17 @@ using Meta.Configs;
 
 namespace Meta.Controllers
 {
+    //Processor=>Handler?
     public interface IActionProcessor
     {
-        void Process(IActionConfig config);
+        void Process(IActionConfig actionConfig);
     }
 
     public abstract class ActionAbstract<TArgs> : IActionProcessor where TArgs : IActionConfig, new()
     {
-        public void Process(IActionConfig config)
+        public void Process(IActionConfig actionConfig)
         {
-            Process((TArgs) config);
+            Process((TArgs) actionConfig);
         }
 
         protected abstract void Process(TArgs args);

@@ -75,6 +75,8 @@ namespace Meta.Controllers.Imp
         public void Add(Id unitType, UnitProgressionDto progression, int count)
         {
             var config = _configsHash[unitType];
+            progression ??= config.GetDefaultProgression();  //??
+                
             if (config.IsCanUpgrade)
             {
                 AddUpgradableUnit(config, progression, count);

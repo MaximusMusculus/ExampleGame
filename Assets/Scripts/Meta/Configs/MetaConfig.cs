@@ -9,5 +9,7 @@ namespace Meta.Configs
         public List<ItemConfig> InventoryItems = new List<ItemConfig>();
         public List<UnitConfig> Units = new List<UnitConfig>();
         public List<MetaActionsGroupConfig> ActionsGroups = new List<MetaActionsGroupConfig>();
+        
+        public QuestCollectionConfig Quests = new QuestCollectionConfig();
     }
 }

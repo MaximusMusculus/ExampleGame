@@ -1,32 +1,53 @@
 using System.Collections.Generic;
 using AppRen;
 using Meta.Models;
-using UnityEngine.Assertions;
+
 
 namespace Meta.Configs.Actions
 {
+    
+    //можно сделать абстрактным классом, с классами на каждый элемент энама.
+    //тогда не получится сделать не так. Однако сериализировать будет не так удобно
+    //билдер?
     public class ItemActionConfig : IActionConfig
     {
-        public TypeAction TypeAction => Action;
-
-        public TypeAction Action; //availableList?
+        public TypeMetaAction TypeMetaAction => MetaAction;
+        
+        public TypeMetaAction MetaAction; //availableList?
         public Id TypeItem;
         public int Count;
-    }
+        
 
+
+        public override string ToString()
+        {
+            return $"TypeItem: {TypeItem}, Count: {Count}";
+        }
+    }
+    
+    
+    
+    
+
+    //наследоваться от ItemActionConfig? с добавлением Progression
     public class UnitActionConfig : IActionConfig
     {
-        public TypeAction TypeAction => Action;
-
-        public TypeAction Action;
+        public TypeMetaAction TypeMetaAction => MetaAction;
+        
+        public TypeMetaAction MetaAction;
         public Id TypeUnit;
         public UnitProgressionDto Progression;
         public int Count;
+
+        public override string ToString()
+        {
+            return $"TypeUnit: {TypeUnit}, Progression: {Progression}, Count: {Count}";
+        }
     }
 
     public class ActionCollectionConfig : IActionConfig
     {
-        public TypeAction TypeAction => TypeAction.Collection;
+        public TypeMetaAction TypeMetaAction => TypeMetaAction.Collection;
 
         //хранение набора коллекции в типизированном виде
         //для удобной читаемости и сериализации/десериализации

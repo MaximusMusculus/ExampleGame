@@ -1,25 +1,39 @@
 namespace Meta.Configs
 {
-    public enum TypeAction
+    //вместо энама можно строки разместить
+    public static class TypeAction
+    {
+        public const string Collection = "Collection";//??
+        
+        public const string ItemAdd = "ItemAdd";
+        public const string ItemSpend = "ItemSpend";
+        public const string ItemExpandLimit = "ItemExpandLimit";
+        
+        public const string UnitAdd = "UnitAdd";
+        public const string UnitSpend = "UnitSpend";
+        
+    }
+    
+    public enum TypeMetaAction
     {
         None,
         Collection,
         
-        InventoryItemAdd,
-        InventoryItemSpend,
-        InventoryItemExpandLimit,
+        InventoryItemAdd,           //ItemActionConfig
+        InventoryItemSpend,         //ItemActionConfig
+        InventoryItemExpandLimit,   //ItemActionConfig
 
-        UnitAdd,
-        UnitSpend,
+        UnitAdd,        //UnitActionConfig
+        UnitSpend,      //UnitActionConfig
         
         
         //допустим
-        EventStart,
-        EventStop,
+        EventStart, //targetEventId?
+        EventStop,  //targetEventId?
     }
 
     public interface IActionConfig
     {
-        TypeAction TypeAction { get; }
+        TypeMetaAction TypeMetaAction { get; }
     }
 }

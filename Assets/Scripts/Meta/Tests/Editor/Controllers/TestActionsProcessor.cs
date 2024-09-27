@@ -15,7 +15,7 @@ namespace Meta.Tests.Editor.Controllers
 
             var itemAction = new ItemActionConfig
             {
-                Action = TypeAction.InventoryItemAdd,
+                MetaAction = TypeMetaAction.InventoryItemAdd,
                 TypeItem = new Id(1),
                 Count = 10
             };
@@ -23,7 +23,7 @@ namespace Meta.Tests.Editor.Controllers
             
             var unitAction = new UnitActionConfig
             {
-                Action = TypeAction.UnitAdd,
+                MetaAction = TypeMetaAction.UnitAdd,
                 TypeUnit = new Id(1),
                 Progression = new UnitProgressionDto(),
                 Count = 10
