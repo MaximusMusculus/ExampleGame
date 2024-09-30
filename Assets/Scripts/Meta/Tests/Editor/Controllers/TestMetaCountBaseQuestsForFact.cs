@@ -56,7 +56,11 @@ namespace Meta.Tests.Editor.Controllers
             var actionProcessor = new ActionProcessor(_inventory, _units);
             var fact = new QuestControllerControllerFactory(new ConditionProcessor(_inventory, _units));
             _questsController = new QuestsController(_questsData, questsConfig, fact, actionProcessor);
-            _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController, null);
+            
+            var autoComplete = new QuestAutoCompleteProcessorForFact(_questsData, _questsController);
+            
+            
+            _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController, autoComplete);
         }
         
         
@@ -95,6 +99,36 @@ namespace Meta.Tests.Editor.Controllers
             Assert.IsTrue(_questsData.CountBasedQuest.First().IsRewarded);
         }
 
+    }
+    
+    public class QuestAutoCompleteProcessorForFact : IActionProcessor
+    {
+        private readonly QuestCollectionDto _questsData;
+        private readonly IQuestsController _questController;
 
+        public QuestAutoCompleteProcessorForFact(QuestCollectionDto questsData, IQuestsController questController)
+        {
+            _questsData = questsData;
+            _questController = questController;
+        }
+
+        public void Process(IActionConfig actionConfig)
+        {
+            foreach (var quest in _questsData.CountBasedQuest)
+            {
+                if (quest.IsCompleted && quest.IsRewarded == false)
+                {
+                    _questController.ClaimReward(quest.Id);
+                }
+            }
+
+            foreach (var quest in _questsData.ConditionalQuest)
+            {
+                if (quest.IsCompleted && quest.IsRewarded == false)
+                {
+                    _questController.ClaimReward(quest.Id);
+                }
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
 using Meta.Models;
+using UnityEngine.Assertions;
 
 namespace Meta.Controllers
 {
@@ -63,7 +64,7 @@ namespace Meta.Controllers
     {
     }
 
-    public class QuestsController : IActionProcessor
+    public class QuestsController : IActionProcessor, IQuestsController
     {
         private readonly List<IQuestController> _metaQuestControllers = new List<IQuestController>(ConstDefaultCapacity.Small);
 
@@ -97,6 +98,18 @@ namespace Meta.Controllers
         public void AddNewQuest(Id questId)
         {
             AddNewQuest(_configs[questId]);
+        }
+
+        public void ClaimReward(Id questId)
+        {
+            var quest = _questData.GetAll().FirstOrDefault(c => c.Id .Equals(questId));
+            Assert.IsNotNull(quest);
+            Assert.IsTrue(quest.IsCompleted);
+            Assert.IsFalse(quest.IsRewarded);
+
+            var questConfig = _configs[quest.ConfigId];
+            _rewardProcessor.Process(questConfig.Reward);
+            quest.IsRewarded = true;
         }
 
         public void AddNewQuest(IQuestConfig questConfig)
