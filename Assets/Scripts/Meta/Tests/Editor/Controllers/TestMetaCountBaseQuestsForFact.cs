@@ -58,7 +58,6 @@ namespace Meta.Tests.Editor.Controllers
             var fact = new QuestControllerControllerFactory(new ConditionProcessor(_inventory, _units));
             _questsController = new QuestsController(questsConfig,_questsData, fact, actionProcessor);
             var autoComplete = new QuestAutoCompleteProcessorForFact(_questsData, _questsController);
-
             _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController, autoComplete);
         }
         
@@ -128,6 +127,27 @@ namespace Meta.Tests.Editor.Controllers
                     _questController.ClaimReward(quest);
                 }
             }
+        }
+    }
+    
+    public class ActionProcessorFacade : IActionProcessor
+    {
+        private readonly IActionProcessor _executeActionProcessor;
+        private readonly IActionProcessor _questActionProcessor;
+        private readonly IActionProcessor _questAutoCompleteProcessor;
+
+        public ActionProcessorFacade(IActionProcessor executeActionProcessor, IActionProcessor questActionProcessor, IActionProcessor autoComplete)
+        {
+            _executeActionProcessor = executeActionProcessor;
+            _questActionProcessor = questActionProcessor;
+            _questAutoCompleteProcessor = autoComplete;
+        }
+
+        public void Process(IActionConfig actionConfig)
+        {
+            _executeActionProcessor.Process(actionConfig);
+            _questActionProcessor.Process(actionConfig);
+            _questAutoCompleteProcessor.Process(actionConfig);
         }
     }
 }

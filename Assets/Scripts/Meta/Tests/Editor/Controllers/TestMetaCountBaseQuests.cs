@@ -12,11 +12,6 @@ using NUnit.Framework;
 
 namespace Meta.Tests.Editor.Controllers
 {
-    public class TestQuestController
-    {
-        
-    }
-    
     [TestFixture]
     public class TestMetaCountBaseQuests
     {
@@ -125,24 +120,5 @@ namespace Meta.Tests.Editor.Controllers
         }
     }
     
-    public class ActionProcessorFacade : IActionProcessor
-    {
-        private readonly IActionProcessor _executeActionProcessor;
-        private readonly IActionProcessor _questActionProcessor;
-        private readonly IActionProcessor _questAutoCompleteProcessor;
-
-        public ActionProcessorFacade(IActionProcessor executeActionProcessor, IActionProcessor questActionProcessor, IActionProcessor autoComplete)
-        {
-            _executeActionProcessor = executeActionProcessor;
-            _questActionProcessor = questActionProcessor;
-            _questAutoCompleteProcessor = autoComplete;
-        }
-
-        public void Process(IActionConfig actionConfig)
-        {
-            _executeActionProcessor.Process(actionConfig);
-            _questActionProcessor.Process(actionConfig);
-            _questAutoCompleteProcessor.Process(actionConfig);
-        }
-    }
+ 
 }
