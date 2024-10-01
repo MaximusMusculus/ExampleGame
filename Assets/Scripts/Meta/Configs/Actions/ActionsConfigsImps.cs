@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using AppRen;
+using Meta.Controllers;
 using Meta.Models;
 
 namespace Meta.Configs.Actions
 {
     
-    public interface IInventoryAction
+       public interface IInventoryAction
     {
         public void Visit(IInventoryActionVisitor visitor);
     }
@@ -22,13 +23,19 @@ namespace Meta.Configs.Actions
     /// Можно попробовать оба варианта 
     public interface IInventoryActionVisitor
     {
-        void ItemAdd(ItemActionConfig itemActionConfig);
-        void ItemSpend(ItemActionConfig itemActionConfig);
-        void ItemExpandLimit(ItemActionConfig itemActionConfig);
+        //void ItemAdd(InventoryActionConfig inventoryActionConfig);
+        void ItemAdd(Id itemId, int count);
+        
+        void ItemSpend(Id itemId, int count);
+        
+        void ItemExpandLimit(Id itemId, int count);
+        
+        //void ItemSpend(InventoryActionConfig inventoryActionConfig);
+        //void ItemExpandLimit(InventoryActionConfig inventoryActionConfig);
     }
     
     
-    public class ItemActionConfig : IActionConfig, IInventoryAction
+    public class InventoryActionConfig : IActionConfig, IInventoryAction
     {
         public string ActionGroup => TypeActionGroup.Inventory;
         
@@ -36,7 +43,7 @@ namespace Meta.Configs.Actions
         public Id TypeItem;
         public int Count;
 
-        public ItemActionConfig(TypeInventoryAction action)
+        public InventoryActionConfig(TypeInventoryAction action)
         {
             Action = action;
         }
@@ -51,13 +58,13 @@ namespace Meta.Configs.Actions
             switch (Action)
             {
                 case TypeInventoryAction.ItemAdd:
-                    visitor.ItemAdd(this);
+                    visitor.ItemAdd(TypeItem, Count);
                     break;
                 case TypeInventoryAction.ItemSpend:
-                    visitor.ItemSpend(this);
+                    visitor.ItemSpend(TypeItem, Count);
                     break;
                 case TypeInventoryAction.ItemExpandLimit:
-                    visitor.ItemExpandLimit(this);
+                    visitor.ItemExpandLimit(TypeItem, Count);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -74,7 +81,6 @@ namespace Meta.Configs.Actions
     }
     
     
-    
     public interface IUnitActionVisitor
     {
         void UnitAdd(UnitActionConfig unitActionConfig);
@@ -89,6 +95,11 @@ namespace Meta.Configs.Actions
    public class UnitActionConfig : IActionConfig, IUnitAction
     {
         public string ActionGroup => TypeActionGroup.Units;
+        public void Visit(IActionProcessor processor)
+        {
+            throw new NotImplementedException();
+        }
+
         public TypeUnitAction TypeAction;
         
         public Id TypeUnit;
@@ -136,7 +147,7 @@ namespace Meta.Configs.Actions
         //хранение набора коллекции в типизированном виде
         //для удобной читаемости и сериализации/десериализации
         public readonly List<UnitActionConfig> Untis = new List<UnitActionConfig>();
-        public readonly List<ItemActionConfig> Items = new List<ItemActionConfig>();
+        public readonly List<InventoryActionConfig> Items = new List<InventoryActionConfig>();
         
         //схож с ConditionCollectionConfig, там тестирую массив
         private IActionConfig[] _actionsHash;

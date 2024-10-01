@@ -123,25 +123,25 @@ namespace Meta.TestConfiguration
             };
         }
 
-        public ItemActionConfig CreateItemAddAction(Id itemId, int count)
+        public InventoryActionConfig CreateItemAddAction(Id itemId, int count)
         {
-            return new ItemActionConfig(ItemActionConfig.TypeInventoryAction.ItemAdd)
+            return new InventoryActionConfig(InventoryActionConfig.TypeInventoryAction.ItemAdd)
             {
                 TypeItem = itemId,
                 Count = count
             };
         }
-        public ItemActionConfig CreateItemSpendAction(Id itemId, int count)
+        public InventoryActionConfig CreateItemSpendAction(Id itemId, int count)
         {
-            return new ItemActionConfig(ItemActionConfig.TypeInventoryAction.ItemSpend)
+            return new InventoryActionConfig(InventoryActionConfig.TypeInventoryAction.ItemSpend)
             {
                 TypeItem = itemId,
                 Count = count
             };
         }
-        public ItemActionConfig CreateItemExpandLimitAction(Id itemId, int count)
+        public InventoryActionConfig CreateItemExpandLimitAction(Id itemId, int count)
         {
-            return new ItemActionConfig(ItemActionConfig.TypeInventoryAction.ItemExpandLimit)
+            return new InventoryActionConfig(InventoryActionConfig.TypeInventoryAction.ItemExpandLimit)
             {
                 TypeItem = itemId,
                 Count = count
@@ -397,12 +397,12 @@ namespace Meta.TestConfiguration
 
         private ActionCollectionConfig _rewardAction;
         private ConditionCollectionConfig _conditions;
-        private readonly HashSet<TypeMetaAction> _triggers = new HashSet<TypeMetaAction>();
+        private readonly HashSet<TypeQuest> _triggers = new HashSet<TypeQuest>();
         private Id _questId;
         private Id _targetEntityId;
         private int _targetCount;
 
-        private TypeQuest _typeQuest;
+        private TypeQuestGroup _typeQuestGroup;
 
         public MetaQuestConfigBuilder NewQuest(Id questId)
         {
@@ -413,7 +413,7 @@ namespace Meta.TestConfiguration
         public MetaQuestConfigBuilder NewCountQuest(Id questId, Id targetEntityId, int target)
         {
             NewQuest(questId);
-            SetTypeQuest(TypeQuest.CountBased);
+            SetTypeQuest(TypeQuestGroup.CountBased);
             SetCountBased(targetEntityId, target);
             return this;
         }
@@ -421,13 +421,13 @@ namespace Meta.TestConfiguration
         public MetaQuestConfigBuilder NewConditionalQuest(Id questId, ConditionCollectionConfig condition)
         {
             NewQuest(questId);
-            SetTypeQuest(TypeQuest.Conditional);
+            SetTypeQuest(TypeQuestGroup.Conditional);
             SetCondition(condition);
             return this;
         }
         
 
-        public MetaQuestConfigBuilder SetTrigger(params TypeMetaAction[] triggers)
+        public MetaQuestConfigBuilder SetTrigger(params TypeQuest[] triggers)
         {
             if (_triggers.Count > 0)
             {
@@ -443,9 +443,9 @@ namespace Meta.TestConfiguration
         }
 
 
-        public MetaQuestConfigBuilder SetTypeQuest(TypeQuest typeQuest)
+        public MetaQuestConfigBuilder SetTypeQuest(TypeQuestGroup typeQuestGroup)
         {
-            _typeQuest = typeQuest;
+            _typeQuestGroup = typeQuestGroup;
             return this;
         }
 
@@ -487,10 +487,10 @@ namespace Meta.TestConfiguration
 
         public IQuestConfig Build()
         {
-            IQuestConfig result = _typeQuest switch
+            IQuestConfig result = _typeQuestGroup switch
             {
-                TypeQuest.Conditional => CreateQuestMetaConditional(),
-                TypeQuest.CountBased => CreateQuestMetaCountBased(),
+                TypeQuestGroup.Conditional => CreateQuestMetaConditional(),
+                TypeQuestGroup.CountBased => CreateQuestMetaCountBased(),
                 _ => throw new ArgumentOutOfRangeException()
             };
             ClearBuilder();
@@ -507,7 +507,7 @@ namespace Meta.TestConfiguration
             _questId = 0;
             _targetEntityId = 0;
             _targetCount = 0;
-            _typeQuest = TypeQuest.None;
+            _typeQuestGroup = TypeQuestGroup.None;
             _rewardAction = null;
             _conditions = null;
             _triggers.Clear();

@@ -37,7 +37,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 QuestId = MapTestId.QuestSpendRecruts.Id(),
                 TargetValue = 100,
-                TriggerAction = TypeMetaAction.InventoryItemSpend,
+                TriggerAction = TypeQuest.InventoryItemSpend,
                 TargetEntityId = MapTestId.Recruts.Id(),
                 //Reward = new UnitActionConfig {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = MapTestId.UnitAssault.Id(), Count = 1}
             });
@@ -62,14 +62,29 @@ namespace Meta.Tests.Editor.Controllers
 
             public void AddNewQuest(Id configId)
             {
-                _questsController.AddNewQuest(configId);
+               // _questsController.AddNewQuest(configId);
                 _notifyService.Notify("New quest added");
             }
 
             public void ClaimReward(Id id)
             {
-                _questsController.ClaimReward(id);
+                //_questsController.ClaimReward(id);
                 _notifyService.Notify("Reward claimed");
+            }
+
+            public void AddNewQuest(IQuestConfig configId)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void ClaimReward(IQuest quest)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            public void Remove(IQuest quest)
+            {
+                throw new System.NotImplementedException();
             }
         }
 

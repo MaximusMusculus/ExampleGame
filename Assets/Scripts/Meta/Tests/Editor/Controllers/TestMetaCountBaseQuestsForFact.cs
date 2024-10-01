@@ -27,9 +27,7 @@ namespace Meta.Tests.Editor.Controllers
         private QuestsController _questsController;
 
         private ActionConfigFactory _factory;
-        
-        
-        
+
         [SetUp]
         public void SetUp()
         {
@@ -50,7 +48,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 QuestId = MapTestId.QuestSpendRecruts.Id(),
                 TargetValue = 100,
-                TriggerAction = TypeMetaAction.InventoryItemSpend,
+                TriggerAction = TypeQuest.InventoryItemSpend,
                 TargetEntityId = MapTestId.Recruts.Id(),
                 Reward = _factory.CreateUnitAddAction(MapTestId.UnitAssault.Id(), 1)
             });
@@ -58,11 +56,9 @@ namespace Meta.Tests.Editor.Controllers
 
             var actionProcessor = new ActionProcessor(_inventory, _units);
             var fact = new QuestControllerControllerFactory(new ConditionProcessor(_inventory, _units));
-            _questsController = new QuestsController(_questsData, questsConfig, fact, actionProcessor);
-            
+            _questsController = new QuestsController(questsConfig,_questsData, fact, actionProcessor);
             var autoComplete = new QuestAutoCompleteProcessorForFact(_questsData, _questsController);
-            
-            
+
             _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController, autoComplete);
         }
         
@@ -121,7 +117,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 if (quest.IsCompleted && quest.IsRewarded == false)
                 {
-                    _questController.ClaimReward(quest.Id);
+                    _questController.ClaimReward(quest);
                 }
             }
 
@@ -129,7 +125,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 if (quest.IsCompleted && quest.IsRewarded == false)
                 {
-                    _questController.ClaimReward(quest.Id);
+                    _questController.ClaimReward(quest);
                 }
             }
         }

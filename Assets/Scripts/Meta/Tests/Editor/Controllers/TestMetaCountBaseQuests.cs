@@ -12,6 +12,11 @@ using NUnit.Framework;
 
 namespace Meta.Tests.Editor.Controllers
 {
+    public class TestQuestController
+    {
+        
+    }
+    
     [TestFixture]
     public class TestMetaCountBaseQuests
     {
@@ -47,7 +52,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 QuestId = MapTestId.QuestSpendRecruts.Id(),
                 TargetValue = 100,
-                TriggerAction = TypeMetaAction.InventoryItemSpend,
+                TriggerAction = TypeQuest.InventoryItemSpend,
                 TargetEntityId = MapTestId.Recruts.Id(),
                 Reward = _factory.CreateUnitAddAction(MapTestId.UnitAssault.Id(), 1)
             });
@@ -114,7 +119,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 if (quest.IsCompleted && quest.IsRewarded == false)
                 {
-                    _questController.ClaimReward(quest.Id);
+                    _questController.ClaimReward(quest);
                 }
             }
         }

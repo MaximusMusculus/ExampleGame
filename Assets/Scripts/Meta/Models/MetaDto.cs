@@ -14,7 +14,7 @@ namespace Meta.Models
         public QuestCollectionDto Quests = new QuestCollectionDto();
         public QuestsDto PlayerQuests = new QuestsDto();
 
-        //public List<PerkDto> Perks;
+        //public List<PerkDto> Perkypecons;
         //public List<TaskDto> Tasks;
         //public List<BuildingDto> Buildings;
     }
@@ -27,14 +27,20 @@ namespace Meta.Models
         public bool IsCompleted{ get; }
         public bool IsRewarded{ get; }
     }
-
+    
     public class QuestDto : IQuest
     {
         public Id ConfigId { get; set; }
-        public Id Id{ get; set; }
+        public Id Id{ get; set; } //могут ли быть 2 один-х квеста?
+        //наверное - нет.
 
         public QuestDto()
         {
+        }
+
+        public QuestDto(Id configId)
+        {
+            ConfigId = configId;
         }
 
         public QuestDto(Id configId, Id id)
@@ -47,7 +53,7 @@ namespace Meta.Models
         public bool IsRewarded{ get; set; }
     }
     
-
+    
     public class QuestCounterDto : QuestDto
     {
         public int Value;
@@ -81,32 +87,32 @@ namespace Meta.Models
 
         //Спрячу реализацию внутри, это сделано для оптимизации
         //и никто не будет знать ^_^
-        public void Add(QuestDto questDto)
+        public void Add(IQuest questDto)
         {
             if (questDto is QuestCounterDto counter)
             {
                 CountBasedQuest.Add(counter);
             }
-            else
+            else if(questDto is QuestDto conditional)
             {
-                ConditionalQuest.Add(questDto);
+                ConditionalQuest.Add(conditional);
+            }
+        }
+
+        public void Remove(IQuest questDto)
+        {
+            if (questDto is QuestCounterDto counter)
+            {
+                CountBasedQuest.Remove(counter);
+            }
+            else if (questDto is QuestDto conditional)
+            {
+                ConditionalQuest.Remove(conditional);
             }
         }
     }
+    
 
-    public interface IQuests
-    {
-        public IEnumerable<IQuest> GetAll();
-        public bool TryGet(Id id, out IQuest quest);
-        public bool TryGetCount (Id id, out int count);
-    }
-
-    //Могу завернуть в нотификации, тогда каждое действие - будет нотифицировать ^_^ 
-    public interface IQuestsController 
-    {
-        void AddNewQuest(Id configId);
-        void ClaimReward(Id id);
-    }
     
 
     public class QuestsDto

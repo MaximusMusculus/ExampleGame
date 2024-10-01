@@ -1,3 +1,4 @@
+using AppRen;
 using Meta.Configs.Actions;
 
 
@@ -12,9 +13,9 @@ namespace Meta.Controllers.Actions
             _unitController = unitController;
         }
 
-        protected override void Process(IUnitAction args)
+        protected override void Process(IUnitAction action)
         {
-            args.Visit(this);
+            action.Visit(this);
         }
 
         public void UnitAdd(UnitActionConfig unitActionConfig)
@@ -30,7 +31,7 @@ namespace Meta.Controllers.Actions
             }
         }
     }
-    
+
     public class InventoryActionsProcessor : ActionProcessorAbstract<IInventoryAction>, IInventoryActionVisitor
     {
         private readonly IInventoryController _inventoryController;
@@ -40,37 +41,39 @@ namespace Meta.Controllers.Actions
             _inventoryController = inventoryController;
         }
 
-        protected override void Process(IInventoryAction args)
+        protected override void Process(IInventoryAction action)
         {
-            args.Visit(this);
+            action.Visit(this);
         }
 
-        public void ItemAdd(ItemActionConfig itemActionConfig)
+        public void ItemAdd(Id itemId, int count)
         {
-            _inventoryController.Add(itemActionConfig.TypeItem, itemActionConfig.Count);
+            _inventoryController.Add(itemId, count);
         }
-        public void ItemSpend(ItemActionConfig itemActionConfig)
+        
+        public void ItemSpend(Id itemId, int count)
         {
-            _inventoryController.Spend(itemActionConfig.TypeItem, itemActionConfig.Count);
+            _inventoryController.Spend(itemId, count);
         }
-        public void ItemExpandLimit(ItemActionConfig itemActionConfig)
+        
+        public void ItemExpandLimit(Id itemId, int count)
         {
-            _inventoryController.ExpandLimit(itemActionConfig.TypeItem, itemActionConfig.Count);
+            _inventoryController.ExpandLimit(itemId, count);
         }
     }
-    
-    public class ActionProcessorCollectionProcessor : ActionProcessorAbstract<ActionCollectionConfig>
+
+    public class ActionCollectionProcessor : ActionProcessorAbstract<ActionCollectionConfig>
     {
         private readonly IActionProcessor _actionProcessor;
 
-        public ActionProcessorCollectionProcessor(IActionProcessor actionProcessor)
+        public ActionCollectionProcessor(IActionProcessor actionProcessor)
         {
             _actionProcessor = actionProcessor;
         }
 
-        protected override void Process(ActionCollectionConfig args)
+        protected override void Process(ActionCollectionConfig action)
         {
-            foreach (var anyAction in args.GetAll())
+            foreach (var anyAction in action.GetAll())
             {
                 _actionProcessor.Process(anyAction);
             }

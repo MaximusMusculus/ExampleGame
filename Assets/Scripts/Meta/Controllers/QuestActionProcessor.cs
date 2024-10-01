@@ -32,7 +32,7 @@ namespace Meta.Controllers
         {
             foreach (var questDto in _data.Quests)
             {
-                if(_config.TryGetValue(questDto.ConfigId, out var config) == false)
+                if (_config.TryGetValue(questDto.ConfigId, out var config) == false)
                 {
                     continue;
                 }
@@ -48,9 +48,10 @@ namespace Meta.Controllers
             }
         }
     }
+
     public class QuestMetaCountBasedProcessor : IActionProcessor
     {
-        private readonly Dictionary<TypeMetaAction, IActionProcessor> _questProcessors;
+        private readonly Dictionary<string, IActionProcessor> _questProcessors;
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
 
         public QuestMetaCountBasedProcessor(List<QuestCountBasedConfig> questConfigs, QuestsDto data)
@@ -60,57 +61,89 @@ namespace Meta.Controllers
             {
                 _config.Add(questConfig.QuestId, questConfig);
             }
-
-            var itemQuestProcessor = new QuestActionProcessorItemProcessor(_config, data);
-            var unitQuestProcessor = new QuestActionProcessorUnitProcessor(_config, data);
-
-            _questProcessors = new Dictionary<TypeMetaAction, IActionProcessor>();
-            _questProcessors[TypeMetaAction.Collection] = new ActionProcessorCollectionProcessor(this);
             
-            _questProcessors[TypeMetaAction.InventoryItemAdd] = itemQuestProcessor;
-            _questProcessors[TypeMetaAction.InventoryItemSpend] = itemQuestProcessor;
-            _questProcessors[TypeMetaAction.InventoryItemExpandLimit] = itemQuestProcessor;
-
-            _questProcessors[TypeMetaAction.UnitAdd] = unitQuestProcessor;
-            _questProcessors[TypeMetaAction.UnitSpend] = unitQuestProcessor;
+            _questProcessors = new Dictionary<string, IActionProcessor>
+            {
+                [TypeActionGroup.Collection] = new ActionCollectionProcessor(this),
+                [TypeActionGroup.Inventory] = new QuestCountBasedProcessor(_config, data),
+                [TypeActionGroup.Units] = new QuestActionProcessorUnitProcessor(_config, data)
+            };
         }
 
         public void Process(IActionConfig actionConfig)
         {
-            throw new NotImplementedException();
-            /*if (_questProcessors.TryGetValue(actionConfig.TypeMetaAction, out var action) == false)
+            if (_questProcessors.TryGetValue(actionConfig.ActionGroup, out var action) == false)
             {
-                throw new ArgumentException($"Action {actionConfig.TypeMetaAction} not found");
+                throw new ArgumentException($"Action {actionConfig.ActionGroup} not found");
             }
 
-            action.Process(actionConfig);*/
+            action.Process(actionConfig);
         }
-
-
-
     }
 
-    public class QuestActionProcessorItemProcessor : ActionProcessorAbstract<ItemActionConfig>
+
+    //--
+    public class QuestCountBasedProcessor : IActionProcessor, IInventoryActionVisitor, IUnitActionVisitor
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
         private readonly QuestsDto _data;
 
-        public QuestActionProcessorItemProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
+        private IQuests _quests;
+        private IQuestsController _questsController;
+
+        public QuestCountBasedProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
         {
             _config = config;
             _data = data;
         }
 
-        protected override void Process(ItemActionConfig args)
+        public void Process(IActionConfig actionConfig)
         {
+            switch (actionConfig.ActionGroup)
+            {
+                case TypeActionGroup.Inventory:
+                    ProcessInventory(actionConfig);
+                    break;
+                case TypeActionGroup.Units:
+                    ProcessUnits(actionConfig);
+                    break;
+            }
+        }
+
+        private void ProcessInventory(IActionConfig actionConfig)
+        {
+            if (actionConfig is not IInventoryAction inventoryAction)
+            {
+                throw new ArgumentException("Action is not IInventoryAction info:" + actionConfig);
+            }
+
+            inventoryAction.Visit(this);
+        }
+
+        private void ProcessUnits(IActionConfig actionConfig)
+        {
+            if (actionConfig is not IUnitAction unitAction)
+            {
+                throw new ArgumentException("Action is not IUnitAction info:" + actionConfig);
+            }
+
+            unitAction.Visit(this);
+        }
+
+
+        /*protected override void Process(ItemActionConfig args)
+        {
+            args.Visit(this);
+            return;
+
             foreach (var questDto in _data.Quests)
             {
-                if(_config.TryGetValue(questDto.ConfigId, out var config) == false)
+                if (_config.TryGetValue(questDto.ConfigId, out var config) == false)
                 {
                     continue;
                 }
 
-                throw new NotImplementedException();
+
                 /*if (config.TriggerAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeItem))
                 {
                     if(_data.Counters.TryGetValue(questDto.Id, out var count) == false)
@@ -121,10 +154,53 @@ namespace Meta.Controllers
                     _data.Counters[questDto.Id] += args.Count;
                     _data.Counters[questDto.Id] = Math.Clamp(_data.Counters[questDto.Id], 0, config.TargetValue);
                     questDto.IsCompleted = _data.Counters[questDto.Id] >= config.TargetValue;
-                }*/
+                }#1#
             }
+        }*/
+
+
+        public void ItemAdd(InventoryActionConfig inventoryActionConfig)
+        {
+            throw new NotImplementedException();
+            //обработка квестов на добавление предметов
+        }
+
+        public void ItemAdd(Id itemId, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ItemSpend(Id itemId, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ItemExpandLimit(Id itemId, int count)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ItemSpend(InventoryActionConfig inventoryActionConfig)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ItemExpandLimit(InventoryActionConfig inventoryActionConfig)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnitAdd(UnitActionConfig unitActionConfig)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UnitSpend(UnitActionConfig unitActionConfig)
+        {
+            throw new NotImplementedException();
         }
     }
+
     public class QuestActionProcessorUnitProcessor : ActionProcessorAbstract<UnitActionConfig>
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
@@ -136,7 +212,7 @@ namespace Meta.Controllers
             _data = data;
         }
 
-        protected override void Process(UnitActionConfig args)
+        protected override void Process(UnitActionConfig action)
         {
             foreach (var questCounterDto in _data.Quests)
             {
@@ -161,8 +237,8 @@ namespace Meta.Controllers
             }
         }
     }
-    
-    
+
+
     /// <summary>
     /// Квест контроллер. Оперирует квестами:
     /// Создает, удаляет и выдает награду  
@@ -196,37 +272,46 @@ namespace Meta.Controllers
             _questsHash.Add(questData.Id, questData);
             _quests.Add(questData);
         }
-        
-        public void ClaimReward(Id questId)
+
+        public void ClaimReward(IQuest questElem)
         {
-            var quest = _quests.Quests.FirstOrDefault(c => c.Id .Equals(questId));
+            var quest = _quests.Quests.FirstOrDefault(c => c.Id.Equals(questElem.Id));
             Assert.IsNotNull(quest);
             Assert.IsTrue(quest.IsCompleted);
             Assert.IsFalse(quest.IsRewarded);
-            
+
             var questConfig = _config.GetAll().First(s => s.QuestId.Equals(quest.ConfigId));
             _actionProcessor.Process(questConfig.Reward);
             quest.IsRewarded = true;
         }
-        
+
         public void RemoveQuest(Id questId)
         {
             _questsHash.TryGetValue(questId, out var quest);
             Assert.IsNotNull(quest);
             _quests.Remove(quest);
         }
-        
+
+        public void Remove(IQuest questElem)
+        {
+            _questsHash.TryGetValue(questElem.Id, out var quest);
+            Assert.IsNotNull(quest);
+            _quests.Remove(quest);
+        }
+
         //-- 
         public IEnumerable<IQuest> GetAll()
         {
             return _quests.Quests;
         }
+
         public bool TryGet(Id id, out IQuest quest)
         {
             var isTryGet = _questsHash.TryGetValue(id, out var questDto);
             quest = questDto;
             return isTryGet;
         }
+
         public bool TryGetCount(Id id, out int count) //Quest?
         {
             return _quests.Counters.TryGetValue(id, out count);

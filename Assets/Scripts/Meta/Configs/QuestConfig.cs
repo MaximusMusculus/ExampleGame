@@ -40,11 +40,11 @@ namespace Meta.Configs
                 return;
             }
             
-            throw new ArgumentException("Unknown quest type:" + questConfig.TypeQuest);
+            throw new ArgumentException("Unknown quest type:" + questConfig.TypeQuestGroup);
         }
     } 
     
-    public enum TypeQuest
+    public enum TypeQuestGroup
     {
         None,
         CountBased,
@@ -54,35 +54,46 @@ namespace Meta.Configs
     public interface IQuestConfig
     {
         public Id QuestId { get; }
-        public TypeQuest TypeQuest { get; }
+        public TypeQuestGroup TypeQuestGroup { get; }
+        public IEnumerable<TypeQuest> GetTriggers();
+        
         IActionConfig Reward { get; set; }
     }
     
     
-    public enum TypeCountBasedChange
+    
+    public enum TypeQuest
     {
         None,
-        InventoryItemAdd,           //ItemActionConfig
-        InventoryItemSpend,         //ItemActionConfig
-        InventoryItemExpandLimit,   //ItemActionConfig
+        Collection,
 
-        UnitAdd,        //UnitActionConfig
-        UnitSpend,      //UnitActionConfig
+        InventoryItemAdd, //ItemActionConfig
+        InventoryItemSpend, //ItemActionConfig
+        InventoryItemExpandLimit, //ItemActionConfig
+
+        UnitAdd, //UnitActionConfig
+        UnitSpend, //UnitActionConfig
     }
-    
-    
+
     
     /// <summary>
     /// Квест для меты со своим счетчиком
     /// </summary>
     public class QuestCountBasedConfig : IQuestConfig
     {
-        public TypeQuest TypeQuest => TypeQuest.CountBased;
+        public TypeQuestGroup TypeQuestGroup => TypeQuestGroup.CountBased;
+        public TypeQuest TriggerAction;
+        
+        
         public Id QuestId { get; set; }
-        public TypeMetaAction TriggerAction;
         public Id TargetEntityId;
         public int TargetValue;
-        
+
+        public IEnumerable<TypeQuest> GetTriggers()
+        {
+            yield return TriggerAction;
+        }
+
         public IActionConfig Reward { get; set; }
     }
 
@@ -91,12 +102,17 @@ namespace Meta.Configs
     //нужен ли мне он?
     public class QuestConditionalConfig : IQuestConfig
     {
-        public TypeQuest TypeQuest => TypeQuest.Conditional;
+        public TypeQuestGroup TypeQuestGroup => TypeQuestGroup.Conditional;
         
         public Id QuestId { get; set;}
-        public HashSet<TypeMetaAction> Triggers = new HashSet<TypeMetaAction>();
+        public HashSet<TypeQuest> Triggers = new HashSet<TypeQuest>();
         public ConditionCollectionConfig Condition;
-        
+
+        public IEnumerable<TypeQuest> GetTriggers()
+        {
+            return Triggers;
+        }
+
         public IActionConfig Reward { get; set; }
     }
     

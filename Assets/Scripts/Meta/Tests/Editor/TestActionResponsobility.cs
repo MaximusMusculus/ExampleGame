@@ -46,7 +46,7 @@ namespace Meta.Tests.Editor
             {
                 QuestId = MapTestId.QuestSpendRecruts.Id(),
                 TargetValue = 100,
-                TriggerAction = TypeMetaAction.InventoryItemSpend,
+                TriggerAction = TypeQuest.InventoryItemSpend,
                 TargetEntityId = MapTestId.Recruts.Id(),
                 Reward = _actionsFactory.CreateUnitAddAction(MapTestId.UnitAssault.Id(),1)
             });

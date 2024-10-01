@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
 using Meta.Models;
-using UnityEngine.Assertions;
 
 namespace Meta.Controllers
 {
@@ -13,7 +10,7 @@ namespace Meta.Controllers
     public interface IQuestControllerFactory
     {
         QuestDto CreateData(IQuestConfig config);
-        IQuestController CreateController(IQuestConfig config, QuestDto dto);
+        IQuestProcessor CreateController(IQuestConfig config, QuestDto dto);
     }
 
     public class QuestControllerControllerFactory : IQuestControllerFactory
@@ -27,187 +24,133 @@ namespace Meta.Controllers
 
         public QuestDto CreateData(IQuestConfig config)
         {
-            return config.TypeQuest switch
+            return config.TypeQuestGroup switch
             {
-                TypeQuest.CountBased => new QuestCounterDto {ConfigId = config.QuestId},
-                TypeQuest.Conditional => new QuestDto {ConfigId = config.QuestId},
-                _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuest)
+                TypeQuestGroup.CountBased => new QuestCounterDto {ConfigId = config.QuestId},
+                TypeQuestGroup.Conditional => new QuestDto {ConfigId = config.QuestId},
+                _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuestGroup)
             };
         }
 
-        public IQuestController CreateController(IQuestConfig config, QuestDto data)
+        public IQuestProcessor CreateController(IQuestConfig config, QuestDto data)
         {
-            return config.TypeQuest switch
+            return config.TypeQuestGroup switch
             {
-                TypeQuest.CountBased => CreateQuestController((QuestCountBasedConfig) config, (QuestCounterDto) data),
-                TypeQuest.Conditional => new QuestConditionalController((QuestConditionalConfig) config, data, _conditionProcessor),
-                _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuest)
+                TypeQuestGroup.CountBased => CreateQuestController((QuestCountBasedConfig) config, (QuestCounterDto) data),
+                TypeQuestGroup.Conditional => new QuestConditionalProcessor((QuestConditionalConfig) config, data, _conditionProcessor),
+                _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuestGroup)
             };
         }
 
-        private IQuestController CreateQuestController(QuestCountBasedConfig config, QuestCounterDto data)
+        private IQuestProcessor CreateQuestController(QuestCountBasedConfig config, QuestCounterDto data)
         {
             return config.TriggerAction switch
             {
-                TypeMetaAction.InventoryItemAdd => new QuestCountBasedItemController(config, data),
-                TypeMetaAction.InventoryItemSpend => new QuestCountBasedItemController(config, data),
-                TypeMetaAction.InventoryItemExpandLimit => new QuestCountBasedItemController(config, data),
-                TypeMetaAction.UnitAdd => new QuestCountBasedUnitController(config, data),
-                TypeMetaAction.UnitSpend => new QuestCountBasedUnitController(config, data),
+                TypeQuest.InventoryItemAdd => new QuestCountInventoryItemController(config, data),
+                TypeQuest.InventoryItemSpend => new QuestCountInventoryItemController(config, data),
+                TypeQuest.InventoryItemExpandLimit => new QuestCountInventoryItemController(config, data),
+                TypeQuest.UnitAdd => new QuestCountUnitsController(config, data),
+                TypeQuest.UnitSpend => new QuestCountUnitsController(config, data),
                 _ => throw new ArgumentException("Unknown CountBased quest type:" + config.TriggerAction)
             };
         }
     }
 
-
-    public interface IQuestController : IActionProcessor
+    public interface IQuestProcessor : IActionProcessor
     {
     }
 
-    public class QuestsController : IActionProcessor, IQuestsController
-    {
-        private readonly List<IQuestController> _metaQuestControllers = new List<IQuestController>(ConstDefaultCapacity.Small);
 
-        private readonly IQuestControllerFactory _questsControllerFactory;
-        private readonly Dictionary<Id, IQuestConfig> _configs;
-        private readonly QuestCollectionDto _questData;
-        private readonly IActionProcessor _rewardProcessor;
-
-        public QuestsController(QuestCollectionDto questData, QuestCollectionConfig questConfig,
-            IQuestControllerFactory questsControllerFactory, IActionProcessor rewardProcessor)
-        {
-            _questData = questData;
-            _rewardProcessor = rewardProcessor;
-            _questsControllerFactory = questsControllerFactory;
-
-            var count = questConfig.GetAll().Count();
-            _configs = new Dictionary<Id, IQuestConfig>(count);
-            foreach (var config in questConfig.GetAll())
-            {
-                _configs.Add(config.QuestId, config);
-            }
-
-            foreach (var questDto in _questData.GetAll())
-            {
-                var config = _configs[questDto.ConfigId];
-                var questEntity = _questsControllerFactory.CreateController(config, questDto);
-                _metaQuestControllers.Add(questEntity);
-            }
-        }
-
-        public void AddNewQuest(Id questId)
-        {
-            AddNewQuest(_configs[questId]);
-        }
-
-        public void ClaimReward(Id questId)
-        {
-            var quest = _questData.GetAll().FirstOrDefault(c => c.Id .Equals(questId));
-            Assert.IsNotNull(quest);
-            Assert.IsTrue(quest.IsCompleted);
-            Assert.IsFalse(quest.IsRewarded);
-
-            var questConfig = _configs[quest.ConfigId];
-            _rewardProcessor.Process(questConfig.Reward);
-            quest.IsRewarded = true;
-        }
-
-        public void AddNewQuest(IQuestConfig questConfig)
-        {
-            var questDto = _questsControllerFactory.CreateData(questConfig);
-            _questData.Add(questDto);
-            var questActionController = _questsControllerFactory.CreateController(questConfig, questDto);
-            _metaQuestControllers.Add(questActionController);
-        }
-
-        public void ClaimReward(IQuest quest)
-        {
-            var rewardAction = _configs[quest.ConfigId].Reward;
-            _questData.GetAll().First(s => s.Id.Equals(quest.Id)).IsRewarded = true;
-            _rewardProcessor.Process(rewardAction);
-        }
-
-        public void RemoveQuest()
-        {
-            //_questData.Remove()
-        }
-
-
-
-        /// <summary>
-        /// Process ActionBasedQuests
-        /// </summary>
-        public void Process(IActionConfig actionConfig)
-        {
-            foreach (var questController in _metaQuestControllers)
-            {
-                questController.Process(actionConfig);
-            }
-        }
-
-        public void ProcessBattleEvent()
-        {
-            /*foreach (var questController in _battleQuestControllers)
-            {
-                questController.ProcessBattleEvent();                
-            }*/
-        }
-    }
-
-    public class QuestCountBasedItemController : ActionProcessorAbstract<ItemActionConfig>, IQuestController
+    public abstract class QuestCountBasedProcessor<TAction> : ActionProcessorAbstract<TAction>, IQuestProcessor
     {
         private readonly QuestCountBasedConfig _config;
         private readonly QuestCounterDto _data;
-        private readonly IQuestsController _questsController;
 
-        public QuestCountBasedItemController(QuestCountBasedConfig config, QuestCounterDto data)
+        protected QuestCountBasedProcessor(QuestCountBasedConfig config, QuestCounterDto data)
         {
             _config = config;
             _data = data;
         }
 
-        protected override void Process(ItemActionConfig args)
+        protected void ProcessQuest(TypeQuest typeQuest, Id item, int count)
         {
-            throw new NotImplementedException();
-            /*if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeItem))
+            if (!CheckTrigger(typeQuest) || !CheckTarget(item))
             {
-                var sumValue = _data.Value + args.Count;
-                _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
-                _data.IsCompleted = _data.Value >= _config.TargetValue;
-            }*/
+                return;
+            }
+
+            var sumValue = _data.Value + count;
+            _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
+            _data.IsCompleted = _data.Value >= _config.TargetValue;
+        }
+
+        private bool CheckTrigger(TypeQuest triggerAction)
+        {
+            return _config.TriggerAction == triggerAction;
+        }
+
+        private bool CheckTarget(Id target)
+        {
+            return _config.TargetEntityId.Equals(target);
         }
     }
-
-    public class QuestCountBasedUnitController : ActionProcessorAbstract<UnitActionConfig>, IQuestController
+    public class QuestCountUnitsController : QuestCountBasedProcessor<IUnitAction>, IUnitActionVisitor
     {
-        private readonly QuestCountBasedConfig _config;
-        private readonly QuestCounterDto _data;
-
-        public QuestCountBasedUnitController(QuestCountBasedConfig config, QuestCounterDto data)
+        public QuestCountUnitsController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data)
         {
-            _config = config;
-            _data = data;
         }
 
-        protected override void Process(UnitActionConfig args)
+        protected override void Process(IUnitAction action)
         {
-            throw new NotImplementedException();
-            /*if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeUnit))
-            {
-                var sumValue = _data.Value + args.Count;
-                _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
-                _data.IsCompleted = _data.Value >= _config.TargetValue;
-            }*/
+            action.Visit(this);
+        }
+
+        public void UnitAdd(UnitActionConfig unitActionConfig)
+        {
+            ProcessQuest(TypeQuest.UnitAdd, unitActionConfig.TypeUnit, unitActionConfig.Count);
+        }
+
+        public void UnitSpend(UnitActionConfig unitActionConfig)
+        {
+            ProcessQuest(TypeQuest.UnitSpend, unitActionConfig.TypeUnit, unitActionConfig.Count);
         }
     }
+    public class QuestCountInventoryItemController : QuestCountBasedProcessor<IInventoryAction>, IInventoryActionVisitor
+    {
+        public QuestCountInventoryItemController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data)
+        {
+        }
 
-    public class QuestConditionalController : IQuestController
+        protected override void Process(IInventoryAction action)
+        {
+            action.Visit(this);
+        }
+
+        public void ItemAdd(Id itemId, int count)
+        {
+            ProcessQuest(TypeQuest.InventoryItemAdd, itemId, count);
+        }
+
+        public void ItemSpend(Id itemId, int count)
+        {
+            ProcessQuest(TypeQuest.InventoryItemSpend, itemId, count);
+        }
+
+        public void ItemExpandLimit(Id itemId, int count)
+        {
+            ProcessQuest(TypeQuest.InventoryItemExpandLimit, itemId, count);
+        }
+    }
+    
+    
+
+    public class QuestConditionalProcessor : IQuestProcessor
     {
         private readonly QuestConditionalConfig _config;
         private readonly QuestDto _data;
         private readonly IConditionProcessor _conditionProcessor;
 
-        public QuestConditionalController(QuestConditionalConfig config, QuestDto data, IConditionProcessor conditionProcessor)
+        public QuestConditionalProcessor(QuestConditionalConfig config, QuestDto data, IConditionProcessor conditionProcessor)
         {
             _config = config;
             _data = data;

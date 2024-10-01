@@ -61,18 +61,18 @@ namespace Meta.Tests.Editor.Controllers
             
 
             _metaBuilder.AddQuestConfig(_questBuilder.NewCountQuest(MapTestId.QuestAddUnitGunner.Id(), MapTestId.UnitGunner.Id(), 20)
-                .SetTrigger(TypeMetaAction.UnitAdd)
+                .SetTrigger(TypeQuest.UnitAdd)
                 .SetReward(_actionBuilder.NewAction().InventoryItemAdd(MapTestId.Hard.Id(), 50).Build())
                 .Build());
 
             _metaBuilder.AddQuestConfig(_questBuilder.NewCountQuest(MapTestId.QuestSpendRecruts.Id(), MapTestId.Recruts.Id(), 200)
-                .SetTrigger(TypeMetaAction.InventoryItemSpend)
+                .SetTrigger(TypeQuest.InventoryItemSpend)
                 .SetReward(_actionBuilder.NewAction().InventoryItemSpend(MapTestId.Hard.Id(), 55).Build())
                 .Build());
 
             _metaBuilder.AddQuestConfig(_questBuilder.NewConditionalQuest(MapTestId.QuestCollectGunners.Id(), 
                     _conditions.NewCollection(TypeCollection.And).UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.Greater, 10).Build())
-                .SetTrigger(TypeMetaAction.UnitAdd)
+                .SetTrigger(TypeQuest.UnitAdd)
                 .SetReward(_actionBuilder.NewAction().InventoryItemAdd(MapTestId.Hard.Id(), 100).Build())
                 .Build());
 

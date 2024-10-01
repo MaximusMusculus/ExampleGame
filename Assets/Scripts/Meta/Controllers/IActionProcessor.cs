@@ -14,6 +14,6 @@ namespace Meta.Controllers
         {
             Process((TArgs) actionConfig);
         }
-        protected abstract void Process(TArgs args);
+        protected abstract void Process(TArgs action);
     }
 }
