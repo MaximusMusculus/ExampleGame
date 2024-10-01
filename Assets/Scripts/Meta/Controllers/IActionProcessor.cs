@@ -9,19 +9,12 @@ namespace Meta.Controllers
         void Process(IActionConfig actionConfig);
     }
 
-    public abstract class ActionAbstract<TArgs> : IActionProcessor where TArgs : IActionConfig, new()
+    public abstract class ActionProcessorAbstract<TArgs> : IActionProcessor// where TArgs : IActionConfig
     {
         public void Process(IActionConfig actionConfig)
         {
             Process((TArgs) actionConfig);
         }
-
         protected abstract void Process(TArgs args);
-
-        
-        public static TArgs CreateEmptyArgs()
-        {
-            return new TArgs();
-        }
     }
 }

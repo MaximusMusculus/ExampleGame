@@ -99,9 +99,61 @@ namespace Meta.TestConfiguration
         }
     }
 
+
+    public class ActionConfigFactory
+    {
+        public UnitActionConfig CreateUnitAddAction(Id unitType,int count, UnitProgressionDto progression =null)
+        {
+            progression ??= new UnitProgressionDto();
+            return new UnitActionConfig(UnitActionConfig.TypeUnitAction.UnitAdd)
+            {
+                TypeUnit = unitType,
+                Progression = progression,
+                Count = count
+            };
+        }
+        public UnitActionConfig CreateUnitSpendAction(Id unitType, int count, UnitProgressionDto progression = null)
+        {
+            progression ??= new UnitProgressionDto();
+            return new UnitActionConfig(UnitActionConfig.TypeUnitAction.UnitSpend)
+            {
+                TypeUnit = unitType,
+                Progression = progression,
+                Count = count
+            };
+        }
+
+        public ItemActionConfig CreateItemAddAction(Id itemId, int count)
+        {
+            return new ItemActionConfig(ItemActionConfig.TypeInventoryAction.ItemAdd)
+            {
+                TypeItem = itemId,
+                Count = count
+            };
+        }
+        public ItemActionConfig CreateItemSpendAction(Id itemId, int count)
+        {
+            return new ItemActionConfig(ItemActionConfig.TypeInventoryAction.ItemSpend)
+            {
+                TypeItem = itemId,
+                Count = count
+            };
+        }
+        public ItemActionConfig CreateItemExpandLimitAction(Id itemId, int count)
+        {
+            return new ItemActionConfig(ItemActionConfig.TypeInventoryAction.ItemExpandLimit)
+            {
+                TypeItem = itemId,
+                Count = count
+            };
+        }
+    }
+    
+    
     public class ActionCollectionConfigBuilder
     {
         private ActionCollectionConfig _config;
+        private readonly ActionConfigFactory _factory = new ActionConfigFactory();
 
         public ActionCollectionConfigBuilder NewAction()
         {
@@ -111,33 +163,31 @@ namespace Meta.TestConfiguration
 
         public ActionCollectionConfigBuilder UnitAdd(UnitConfig unit, int count)
         {
-            _config.Untis.Add(new UnitActionConfig
-                {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(_factory.CreateUnitAddAction(unit.UnitType, count, unit.Progression));
             return this;
         }
 
         public ActionCollectionConfigBuilder UnitSpend(UnitConfig unit, int count)
         {
-            _config.Untis.Add(new UnitActionConfig
-                {MetaAction = TypeMetaAction.UnitSpend, TypeUnit = unit.UnitType, Progression = unit.Progression, Count = count});
+            _config.Untis.Add(_factory.CreateUnitSpendAction(unit.UnitType, count, unit.Progression));
             return this;
         }
 
         public ActionCollectionConfigBuilder InventoryItemAdd(Id itemId, int count)
         {
-            _config.Items.Add(new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemAdd, TypeItem = itemId, Count = count});
+            _config.Items.Add(_factory.CreateItemAddAction(itemId, count));
             return this;
         }
 
         public ActionCollectionConfigBuilder InventoryItemSpend(Id itemId, int count)
         {
-            _config.Items.Add(new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemSpend, TypeItem = itemId, Count = count});
+            _config.Items.Add(_factory.CreateItemSpendAction(itemId, count));
             return this;
         }
 
         public ActionCollectionConfigBuilder InventoryItemExpandLimit(Id itemId, int count)
         {
-            _config.Items.Add(new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemExpandLimit, TypeItem = itemId, Count = count});
+            _config.Items.Add(_factory.CreateItemExpandLimitAction(itemId, count));
             return this;
         }
 

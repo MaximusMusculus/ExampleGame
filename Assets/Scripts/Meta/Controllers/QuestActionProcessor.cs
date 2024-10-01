@@ -36,11 +36,12 @@ namespace Meta.Controllers
                 {
                     continue;
                 }
-                
-                if (!config.Triggers.Contains(actionConfig.TypeMetaAction))
+
+                throw new NotImplementedException();
+                /*if (!config.Triggers.Contains(actionConfig.TypeMetaAction))
                 {
                     continue;
-                }
+                }*/
 
                 var isCompleted = _conditionProcessor.Check(config.Condition);
                 questDto.IsCompleted = isCompleted;
@@ -60,11 +61,11 @@ namespace Meta.Controllers
                 _config.Add(questConfig.QuestId, questConfig);
             }
 
-            var itemQuestProcessor = new QuestActionItemProcessor(_config, data);
-            var unitQuestProcessor = new QuestActionUnitProcessor(_config, data);
+            var itemQuestProcessor = new QuestActionProcessorItemProcessor(_config, data);
+            var unitQuestProcessor = new QuestActionProcessorUnitProcessor(_config, data);
 
             _questProcessors = new Dictionary<TypeMetaAction, IActionProcessor>();
-            _questProcessors[TypeMetaAction.Collection] = new ActionCollectionProcessor(this);
+            _questProcessors[TypeMetaAction.Collection] = new ActionProcessorCollectionProcessor(this);
             
             _questProcessors[TypeMetaAction.InventoryItemAdd] = itemQuestProcessor;
             _questProcessors[TypeMetaAction.InventoryItemSpend] = itemQuestProcessor;
@@ -76,24 +77,25 @@ namespace Meta.Controllers
 
         public void Process(IActionConfig actionConfig)
         {
-            if (_questProcessors.TryGetValue(actionConfig.TypeMetaAction, out var action) == false)
+            throw new NotImplementedException();
+            /*if (_questProcessors.TryGetValue(actionConfig.TypeMetaAction, out var action) == false)
             {
                 throw new ArgumentException($"Action {actionConfig.TypeMetaAction} not found");
             }
 
-            action.Process(actionConfig);
+            action.Process(actionConfig);*/
         }
 
 
 
     }
 
-    public class QuestActionItemProcessor : ActionAbstract<ItemActionConfig>
+    public class QuestActionProcessorItemProcessor : ActionProcessorAbstract<ItemActionConfig>
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
         private readonly QuestsDto _data;
 
-        public QuestActionItemProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
+        public QuestActionProcessorItemProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
         {
             _config = config;
             _data = data;
@@ -108,8 +110,8 @@ namespace Meta.Controllers
                     continue;
                 }
 
-                
-                if (config.TriggerAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeItem))
+                throw new NotImplementedException();
+                /*if (config.TriggerAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeItem))
                 {
                     if(_data.Counters.TryGetValue(questDto.Id, out var count) == false)
                     {
@@ -119,16 +121,16 @@ namespace Meta.Controllers
                     _data.Counters[questDto.Id] += args.Count;
                     _data.Counters[questDto.Id] = Math.Clamp(_data.Counters[questDto.Id], 0, config.TargetValue);
                     questDto.IsCompleted = _data.Counters[questDto.Id] >= config.TargetValue;
-                }
+                }*/
             }
         }
     }
-    public class QuestActionUnitProcessor : ActionAbstract<UnitActionConfig>
+    public class QuestActionProcessorUnitProcessor : ActionProcessorAbstract<UnitActionConfig>
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
         private readonly QuestsDto _data;
 
-        public QuestActionUnitProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
+        public QuestActionProcessorUnitProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
         {
             _config = config;
             _data = data;
@@ -143,7 +145,9 @@ namespace Meta.Controllers
                     continue;
                 }
 
-                if (config.TriggerAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeUnit))
+                throw new NotImplementedException();
+
+                /*if (config.TriggerAction.Equals(args.MetaAction) && config.TargetEntityId.Equals(args.TypeUnit))
                 {
                     if(_data.Counters.TryGetValue(questCounterDto.Id, out var count) == false)
                     {
@@ -153,7 +157,7 @@ namespace Meta.Controllers
                     _data.Counters[questCounterDto.Id] += args.Count;
                     _data.Counters[questCounterDto.Id] = Math.Clamp(_data.Counters[questCounterDto.Id], 0, config.TargetValue);
                     questCounterDto.IsCompleted = _data.Counters[questCounterDto.Id] >= config.TargetValue;
-                }
+                }*/
             }
         }
     }

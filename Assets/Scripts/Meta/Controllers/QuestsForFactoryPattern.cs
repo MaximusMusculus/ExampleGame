@@ -154,7 +154,7 @@ namespace Meta.Controllers
         }
     }
 
-    public class QuestCountBasedItemController : ActionAbstract<ItemActionConfig>, IQuestController
+    public class QuestCountBasedItemController : ActionProcessorAbstract<ItemActionConfig>, IQuestController
     {
         private readonly QuestCountBasedConfig _config;
         private readonly QuestCounterDto _data;
@@ -168,16 +168,17 @@ namespace Meta.Controllers
 
         protected override void Process(ItemActionConfig args)
         {
-            if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeItem))
+            throw new NotImplementedException();
+            /*if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeItem))
             {
                 var sumValue = _data.Value + args.Count;
                 _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
                 _data.IsCompleted = _data.Value >= _config.TargetValue;
-            }
+            }*/
         }
     }
 
-    public class QuestCountBasedUnitController : ActionAbstract<UnitActionConfig>, IQuestController
+    public class QuestCountBasedUnitController : ActionProcessorAbstract<UnitActionConfig>, IQuestController
     {
         private readonly QuestCountBasedConfig _config;
         private readonly QuestCounterDto _data;
@@ -190,12 +191,13 @@ namespace Meta.Controllers
 
         protected override void Process(UnitActionConfig args)
         {
-            if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeUnit))
+            throw new NotImplementedException();
+            /*if (_config.TriggerAction.Equals(args.MetaAction) && _config.TargetEntityId.Equals(args.TypeUnit))
             {
                 var sumValue = _data.Value + args.Count;
                 _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
                 _data.IsCompleted = _data.Value >= _config.TargetValue;
-            }
+            }*/
         }
     }
 
@@ -214,11 +216,13 @@ namespace Meta.Controllers
 
         public void Process(IActionConfig actionConfig)
         {
+            throw new NotImplementedException();
+            /*
             if (_config.Triggers.Contains(actionConfig.TypeMetaAction))
             {
                 var isCompleted = _conditionProcessor.Check(_config.Condition);
                 _data.IsCompleted = isCompleted;
-            }
+            }*/
         }
     }
 }

@@ -3,84 +3,11 @@ using Meta.Configs.Actions;
 
 namespace Meta.Controllers.Actions
 {
-    //Пока в одном файле, потом можно разбить
-    
-    public class InventoryItemAddAction: ActionAbstract<ItemActionConfig>
-    {
-        private readonly IInventoryController _inventoryController;
-
-        public InventoryItemAddAction(IInventoryController inventoryController)
-        {
-            _inventoryController = inventoryController;
-        }
-        protected override void Process(ItemActionConfig config)
-        {
-            _inventoryController.Add(config.TypeItem, config.Count);
-        }
-    }
-    public class InventoryItemSpendAction: ActionAbstract<ItemActionConfig>
-    {
-        private readonly IInventoryController _inventoryController;
-
-        public InventoryItemSpendAction(IInventoryController inventoryController)
-        {
-            _inventoryController = inventoryController;
-        }
-        protected override void Process(ItemActionConfig config)
-        {
-            _inventoryController.Spend(config.TypeItem, config.Count);
-        }
-    }
-    public class InventoryItemExpandLimitAction: ActionAbstract<ItemActionConfig>
-    {
-        private readonly IInventoryController _inventoryController;
-
-        public InventoryItemExpandLimitAction(IInventoryController inventoryController)
-        {
-            _inventoryController = inventoryController;
-        }
-        protected override void Process(ItemActionConfig config)
-        {
-            _inventoryController.ExpandLimit(config.TypeItem, config.Count);
-        }
-    }
-    
-    public class UnitAddAction: ActionAbstract<UnitActionConfig>
-    {
-        private readonly IUnitsController _unitController;
-
-        public UnitAddAction(IUnitsController unitController)
-        {
-            _unitController = unitController;
-        }
-        protected override void Process(UnitActionConfig config)
-        {
-            _unitController.Add(config.TypeUnit, config.Progression, config.Count);
-        }
-    }
-    public class UnitSpendAction: ActionAbstract<UnitActionConfig>
-    {
-        private readonly IUnitsController _unitController;
-
-        public UnitSpendAction(IUnitsController unitController)
-        {
-            _unitController = unitController;
-        }
-        protected override void Process(UnitActionConfig config)
-        {
-            if (_unitController.TryGetUnit(config.TypeUnit, config.Progression, out var unit))
-            {
-                _unitController.Spend(unit, config.Count);
-            }
-        }
-    }
-
-
-    public class ActionCollectionProcessor : ActionAbstract<ActionCollectionConfig>
+    public class ActionProcessorCollectionProcessor : ActionProcessorAbstract<ActionCollectionConfig>
     {
         private readonly IActionProcessor _actionProcessor;
 
-        public ActionCollectionProcessor(IActionProcessor actionProcessor)
+        public ActionProcessorCollectionProcessor(IActionProcessor actionProcessor)
         {
             _actionProcessor = actionProcessor;
         }
@@ -90,6 +17,62 @@ namespace Meta.Controllers.Actions
             foreach (var anyAction in args.GetAll())
             {
                 _actionProcessor.Process(anyAction);
+            }
+        }
+    }
+    
+    public class InventoryActionsProcessor : ActionProcessorAbstract<IInventoryAction>, IInventoryActionVisitor
+    {
+        private readonly IInventoryController _inventoryController;
+
+        public InventoryActionsProcessor(IInventoryController inventoryController)
+        {
+            _inventoryController = inventoryController;
+        }
+
+        protected override void Process(IInventoryAction args)
+        {
+            args.Visit(this);
+        }
+
+        public void ItemAdd(ItemActionConfig itemActionConfig)
+        {
+            _inventoryController.Add(itemActionConfig.TypeItem, itemActionConfig.Count);
+        }
+        public void ItemSpend(ItemActionConfig itemActionConfig)
+        {
+            _inventoryController.Spend(itemActionConfig.TypeItem, itemActionConfig.Count);
+        }
+        public void ItemExpandLimit(ItemActionConfig itemActionConfig)
+        {
+            _inventoryController.ExpandLimit(itemActionConfig.TypeItem, itemActionConfig.Count);
+        }
+    }
+    
+    public class UnitActionProcessor : ActionProcessorAbstract<IUnitAction>, IUnitActionVisitor
+    {
+        private readonly IUnitsController _unitController;
+
+        public UnitActionProcessor(IUnitsController unitController)
+        {
+            _unitController = unitController;
+        }
+
+        protected override void Process(IUnitAction args)
+        {
+            args.Visit(this);
+        }
+
+        public void UnitAdd(UnitActionConfig unitActionConfig)
+        {
+            _unitController.Add(unitActionConfig.TypeUnit, unitActionConfig.Progression, unitActionConfig.Count);
+        }
+
+        public void UnitSpend(UnitActionConfig unitActionConfig)
+        {
+            if (_unitController.TryGetUnit(unitActionConfig.TypeUnit, unitActionConfig.Progression, out var unit))
+            {
+                _unitController.Spend(unit, unitActionConfig.Count);
             }
         }
     }

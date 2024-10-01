@@ -2,7 +2,6 @@
 using System.Linq;
 using AppRen;
 using Meta.Configs;
-using Meta.Configs.Actions;
 using Meta.Controllers;
 using Meta.Controllers.Actions;
 using Meta.Controllers.Conditions;
@@ -26,11 +25,15 @@ namespace Meta.Tests.Editor.Controllers
         private UnitsController _units;
         private QuestCollectionDto _questsData;
         private QuestsController _questsController;
+
+        private ActionConfigFactory _factory;
+        
         
         
         [SetUp]
         public void SetUp()
         {
+            _factory = new ActionConfigFactory();
             _questsData = new QuestCollectionDto(); 
             _itemsData = new List<ItemDto>();
             _unitsData = new List<UnitDto>();
@@ -49,7 +52,7 @@ namespace Meta.Tests.Editor.Controllers
                 TargetValue = 100,
                 TriggerAction = TypeMetaAction.InventoryItemSpend,
                 TargetEntityId = MapTestId.Recruts.Id(),
-                Reward = new UnitActionConfig {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = MapTestId.UnitAssault.Id(), Count = 1}
+                Reward = _factory.CreateUnitAddAction(MapTestId.UnitAssault.Id(), 1)
             });
 
 
@@ -74,7 +77,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestQuestSpendRecrutsProgress()
         {
-            var spend50 = new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemSpend, TypeItem = MapTestId.Recruts.Id(), Count = 50};
+            var spend50 = _factory.CreateItemSpendAction(MapTestId.Recruts.Id(), 50);
             _questsController.AddNewQuest(MapTestId.QuestSpendRecruts.Id());
             Assert.AreEqual(0, _questsData.CountBasedQuest.First().Value);
 
@@ -89,7 +92,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestQuestClaimReward()
         {
-            var spend100 = new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemSpend, TypeItem = MapTestId.Recruts.Id(), Count = 100};
+            var spend100 = _factory.CreateItemSpendAction(MapTestId.Recruts.Id(), 100);
             _questsController.AddNewQuest(MapTestId.QuestSpendRecruts.Id());
             _actionProcessor.Process(spend100);
             Assert.IsTrue(_questsData.CountBasedQuest.First().IsCompleted);

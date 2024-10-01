@@ -25,10 +25,12 @@ namespace Meta.Tests.Editor.Controllers
 
         private InventoryController _inventory;
         private UnitsController _units;
+        private ActionConfigFactory _factory;
 
         [SetUp]
         public void SetUp()
         {
+            _factory = new ActionConfigFactory();
             _questsData = new QuestsDto();
             _itemsData = new List<ItemDto>();
             _unitsData = new List<UnitDto>();
@@ -47,17 +49,14 @@ namespace Meta.Tests.Editor.Controllers
                 TargetValue = 100,
                 TriggerAction = TypeMetaAction.InventoryItemSpend,
                 TargetEntityId = MapTestId.Recruts.Id(),
-                Reward = new UnitActionConfig {MetaAction = TypeMetaAction.UnitAdd, TypeUnit = MapTestId.UnitAssault.Id(), Count = 1}
+                Reward = _factory.CreateUnitAddAction(MapTestId.UnitAssault.Id(), 1)
             });
             
-            
+            //--
             var execute = new ActionProcessor(_inventory, _units);
             _questController = new QuestController(questsConfig, _questsData, _idProvider, execute);
             var autoComplete = new QuestAutoCompleteProcessor(_questsData, _questController);
             _actionProcessor = new ActionProcessorFacade(execute, new QuestMetaCountBasedProcessor(questsConfig.CountBased, _questsData), autoComplete);
-           
-            
-
         }
 
         [Test]
@@ -70,7 +69,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestQuestSpendRecrutsProgress()
         {
-            var spend50 = new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemSpend, TypeItem = MapTestId.Recruts.Id(), Count = 50};
+            var spend50 = _factory.CreateItemSpendAction(MapTestId.Recruts.Id(), 50);
             _questController.AddNewQuest(MapTestId.QuestSpendRecruts.Id());
             
             _questController.TryGetCount(MapTestId.QuestSpendRecruts.Id(), out var counter);
@@ -86,7 +85,7 @@ namespace Meta.Tests.Editor.Controllers
         [Test]
         public void TestQuestClaimReward()
         {
-            var spend100 = new ItemActionConfig {MetaAction = TypeMetaAction.InventoryItemSpend, TypeItem = MapTestId.Recruts.Id(), Count = 100};
+            var spend100 = _factory.CreateItemSpendAction(MapTestId.Recruts.Id(), 100);
             _questController.AddNewQuest(MapTestId.QuestSpendRecruts.Id());
             _actionProcessor.Process(spend100);
             Assert.IsTrue(_questsData.Quests.First().IsCompleted);

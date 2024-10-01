@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Meta;
@@ -89,7 +90,8 @@ namespace MetaUi
         {
             //отбираем только те действия, которые добавляют юнитов
             //если будет такое часто - передать фильтр
-            foreach (var trainAction in _trainActions)
+            throw new NotImplementedException();
+            /*foreach (var trainAction in _trainActions)
             {
                 foreach (var action in trainAction.Actions.GetAll())
                 {
@@ -98,7 +100,7 @@ namespace MetaUi
                         yield return trainAction;
                     }
                 }
-            }
+            }*/
         }
         private void BindDataToView()
         {
@@ -119,9 +121,10 @@ namespace MetaUi
             
             //если захочется тутор, то кондишен оборачивается доп-но в тутор логику
             elemData.ButtonEnabled = _conditions.Check(actionConfig.Require);
-            
+
+            throw new NotImplementedException();
             // я знаю, что в списке действий - должно быть действие по добавлению юнита
-            var addUnitAction = actionConfig.Actions.Untis.FirstOrDefault(s => s.TypeMetaAction == TypeMetaAction.UnitAdd);
+            /*var addUnitAction = actionConfig.Actions.Untis.FirstOrDefault(s => s.TypeMetaAction == TypeMetaAction.UnitAdd);
             Assert.IsNotNull(addUnitAction);
 
             elemData.Title = "UnitType: " + addUnitAction.TypeUnit;
@@ -166,7 +169,7 @@ namespace MetaUi
                     unitLimit = ((CountConditionConfig) condition).Value;
                 }
             }
-            elemData.CountAndLimit = $"{unitCount}/{unitLimit}";
+            elemData.CountAndLimit = $"{unitCount}/{unitLimit}";*/
         }
 
 
