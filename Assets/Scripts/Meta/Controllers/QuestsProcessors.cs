@@ -68,8 +68,8 @@ namespace Meta.Controllers.Imp
         {
             return config.TypeQuestGroup switch
             {
-                TypeQuestGroup.CountBased => new QuestCounterDto {ConfigId = config.QuestId},
-                TypeQuestGroup.Conditional => new QuestDto {ConfigId = config.QuestId},
+                TypeQuestGroup.CountBased => new QuestCounterDto(config.QuestId),
+                TypeQuestGroup.Conditional => new QuestDto(config.QuestId),
                 _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuestGroup)
             };
         }

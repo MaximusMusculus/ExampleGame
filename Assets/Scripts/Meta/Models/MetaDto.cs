@@ -22,8 +22,6 @@ namespace Meta.Models
     public interface IQuest
     {
         public Id ConfigId { get; }
-        public Id Id{ get; }
-        
         public bool IsCompleted{ get; }
         public bool IsRewarded{ get; }
     }
@@ -31,38 +29,21 @@ namespace Meta.Models
     public class QuestDto : IQuest
     {
         public Id ConfigId { get; set; }
-        public Id Id{ get; set; } //могут ли быть 2 один-х квеста?
-        //наверное - нет.
-
-        public QuestDto()
-        {
-        }
-
+        
         public QuestDto(Id configId)
         {
             ConfigId = configId;
         }
-
-        public QuestDto(Id configId, Id id)
-        {
-            ConfigId = configId;
-            Id = id;
-        }
-
+        
         public bool IsCompleted{ get; set; }
         public bool IsRewarded{ get; set; }
     }
-    
-    
+
     public class QuestCounterDto : QuestDto
     {
         public int Value;
 
-        public QuestCounterDto()
-        {
-        }
-
-        public QuestCounterDto(Id configId, Id id) : base(configId, id)
+        public QuestCounterDto(Id configId) : base(configId)
         {
         }
     }

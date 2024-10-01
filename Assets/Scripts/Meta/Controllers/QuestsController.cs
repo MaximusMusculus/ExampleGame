@@ -12,6 +12,7 @@ namespace Meta.Controllers
     {
         public IEnumerable<IQuest> GetAll();
     }
+
     public interface IQuestsController
     {
         void AddNewQuest(Id configId);
@@ -65,13 +66,11 @@ namespace Meta.Controllers.Imp
 
         public void ClaimReward(IQuest quest)
         {
-            ClaimReward(quest.Id);
+            ClaimReward(quest.ConfigId);
         }
-
-
-        public void ClaimReward(Id questId)
+        private void ClaimReward(Id questId)
         {
-            var quest = _questData.GetAll().FirstOrDefault(c => c.Id.Equals(questId));
+            var quest = _questData.GetAll().FirstOrDefault(c => c.ConfigId.Equals(questId));
             Assert.IsNotNull(quest);
             Assert.IsTrue(quest.IsCompleted);
             Assert.IsFalse(quest.IsRewarded);
