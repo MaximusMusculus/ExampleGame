@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using AppRen;
 using Meta.Configs;
 using Meta.Controllers;
 using Meta.Controllers.Actions;
@@ -15,7 +14,6 @@ namespace Meta.Tests.Editor.Controllers
     [TestFixture]
     public class TestQuests
     {
-        private IIdProvider _idProvider;
         private IActionProcessor _actionProcessor;
         
         private List<ItemDto> _itemsData;
@@ -35,8 +33,7 @@ namespace Meta.Tests.Editor.Controllers
             _questsData = new QuestCollectionDto(); 
             _itemsData = new List<ItemDto>();
             _unitsData = new List<UnitDto>();
-            _idProvider = new IdProvider(new IdProviderDto());
-
+            
             var itemsConfig = new List<ItemConfig> {new ItemConfig {Item = MapTestId.Recruts.Id(), DefaultCount = 200}};
             _inventory = new InventoryController(itemsConfig, _itemsData);
 
@@ -129,7 +126,7 @@ namespace Meta.Tests.Editor.Controllers
             }
         }
     }
-    
+    //chain of responsibility need
     public class ActionProcessorFacade : IActionProcessor
     {
         private readonly IActionProcessor _executeActionProcessor;
