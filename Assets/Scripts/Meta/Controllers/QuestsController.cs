@@ -18,23 +18,25 @@ namespace Meta.Controllers
         void ClaimReward(IQuest quest);
         void Remove(IQuest quest);
     }
+}
 
-    
+namespace Meta.Controllers.Imp
+{
     public class QuestsController : IActionProcessor, IQuestsController, IQuests
     {
         private readonly List<IQuestProcessor> _metaQuestControllers = new List<IQuestProcessor>(ConstDefaultCapacity.Small);
 
-        private readonly IQuestControllerFactory _questsControllerFactory;
+        private readonly IQuestProcessorsFactory _questsProcessorsFactory;
         private readonly Dictionary<Id, IQuestConfig> _configs;
         private readonly QuestCollectionDto _questData;
         private readonly IActionProcessor _rewardProcessor;
 
-        public QuestsController(QuestCollectionConfig questConfig,QuestCollectionDto questData,
-            IQuestControllerFactory questsControllerFactory, IActionProcessor rewardProcessor)
+        public QuestsController(QuestCollectionConfig questConfig, QuestCollectionDto questData,
+            IQuestProcessorsFactory questsProcessorsFactory, IActionProcessor rewardProcessor)
         {
             _questData = questData;
             _rewardProcessor = rewardProcessor;
-            _questsControllerFactory = questsControllerFactory;
+            _questsProcessorsFactory = questsProcessorsFactory;
 
             var count = questConfig.GetAll().Count();
             _configs = new Dictionary<Id, IQuestConfig>(count);
@@ -46,7 +48,7 @@ namespace Meta.Controllers
             foreach (var questDto in _questData.GetAll())
             {
                 var config = _configs[questDto.ConfigId];
-                var questEntity = _questsControllerFactory.CreateController(config, questDto);
+                var questEntity = _questsProcessorsFactory.CreateController(config, questDto);
                 _metaQuestControllers.Add(questEntity);
             }
         }
@@ -54,19 +56,19 @@ namespace Meta.Controllers
         public void AddNewQuest(Id questId)
         {
             var questConfig = _configs[questId];
-            var questDto = _questsControllerFactory.CreateData(questConfig);
+            var questDto = _questsProcessorsFactory.CreateData(questConfig);
             _questData.Add(questDto);
-            var questActionController = _questsControllerFactory.CreateController(questConfig, questDto);
+            var questActionController = _questsProcessorsFactory.CreateController(questConfig, questDto);
             _metaQuestControllers.Add(questActionController);
         }
 
-        
+
         public void ClaimReward(IQuest quest)
         {
             ClaimReward(quest.Id);
         }
 
-        
+
         public void ClaimReward(Id questId)
         {
             var quest = _questData.GetAll().FirstOrDefault(c => c.Id.Equals(questId));
@@ -78,13 +80,13 @@ namespace Meta.Controllers
             _rewardProcessor.Process(questConfig.Reward);
             quest.IsRewarded = true;
         }
-        
+
 
         public void Remove(IQuest quest)
         {
             throw new NotImplementedException();
         }
-        
+
 
         //это должно быть не здесь. 
         public void Process(IActionConfig actionConfig)

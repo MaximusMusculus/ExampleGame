@@ -21,8 +21,8 @@ namespace Meta.Tests.Editor.Controllers
         private List<ItemDto> _itemsData;
         private List<UnitDto> _unitsData;
         
-        private InventoryController _inventory;
-        private UnitsController _units;
+        private IInventoryController _inventory;
+        private IUnitsController _units;
         private QuestCollectionDto _questsData;
         private QuestsController _questsController;
 
@@ -55,7 +55,7 @@ namespace Meta.Tests.Editor.Controllers
 
 
             var actionProcessor = new ActionProcessor(_inventory, _units);
-            var fact = new QuestControllerControllerFactory(new ConditionProcessor(_inventory, _units));
+            var fact = new QuestProcessorsProcessorsFactory(new ConditionProcessor(_inventory, _units));
             _questsController = new QuestsController(questsConfig,_questsData, fact, actionProcessor);
             var autoComplete = new QuestAutoCompleteProcessorForFact(_questsData, _questsController);
             _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController, autoComplete);

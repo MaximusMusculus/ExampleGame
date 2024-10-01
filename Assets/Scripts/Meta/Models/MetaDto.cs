@@ -12,8 +12,8 @@ namespace Meta.Models
         
         public List<ExchangeItemDto> PurchaseItems = new List<ExchangeItemDto>();
         public QuestCollectionDto Quests = new QuestCollectionDto();
-        public QuestsDto PlayerQuests = new QuestsDto();
-
+        
+        
         //public List<PerkDto> Perkypecons;
         //public List<TaskDto> Tasks;
         //public List<BuildingDto> Buildings;
@@ -114,24 +114,6 @@ namespace Meta.Models
     
 
     
-
-    public class QuestsDto
-    {
-        public readonly List<QuestDto> Quests = new List<QuestDto>(ConstDefaultCapacity.Medium);
-        public readonly Dictionary<Id, int> Counters = new Dictionary<Id, int>(ConstDefaultCapacity.Small);
-
-        public void Add(QuestDto questDto)
-        {
-            Quests.Add(questDto);
-        }
-        
-        public void Remove(QuestDto questId)
-        {
-            Quests.Remove(questId);
-            Counters.Remove(questId.Id);
-        }
-    }
-
     /*
  //Копилот торопит события. ^_^
  public class PlayerDto

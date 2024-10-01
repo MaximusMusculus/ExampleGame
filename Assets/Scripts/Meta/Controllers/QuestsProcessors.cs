@@ -7,17 +7,59 @@ using Meta.Models;
 namespace Meta.Controllers
 {
     //2й способ (хуже кеш и скорость, но лучше расширение, чтение и понимание) Профит падает с количеством (до 100)
-    public interface IQuestControllerFactory
+    public interface IQuestProcessorsFactory
     {
         QuestDto CreateData(IQuestConfig config);
         IQuestProcessor CreateController(IQuestConfig config, QuestDto dto);
     }
 
-    public class QuestControllerControllerFactory : IQuestControllerFactory
+    public interface IQuestProcessor : IActionProcessor
+    {
+    }
+
+    public abstract class QuestCountBasedProcessor<TAction> : ActionProcessorAbstract<TAction>, IQuestProcessor
+    {
+        private readonly QuestCountBasedConfig _config;
+        private readonly QuestCounterDto _data;
+
+        protected QuestCountBasedProcessor(QuestCountBasedConfig config, QuestCounterDto data)
+        {
+            _config = config;
+            _data = data;
+        }
+
+        protected void ProcessQuest(TypeQuest typeQuest, Id item, int count)
+        {
+            if (!CheckTrigger(typeQuest) || !CheckTarget(item))
+            {
+                return;
+            }
+
+            var sumValue = _data.Value + count;
+            _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
+            _data.IsCompleted = _data.Value >= _config.TargetValue;
+        }
+
+        private bool CheckTrigger(TypeQuest triggerAction)
+        {
+            return _config.TriggerAction == triggerAction;
+        }
+
+        private bool CheckTarget(Id target)
+        {
+            return _config.TargetEntityId.Equals(target);
+        }
+    }
+
+}
+
+namespace Meta.Controllers.Imp
+{
+    public class QuestProcessorsProcessorsFactory : IQuestProcessorsFactory
     {
         private readonly IConditionProcessor _conditionProcessor;
 
-        public QuestControllerControllerFactory(IConditionProcessor conditionProcessor)
+        public QuestProcessorsProcessorsFactory(IConditionProcessor conditionProcessor)
         {
             _conditionProcessor = conditionProcessor;
         }
@@ -56,44 +98,6 @@ namespace Meta.Controllers
         }
     }
 
-    public interface IQuestProcessor : IActionProcessor
-    {
-    }
-
-
-    public abstract class QuestCountBasedProcessor<TAction> : ActionProcessorAbstract<TAction>, IQuestProcessor
-    {
-        private readonly QuestCountBasedConfig _config;
-        private readonly QuestCounterDto _data;
-
-        protected QuestCountBasedProcessor(QuestCountBasedConfig config, QuestCounterDto data)
-        {
-            _config = config;
-            _data = data;
-        }
-
-        protected void ProcessQuest(TypeQuest typeQuest, Id item, int count)
-        {
-            if (!CheckTrigger(typeQuest) || !CheckTarget(item))
-            {
-                return;
-            }
-
-            var sumValue = _data.Value + count;
-            _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
-            _data.IsCompleted = _data.Value >= _config.TargetValue;
-        }
-
-        private bool CheckTrigger(TypeQuest triggerAction)
-        {
-            return _config.TriggerAction == triggerAction;
-        }
-
-        private bool CheckTarget(Id target)
-        {
-            return _config.TargetEntityId.Equals(target);
-        }
-    }
     public class QuestCountUnitsController : QuestCountBasedProcessor<IUnitAction>, IUnitActionVisitor
     {
         public QuestCountUnitsController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data)
@@ -104,7 +108,7 @@ namespace Meta.Controllers
         {
             action.Visit(this);
         }
-        
+
 
         public void UnitAdd(Id typeUnit, UnitProgressionDto progression, int count)
         {
@@ -116,6 +120,7 @@ namespace Meta.Controllers
             ProcessQuest(TypeQuest.UnitSpend, typeUnit, count);
         }
     }
+
     public class QuestCountInventoryItemController : QuestCountBasedProcessor<IInventoryAction>, IInventoryActionVisitor
     {
         public QuestCountInventoryItemController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data)
@@ -142,8 +147,7 @@ namespace Meta.Controllers
             ProcessQuest(TypeQuest.InventoryItemExpandLimit, itemId, count);
         }
     }
-    
-    
+
 
     public class QuestConditionalProcessor : IQuestProcessor
     {
