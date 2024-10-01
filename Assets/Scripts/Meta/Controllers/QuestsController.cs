@@ -53,9 +53,20 @@ namespace Meta.Controllers
 
         public void AddNewQuest(Id questId)
         {
-            AddNewQuest(_configs[questId]);
+            var questConfig = _configs[questId];
+            var questDto = _questsControllerFactory.CreateData(questConfig);
+            _questData.Add(questDto);
+            var questActionController = _questsControllerFactory.CreateController(questConfig, questDto);
+            _metaQuestControllers.Add(questActionController);
         }
 
+        
+        public void ClaimReward(IQuest quest)
+        {
+            ClaimReward(quest.Id);
+        }
+
+        
         public void ClaimReward(Id questId)
         {
             var quest = _questData.GetAll().FirstOrDefault(c => c.Id.Equals(questId));
@@ -67,21 +78,7 @@ namespace Meta.Controllers
             _rewardProcessor.Process(questConfig.Reward);
             quest.IsRewarded = true;
         }
-
-        public void AddNewQuest(IQuestConfig questConfig)
-        {
-            var questDto = _questsControllerFactory.CreateData(questConfig);
-            _questData.Add(questDto);
-            var questActionController = _questsControllerFactory.CreateController(questConfig, questDto);
-            _metaQuestControllers.Add(questActionController);
-        }
-
-        public void ClaimReward(IQuest quest)
-        {
-            var rewardAction = _configs[quest.ConfigId].Reward;
-            _questData.GetAll().First(s => s.Id.Equals(quest.Id)).IsRewarded = true;
-            _rewardProcessor.Process(rewardAction);
-        }
+        
 
         public void Remove(IQuest quest)
         {

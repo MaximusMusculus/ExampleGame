@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace Meta.Tests.Editor.Controllers
 {
     [TestFixture]
-    public class TestMetaCountBaseQuestsForFact
+    public class TestQuests
     {
         private IIdProvider _idProvider;
         private IActionProcessor _actionProcessor;
@@ -92,7 +92,7 @@ namespace Meta.Tests.Editor.Controllers
             _actionProcessor.Process(spend100);
             Assert.IsTrue(_questsData.CountBasedQuest.First().IsCompleted);
             
-            _questsController.ClaimReward(_questsData.CountBasedQuest.First());
+            //_questsController.ClaimReward(_questsData.CountBasedQuest.First()); auto claim
             Assert.AreEqual(1, _unitsData.Count);
             Assert.IsTrue(_questsData.CountBasedQuest.First().IsRewarded);
         }
