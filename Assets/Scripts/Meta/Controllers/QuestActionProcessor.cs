@@ -65,8 +65,8 @@ namespace Meta.Controllers
             _questProcessors = new Dictionary<string, IActionProcessor>
             {
                 [TypeActionGroup.Collection] = new ActionCollectionProcessor(this),
-                [TypeActionGroup.Inventory] = new QuestCountBasedProcessor(_config, data),
-                [TypeActionGroup.Units] = new QuestActionProcessorUnitProcessor(_config, data)
+                [TypeActionGroup.Inventory] = new QuestInventoryProcessor(_config, data),
+                [TypeActionGroup.Units] = new QuestUnitProcessor(_config, data)
             };
         }
 
@@ -81,9 +81,8 @@ namespace Meta.Controllers
         }
     }
 
-
     //--
-    public class QuestCountBasedProcessor : IActionProcessor, IInventoryActionVisitor, IUnitActionVisitor
+    public class QuestInventoryProcessor : ActionProcessorAbstract<IInventoryAction>, IInventoryActionVisitor
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
         private readonly QuestsDto _data;
@@ -91,46 +90,12 @@ namespace Meta.Controllers
         private IQuests _quests;
         private IQuestsController _questsController;
 
-        public QuestCountBasedProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
+        public QuestInventoryProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
         {
             _config = config;
             _data = data;
         }
-
-        public void Process(IActionConfig actionConfig)
-        {
-            switch (actionConfig.ActionGroup)
-            {
-                case TypeActionGroup.Inventory:
-                    ProcessInventory(actionConfig);
-                    break;
-                case TypeActionGroup.Units:
-                    ProcessUnits(actionConfig);
-                    break;
-            }
-        }
-
-        private void ProcessInventory(IActionConfig actionConfig)
-        {
-            if (actionConfig is not IInventoryAction inventoryAction)
-            {
-                throw new ArgumentException("Action is not IInventoryAction info:" + actionConfig);
-            }
-
-            inventoryAction.Visit(this);
-        }
-
-        private void ProcessUnits(IActionConfig actionConfig)
-        {
-            if (actionConfig is not IUnitAction unitAction)
-            {
-                throw new ArgumentException("Action is not IUnitAction info:" + actionConfig);
-            }
-
-            unitAction.Visit(this);
-        }
-
-
+        
         /*protected override void Process(ItemActionConfig args)
         {
             args.Visit(this);
@@ -158,13 +123,12 @@ namespace Meta.Controllers
             }
         }*/
 
-
-        public void ItemAdd(InventoryActionConfig inventoryActionConfig)
+        protected override void Process(IInventoryAction action)
         {
-            throw new NotImplementedException();
-            //обработка квестов на добавление предметов
+            action.Visit(this);
         }
 
+        
         public void ItemAdd(Id itemId, int count)
         {
             throw new NotImplementedException();
@@ -179,34 +143,14 @@ namespace Meta.Controllers
         {
             throw new NotImplementedException();
         }
-
-        public void ItemSpend(InventoryActionConfig inventoryActionConfig)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ItemExpandLimit(InventoryActionConfig inventoryActionConfig)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UnitAdd(UnitActionConfig unitActionConfig)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UnitSpend(UnitActionConfig unitActionConfig)
-        {
-            throw new NotImplementedException();
-        }
     }
 
-    public class QuestActionProcessorUnitProcessor : ActionProcessorAbstract<UnitActionConfig>
+    public class QuestUnitProcessor : ActionProcessorAbstract<UnitActionConfig>
     {
         private readonly Dictionary<Id, QuestCountBasedConfig> _config;
         private readonly QuestsDto _data;
 
-        public QuestActionProcessorUnitProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
+        public QuestUnitProcessor(Dictionary<Id, QuestCountBasedConfig> config, QuestsDto data)
         {
             _config = config;
             _data = data;
@@ -238,6 +182,10 @@ namespace Meta.Controllers
         }
     }
 
+    
+    
+    
+    
 
     /// <summary>
     /// Квест контроллер. Оперирует квестами:
@@ -316,5 +264,78 @@ namespace Meta.Controllers
         {
             return _quests.Counters.TryGetValue(id, out count);
         }
+    }
+    
+    
+     public interface IQuestsCollectionDto<TQuestType> where TQuestType: IQuest
+    {
+        bool TryGet(TypeQuest typeQuest, out HashSet<TQuestType> quest);
+    }
+    public interface IQuestConfigCollection<TQuestConfig> where  TQuestConfig : IQuestConfig
+    {
+        bool TryGet(Id id, out TQuestConfig questConfig);
+    }
+    
+
+    public class QuestCountInventoryProcessor : ActionProcessorAbstract<IInventoryAction>, IInventoryActionVisitor
+    {
+        private readonly IQuestsCollectionDto<QuestCounterDto> _dataCollection;
+        private readonly IQuestConfigCollection<QuestCountBasedConfig> _configCollection;
+        
+        public QuestCountInventoryProcessor(IQuestsCollectionDto<QuestCounterDto> dataCollection, IQuestConfigCollection<QuestCountBasedConfig> configCollection)
+        {
+            _dataCollection = dataCollection;
+            _configCollection = configCollection;
+        }
+        
+        protected override void Process(IInventoryAction action)
+        {
+            action.Visit(this);
+        }
+
+        public void ItemAdd(Id itemId, int count)
+        {
+            ProcessQuests(TypeQuest.InventoryItemAdd, itemId, count);
+        }
+        public void ItemSpend(Id itemId, int count)
+        {
+            ProcessQuests(TypeQuest.UnitSpend, itemId, count);
+        }
+        public void ItemExpandLimit(Id itemId, int count)
+        {
+            ProcessQuests(TypeQuest.InventoryItemExpandLimit, itemId, count);
+        }
+
+        private void ProcessQuests(TypeQuest typeTrigger, Id item, int count)
+        {
+            if (_dataCollection.TryGet(typeTrigger, out var questSet) == false)
+            {
+                return;
+            }
+
+            foreach (var quest in questSet)
+            {
+                _configCollection.TryGet(quest.ConfigId, out var questConfig);
+                if (!CheckTarget(questConfig, item))
+                {
+                    continue;
+                }
+
+                UpdateProgress(quest, questConfig, count);
+            }
+        }
+
+        private bool CheckTarget(QuestCountBasedConfig config, Id target)
+        {
+            return config.TargetEntityId.Equals(target);
+        }
+        
+        private void UpdateProgress(QuestCounterDto data, QuestCountBasedConfig config, int count)
+        {
+            var sumValue = data.Value + count;
+            data.Value = Math.Clamp(sumValue, 0, config.TargetValue);
+            data.IsCompleted = data.Value >= config.TargetValue;
+        }
+        
     }
 }

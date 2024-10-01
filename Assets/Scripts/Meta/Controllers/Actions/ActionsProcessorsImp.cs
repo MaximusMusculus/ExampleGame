@@ -1,5 +1,6 @@
 using AppRen;
 using Meta.Configs.Actions;
+using Meta.Models;
 
 
 namespace Meta.Controllers.Actions
@@ -17,17 +18,17 @@ namespace Meta.Controllers.Actions
         {
             action.Visit(this);
         }
-
-        public void UnitAdd(UnitActionConfig unitActionConfig)
+        
+        public void UnitAdd(Id typeUnit, UnitProgressionDto progression, int count)
         {
-            _unitController.Add(unitActionConfig.TypeUnit, unitActionConfig.Progression, unitActionConfig.Count);
+            _unitController.Add(typeUnit, progression, count);
         }
 
-        public void UnitSpend(UnitActionConfig unitActionConfig)
+        public void UnitSpend(Id typeUnit, UnitProgressionDto progression, int count)
         {
-            if (_unitController.TryGetUnit(unitActionConfig.TypeUnit, unitActionConfig.Progression, out var unit))
+            if (_unitController.TryGetUnit(typeUnit, progression, out var unit))
             {
-                _unitController.Spend(unit, unitActionConfig.Count);
+                _unitController.Spend(unit, count);
             }
         }
     }

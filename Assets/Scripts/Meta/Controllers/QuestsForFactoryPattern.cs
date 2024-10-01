@@ -104,15 +104,16 @@ namespace Meta.Controllers
         {
             action.Visit(this);
         }
+        
 
-        public void UnitAdd(UnitActionConfig unitActionConfig)
+        public void UnitAdd(Id typeUnit, UnitProgressionDto progression, int count)
         {
-            ProcessQuest(TypeQuest.UnitAdd, unitActionConfig.TypeUnit, unitActionConfig.Count);
+            ProcessQuest(TypeQuest.UnitAdd, typeUnit, count);
         }
 
-        public void UnitSpend(UnitActionConfig unitActionConfig)
+        public void UnitSpend(Id typeUnit, UnitProgressionDto progression, int count)
         {
-            ProcessQuest(TypeQuest.UnitSpend, unitActionConfig.TypeUnit, unitActionConfig.Count);
+            ProcessQuest(TypeQuest.UnitSpend, typeUnit, count);
         }
     }
     public class QuestCountInventoryItemController : QuestCountBasedProcessor<IInventoryAction>, IInventoryActionVisitor

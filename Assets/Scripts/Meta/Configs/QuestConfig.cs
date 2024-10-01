@@ -10,6 +10,7 @@ namespace Meta.Configs
     {
         IEnumerable<IQuestConfig> GetAll();
     }
+    
     public class QuestCollectionConfig : IQuestCollectionConfig
     {
         public List<QuestCountBasedConfig> CountBased = new List<QuestCountBasedConfig>();

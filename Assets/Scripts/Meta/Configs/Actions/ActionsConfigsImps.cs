@@ -6,12 +6,12 @@ using Meta.Models;
 
 namespace Meta.Configs.Actions
 {
-    
-       public interface IInventoryAction
+
+    public interface IInventoryAction
     {
         public void Visit(IInventoryActionVisitor visitor);
     }
-    
+
     /// Этот интерфейс будет юзаться в
     /// 1. ExecuteProcessor
     /// 2. QuestProcessor
@@ -23,22 +23,16 @@ namespace Meta.Configs.Actions
     /// Можно попробовать оба варианта 
     public interface IInventoryActionVisitor
     {
-        //void ItemAdd(InventoryActionConfig inventoryActionConfig);
         void ItemAdd(Id itemId, int count);
-        
         void ItemSpend(Id itemId, int count);
-        
         void ItemExpandLimit(Id itemId, int count);
-        
-        //void ItemSpend(InventoryActionConfig inventoryActionConfig);
-        //void ItemExpandLimit(InventoryActionConfig inventoryActionConfig);
     }
-    
-    
+
+
     public class InventoryActionConfig : IActionConfig, IInventoryAction
     {
         public string ActionGroup => TypeActionGroup.Inventory;
-        
+
         public TypeInventoryAction Action;
         public Id TypeItem;
         public int Count;
@@ -70,7 +64,7 @@ namespace Meta.Configs.Actions
                     throw new ArgumentOutOfRangeException();
             }
         }
-        
+
         public enum TypeInventoryAction
         {
             None,
@@ -79,29 +73,31 @@ namespace Meta.Configs.Actions
             ItemExpandLimit
         }
     }
-    
-    
+
+
     public interface IUnitActionVisitor
     {
-        void UnitAdd(UnitActionConfig unitActionConfig);
-        void UnitSpend(UnitActionConfig unitActionConfig);
+        void UnitAdd(Id typeUnit, UnitProgressionDto progression, int count);
+        void UnitSpend(Id typeUnit, UnitProgressionDto progression, int count);
     }
+
     public interface IUnitAction
     {
         void Visit(IUnitActionVisitor visitor);
     }
-    
+
     //-- implement
-   public class UnitActionConfig : IActionConfig, IUnitAction
+    public class UnitActionConfig : IActionConfig, IUnitAction
     {
         public string ActionGroup => TypeActionGroup.Units;
+
         public void Visit(IActionProcessor processor)
         {
             throw new NotImplementedException();
         }
 
         public TypeUnitAction TypeAction;
-        
+
         public Id TypeUnit;
         public UnitProgressionDto Progression;
         public int Count;
@@ -121,16 +117,16 @@ namespace Meta.Configs.Actions
             switch (TypeAction)
             {
                 case TypeUnitAction.UnitAdd:
-                    visitor.UnitAdd(this);
+                    visitor.UnitAdd(TypeUnit, Progression, Count);
                     break;
                 case TypeUnitAction.UnitSpend:
-                    visitor.UnitSpend(this);
+                    visitor.UnitSpend(TypeUnit, Progression, Count);
                     break;
                 default:
                     throw new ArgumentException("Unknown action " + TypeAction);
             }
         }
-        
+
         public enum TypeUnitAction
         {
             None,
@@ -138,7 +134,7 @@ namespace Meta.Configs.Actions
             UnitSpend,
         }
     }
-    
+
     //-- implement
     public class ActionCollectionConfig : IActionConfig
     {
@@ -148,23 +144,24 @@ namespace Meta.Configs.Actions
         //для удобной читаемости и сериализации/десериализации
         public readonly List<UnitActionConfig> Untis = new List<UnitActionConfig>();
         public readonly List<InventoryActionConfig> Items = new List<InventoryActionConfig>();
-        
+
         //схож с ConditionCollectionConfig, там тестирую массив
         private IActionConfig[] _actionsHash;
-        
+
         private void CreateHash()
         {
             _actionsHash = new IActionConfig[Items.Count + Untis.Count];
             int i = 0;
-            
+
             foreach (var item in Items)
             {
                 _actionsHash[i] = item;
                 i++;
             }
+
             foreach (var unit in Untis)
             {
-                _actionsHash[i]= unit;
+                _actionsHash[i] = unit;
                 i++;
             }
         }
@@ -176,6 +173,7 @@ namespace Meta.Configs.Actions
             {
                 CreateHash();
             }
+
             return _actionsHash;
         }
     }
