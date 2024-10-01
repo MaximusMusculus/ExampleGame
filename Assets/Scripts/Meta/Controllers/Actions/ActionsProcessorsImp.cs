@@ -3,20 +3,30 @@ using Meta.Configs.Actions;
 
 namespace Meta.Controllers.Actions
 {
-    public class ActionProcessorCollectionProcessor : ActionProcessorAbstract<ActionCollectionConfig>
+    public class UnitActionProcessor : ActionProcessorAbstract<IUnitAction>, IUnitActionVisitor
     {
-        private readonly IActionProcessor _actionProcessor;
+        private readonly IUnitsController _unitController;
 
-        public ActionProcessorCollectionProcessor(IActionProcessor actionProcessor)
+        public UnitActionProcessor(IUnitsController unitController)
         {
-            _actionProcessor = actionProcessor;
+            _unitController = unitController;
         }
 
-        protected override void Process(ActionCollectionConfig args)
+        protected override void Process(IUnitAction args)
         {
-            foreach (var anyAction in args.GetAll())
+            args.Visit(this);
+        }
+
+        public void UnitAdd(UnitActionConfig unitActionConfig)
+        {
+            _unitController.Add(unitActionConfig.TypeUnit, unitActionConfig.Progression, unitActionConfig.Count);
+        }
+
+        public void UnitSpend(UnitActionConfig unitActionConfig)
+        {
+            if (_unitController.TryGetUnit(unitActionConfig.TypeUnit, unitActionConfig.Progression, out var unit))
             {
-                _actionProcessor.Process(anyAction);
+                _unitController.Spend(unit, unitActionConfig.Count);
             }
         }
     }
@@ -49,30 +59,20 @@ namespace Meta.Controllers.Actions
         }
     }
     
-    public class UnitActionProcessor : ActionProcessorAbstract<IUnitAction>, IUnitActionVisitor
+    public class ActionProcessorCollectionProcessor : ActionProcessorAbstract<ActionCollectionConfig>
     {
-        private readonly IUnitsController _unitController;
+        private readonly IActionProcessor _actionProcessor;
 
-        public UnitActionProcessor(IUnitsController unitController)
+        public ActionProcessorCollectionProcessor(IActionProcessor actionProcessor)
         {
-            _unitController = unitController;
+            _actionProcessor = actionProcessor;
         }
 
-        protected override void Process(IUnitAction args)
+        protected override void Process(ActionCollectionConfig args)
         {
-            args.Visit(this);
-        }
-
-        public void UnitAdd(UnitActionConfig unitActionConfig)
-        {
-            _unitController.Add(unitActionConfig.TypeUnit, unitActionConfig.Progression, unitActionConfig.Count);
-        }
-
-        public void UnitSpend(UnitActionConfig unitActionConfig)
-        {
-            if (_unitController.TryGetUnit(unitActionConfig.TypeUnit, unitActionConfig.Progression, out var unit))
+            foreach (var anyAction in args.GetAll())
             {
-                _unitController.Spend(unit, unitActionConfig.Count);
+                _actionProcessor.Process(anyAction);
             }
         }
     }

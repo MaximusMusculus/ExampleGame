@@ -5,6 +5,12 @@ using Meta.Models;
 
 namespace Meta.Configs.Actions
 {
+    
+    public interface IInventoryAction
+    {
+        public void Visit(IInventoryActionVisitor visitor);
+    }
+    
     /// Этот интерфейс будет юзаться в
     /// 1. ExecuteProcessor
     /// 2. QuestProcessor
@@ -21,12 +27,6 @@ namespace Meta.Configs.Actions
         void ItemExpandLimit(ItemActionConfig itemActionConfig);
     }
     
-    public interface IInventoryAction
-    {
-        public void Visit(IInventoryActionVisitor visitor);
-    }
-    
-    //-- implement
     
     public class ItemActionConfig : IActionConfig, IInventoryAction
     {
@@ -74,7 +74,7 @@ namespace Meta.Configs.Actions
     }
     
     
-    //----------Units------------------
+    
     public interface IUnitActionVisitor
     {
         void UnitAdd(UnitActionConfig unitActionConfig);
@@ -131,7 +131,6 @@ namespace Meta.Configs.Actions
     //-- implement
     public class ActionCollectionConfig : IActionConfig
     {
-        public TypeMetaAction TypeMetaAction => TypeMetaAction.Collection;
         public string ActionGroup => TypeActionGroup.Collection;
 
         //хранение набора коллекции в типизированном виде
