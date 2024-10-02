@@ -265,8 +265,8 @@ namespace MetaUi
             _actionSplitProcessor.Reset().Set(_price).Set(_unitsCollection).Fill(actionConfig.Actions);
 
             var unit = _unitsCollection.Units[0];
-            viewData.Title = string.Empty;// "UnitType: " + unit.UnitType;
-            viewData.Description = string.Empty;// "Description: ";
+            viewData.Title = "UnitType: " + unit.UnitType;
+            viewData.Description = "Description: ";
             viewData.Icon = _spriteHolder.GetSprite(unit.UnitType);
 
             Assert.IsTrue(_price.Count <= viewData.ItemsData.Count);
@@ -281,7 +281,7 @@ namespace MetaUi
                 var item = _price.Items[i];
                 var itemViewInfo = viewData.ItemsData[i];
                 itemViewInfo.Icon = _spriteHolder.GetSprite( item.ItemId);
-                itemViewInfo.Text = string.Empty;// item.Count.ToString();
+                itemViewInfo.Text = item.Count.ToString();
                 itemViewInfo.IsEnable = true;
                 itemViewInfo.IsWarning = _inventory.GetCount(item.ItemId) < item.Count;
                 allInventoryItemsExist &= itemViewInfo.IsWarning == false;
@@ -299,7 +299,7 @@ namespace MetaUi
                 }
             }
 
-            viewData.CountAndLimit = string.Empty;// $"{existCount}/{unitLimit}";
+            viewData.CountAndLimit = $"{existCount}/{unitLimit}";
             viewData.ButtonEnabled = _conditionProcessor.Check(actionConfig.Require) && allInventoryItemsExist;
         }
         
