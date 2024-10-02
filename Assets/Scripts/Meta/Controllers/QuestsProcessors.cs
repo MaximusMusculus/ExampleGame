@@ -15,12 +15,14 @@ namespace Meta.Controllers
 
     public interface IQuestProcessor : IActionProcessor
     {
+        string ActionGroup { get; }
     }
 
     public abstract class QuestCountBasedProcessor<TAction> : ActionProcessorAbstract<TAction>, IQuestProcessor
     {
         private readonly QuestCountBasedConfig _config;
         private readonly QuestCounterDto _data;
+        public abstract string ActionGroup { get; }
 
         protected QuestCountBasedProcessor(QuestCountBasedConfig config, QuestCounterDto data)
         {
@@ -100,6 +102,7 @@ namespace Meta.Controllers.Imp
 
     public class QuestCountUnitsController : QuestCountBasedProcessor<IUnitAction>, IUnitActionVisitor
     {
+        public override string ActionGroup => TypeActionGroup.Units;
         public QuestCountUnitsController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data)
         {
         }
@@ -119,10 +122,14 @@ namespace Meta.Controllers.Imp
         {
             ProcessQuest(TypeQuest.UnitSpend, typeUnit, count);
         }
+
+
     }
 
     public class QuestCountInventoryItemController : QuestCountBasedProcessor<IInventoryAction>, IInventoryActionVisitor
     {
+        public override string ActionGroup => TypeActionGroup.Inventory;
+
         public QuestCountInventoryItemController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data)
         {
         }
@@ -154,6 +161,8 @@ namespace Meta.Controllers.Imp
         private readonly QuestConditionalConfig _config;
         private readonly QuestDto _data;
         private readonly IConditionProcessor _conditionProcessor;
+
+        public string ActionGroup => throw new NotImplementedException();
 
         public QuestConditionalProcessor(QuestConditionalConfig config, QuestDto data, IConditionProcessor conditionProcessor)
         {

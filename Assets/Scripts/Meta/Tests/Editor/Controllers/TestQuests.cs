@@ -87,13 +87,12 @@ namespace Meta.Tests.Editor.Controllers
             var spend100 = _factory.CreateItemSpendAction(MapTestId.Recruts.Id(), 100);
             _questsController.AddNewQuest(MapTestId.QuestSpendRecruts.Id());
             _actionProcessor.Process(spend100);
-            Assert.IsTrue(_questsData.CountBasedQuest.First().IsCompleted);
             
+            Assert.IsTrue(_questsData.CountBasedQuest.First().IsCompleted);
             //_questsController.ClaimReward(_questsData.CountBasedQuest.First()); auto claim
             Assert.AreEqual(1, _unitsData.Count);
             Assert.IsTrue(_questsData.CountBasedQuest.First().IsRewarded);
         }
-
     }
     
     public class QuestAutoCompleteProcessorForFact : IActionProcessor

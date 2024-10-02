@@ -92,7 +92,10 @@ namespace Meta.Controllers.Imp
         {
             foreach (var questController in _metaQuestControllers)
             {
-                questController.Process(actionConfig);
+                if (questController.ActionGroup.Equals(actionConfig.ActionGroup))
+                {
+                    questController.Process(actionConfig);
+                }
             }
         }
 
