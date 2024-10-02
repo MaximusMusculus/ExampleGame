@@ -98,9 +98,9 @@ namespace MetaUi
         public void Reset()
         {
             _index = 0;
-            foreach (var viewData in Items)
+            for (var i = 0; i < Items.Count; i++)
             {
-                viewData.Reset();
+                Items[i].Reset();
             }
         }
 
@@ -136,15 +136,14 @@ namespace MetaUi
     public class UnitActionCollection : IUnitActionVisitor
     {
         private int _index;
-        public IReadOnlyList<UnitChangeInfo> Units { get; }
+        public UnitChangeInfo[] Units { get; }
         public UnitActionCollection(int maxSize)
         {
-            var units = new List<UnitChangeInfo>(maxSize);
-            for (int i = 0; i < maxSize; i++)
+            Units = new UnitChangeInfo[maxSize];
+            for (var i = 0; i < maxSize; i++)
             {
-                units.Add(new UnitChangeInfo());
+                Units[i] = new UnitChangeInfo();
             }
-            Units = units;
         }
         
         public void Reset()
@@ -230,6 +229,9 @@ namespace MetaUi
     }
 
     
+   
+    
+    
 
     public class TrainActionDataPresenter
     {
@@ -243,6 +245,7 @@ namespace MetaUi
         private readonly IInventory _inventory;
         private readonly IConditionProcessor _conditionProcessor;
         
+        //Класс содержжит логику проверки и логику заполнения вьюхи
         public TrainActionDataPresenter(ISpriteHolderTest spriteHolder, IUnits units, IInventory inventory, IConditionProcessor conditionProcessor)
         {
             _conditionProcessor = conditionProcessor;
@@ -255,19 +258,19 @@ namespace MetaUi
             _unitsCollection = new UnitActionCollection(1);
         }
         
-        public void ActionToView(MetaActionConfig actionConfig, TrainElemData elemData)
+        public void ActionToView(MetaActionConfig actionConfig, TrainElemData viewData)
         {
-            elemData.Reset();
-            elemData.ActionConfig = actionConfig;
+            viewData.Reset();
+            viewData.ActionConfig = actionConfig;
             _actionSplitProcessor.Reset().Set(_price).Set(_unitsCollection).Fill(actionConfig.Actions);
 
             var unit = _unitsCollection.Units[0];
-            elemData.Title = "UnitType: " + unit.UnitType;
-            elemData.Description = "Description: ";
-            elemData.Icon = _spriteHolder.GetSprite(unit.UnitType);
+            viewData.Title = string.Empty;// "UnitType: " + unit.UnitType;
+            viewData.Description = string.Empty;// "Description: ";
+            viewData.Icon = _spriteHolder.GetSprite(unit.UnitType);
 
-            Assert.IsTrue(_price.Count <= elemData.ItemsData.Count);
-            foreach (var itemView in elemData.ItemsData)
+            Assert.IsTrue(_price.Count <= viewData.ItemsData.Count);
+            foreach (var itemView in viewData.ItemsData)
             {
                 itemView.IsEnable = false;
             }
@@ -276,9 +279,9 @@ namespace MetaUi
             for (var i = 0; i < _price.Count; i++)
             {
                 var item = _price.Items[i];
-                var itemViewInfo = elemData.ItemsData[i];
+                var itemViewInfo = viewData.ItemsData[i];
                 itemViewInfo.Icon = _spriteHolder.GetSprite( item.ItemId);
-                itemViewInfo.Text = item.Count.ToString();
+                itemViewInfo.Text = string.Empty;// item.Count.ToString();
                 itemViewInfo.IsEnable = true;
                 itemViewInfo.IsWarning = _inventory.GetCount(item.ItemId) < item.Count;
                 allInventoryItemsExist &= itemViewInfo.IsWarning == false;
@@ -295,8 +298,9 @@ namespace MetaUi
                     unitLimit = ((CountConditionConfig) condition).Value;
                 }
             }
-            elemData.CountAndLimit = $"{existCount}/{unitLimit}";
-            elemData.ButtonEnabled = _conditionProcessor.Check(actionConfig.Require) && allInventoryItemsExist;
+
+            viewData.CountAndLimit = string.Empty;// $"{existCount}/{unitLimit}";
+            viewData.ButtonEnabled = _conditionProcessor.Check(actionConfig.Require) && allInventoryItemsExist;
         }
         
 

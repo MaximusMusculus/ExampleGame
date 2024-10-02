@@ -5,6 +5,7 @@ using AppRen;
 using Meta;
 using Meta.TestConfiguration;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace MetaUi
 {
@@ -27,8 +28,18 @@ namespace MetaUi
         [SerializeField] private MetaPlayScreen _metaPlayScreen;
 
         private ITestInputCmdExecutor _inputCmdExecutor;
+        private Dictionary<Id, Sprite> _spritesHash;
+
         public void Setup(MetaModel metaModel, ITestInputCmdExecutor inputCmdExecutor)
         {
+            Assert.IsNull(_spritesHash);
+
+            _spritesHash = new Dictionary<Id, Sprite>(_spriteMap.Count);
+            foreach (var spriteMapElem in _spriteMap)
+            {
+                _spritesHash[spriteMapElem.TypeEntity.Id()] = spriteMapElem.Icon;
+            }
+            
             _inputCmdExecutor = inputCmdExecutor;
             _metaPlayScreen.Setup(metaModel, this);
             _metaTrainUnits.Setup(metaModel, metaModel.Config.ActionsGroups[0], this);
@@ -70,7 +81,8 @@ namespace MetaUi
         }
         public Sprite GetSprite(Id typeEntity)
         {
-            return _spriteMap.FirstOrDefault(s => typeEntity.Equals((ushort) s.TypeEntity))?.Icon;
+            _spritesHash.TryGetValue(typeEntity, out var sprite);
+            return sprite;
         }
     }
 }
