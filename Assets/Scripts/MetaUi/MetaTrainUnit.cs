@@ -41,6 +41,7 @@ namespace MetaUi
                 {
                     var elemData = _data.ItemsData[i];
                     _priceView[i].SetEnable(elemData.IsEnable).SetIcon(elemData.Icon).SetText(elemData.Text);
+                    _priceView[i].SetWarning(elemData.IsWarning);
                 }
                 else
                 {

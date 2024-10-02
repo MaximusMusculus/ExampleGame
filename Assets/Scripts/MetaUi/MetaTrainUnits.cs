@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using AppRen;
 using Meta;
 using Meta.Configs;
 using Meta.Configs.Actions;
+using Meta.Configs.Conditions;
 using Meta.Controllers;
 using Meta.Models;
 using UnityEngine;
@@ -30,6 +29,7 @@ namespace MetaUi
             public bool IsEnable;
             public Sprite Icon;
             public string Text;
+            public bool IsWarning;
         }
         
         public void Reset()
@@ -121,7 +121,7 @@ namespace MetaUi
         {
             Items[_index].Set(item, count, action);
             _index++;
-            Count = _index + 1;
+            Count = _index;
         }
     }
 
@@ -234,53 +234,79 @@ namespace MetaUi
     public class TrainActionDataPresenter
     {
         private readonly InventoryActionItemCollection _price;
-        private readonly UnitActionCollection _units;
+        private readonly UnitActionCollection _unitsCollection;
         private readonly ISpriteHolderTest _spriteHolder;
         private readonly int _maxPriceItemsSize = 3;
         private readonly ActionSplitProcessor _actionSplitProcessor;
+
+        private readonly IUnits _units;
+        private readonly IInventory _inventory;
+        private readonly IConditionProcessor _conditionProcessor;
         
-        public TrainActionDataPresenter(ISpriteHolderTest spriteHolder, ActionSplitProcessor actionSplitProcessor)
+        public TrainActionDataPresenter(ISpriteHolderTest spriteHolder, IUnits units, IInventory inventory, IConditionProcessor conditionProcessor)
         {
+            _conditionProcessor = conditionProcessor;
             _spriteHolder = spriteHolder;
-            _actionSplitProcessor = actionSplitProcessor;
+            _inventory = inventory;
+            _units = units;
+
+            _actionSplitProcessor = new ActionSplitProcessor();
             _price = new InventoryActionItemCollection(_maxPriceItemsSize);
-            _units = new UnitActionCollection(1);
+            _unitsCollection = new UnitActionCollection(1);
         }
         
-        public void ActionToView(MetaActionConfig actionConfig, TrainElemData elemData, IUnits units)
+        public void ActionToView(MetaActionConfig actionConfig, TrainElemData elemData)
         {
             elemData.Reset();
             elemData.ActionConfig = actionConfig;
-            _actionSplitProcessor.Reset().Set(_price).Set(_units).Fill(actionConfig.Actions);
+            _actionSplitProcessor.Reset().Set(_price).Set(_unitsCollection).Fill(actionConfig.Actions);
 
-            var unit = _units.Units[0];
+            var unit = _unitsCollection.Units[0];
             elemData.Title = "UnitType: " + unit.UnitType;
             elemData.Description = "Description: ";
             elemData.Icon = _spriteHolder.GetSprite(unit.UnitType);
 
-            var existCount = units.TryGetUnit(unit.UnitType, unit.Progression, out var existUnit) ? existUnit.Count : 0;
-            elemData.CountAndLimit = $"{existCount}"; //{units.GetLimit(unit.UnitType, unit.Progression)}";
-
-            
             Assert.IsTrue(_price.Count <= elemData.ItemsData.Count);
-            for (var i = 0; i < _price.Items.Count; i++)
+            foreach (var itemView in elemData.ItemsData)
+            {
+                itemView.IsEnable = false;
+            }
+            
+            bool allInventoryItemsExist = true;
+            for (var i = 0; i < _price.Count; i++)
             {
                 var item = _price.Items[i];
                 var itemViewInfo = elemData.ItemsData[i];
                 itemViewInfo.Icon = _spriteHolder.GetSprite( item.ItemId);
                 itemViewInfo.Text = item.Count.ToString();
-                itemViewInfo.IsEnable = !item.IsEmpty;
+                itemViewInfo.IsEnable = true;
+                itemViewInfo.IsWarning = _inventory.GetCount(item.ItemId) < item.Count;
+                allInventoryItemsExist &= itemViewInfo.IsWarning == false;
             }
+            
+            //ищу условие на лимит юнитов
+            var unitLimit = int.MaxValue;
+            var existCount = _units.TryGetUnit(unit.UnitType, unit.Progression, out var existUnit) ? existUnit.Count : 0;
+            foreach (var condition in actionConfig.Require.GetConditions())
+            {
+                if (condition.TypeCondition == TypeCondition.UnitsCount)
+                {
+                    //подумать, как убрать кастинг
+                    unitLimit = ((CountConditionConfig) condition).Value;
+                }
+            }
+            elemData.CountAndLimit = $"{existCount}/{unitLimit}";
+            elemData.ButtonEnabled = _conditionProcessor.Check(actionConfig.Require) && allInventoryItemsExist;
         }
         
-        
+
         public void Visit(IInventoryAction inventoryActionConfig)
         {
             inventoryActionConfig.Visit(_price);
         }
         public void Visit(IUnitAction unitActionConfig)
         {
-            unitActionConfig.Visit(_units);
+            unitActionConfig.Visit(_unitsCollection);
         }
     }
     
@@ -292,8 +318,6 @@ namespace MetaUi
     /// </summary>
     public class MetaTrainUnits : MonoBehaviour
     {
-        private IUnits _unitsController;
-        private IConditionProcessor _conditions;
         private IEnumerable<MetaActionConfig> _trainActions;
         
         private List<TrainElemData> _elemsData;
@@ -306,9 +330,7 @@ namespace MetaUi
         {
             Assert.IsNull(_trainDataPresenter);
             
-            _trainDataPresenter = new TrainActionDataPresenter(spriteHolder, new ActionSplitProcessor());
-            _unitsController = metaModel.Units;
-            _conditions = metaModel.ConditionProcessor;
+            _trainDataPresenter = new TrainActionDataPresenter(spriteHolder, metaModel.Units, metaModel.Inventory, metaModel.ConditionProcessor);
             _trainActions = trainActions;
             BindDataToView();
             UpdateUnits();
@@ -324,7 +346,7 @@ namespace MetaUi
                 trainElem.SetData(viewData);
             }
         }
-
+        
         public void UpdateUnits()
         {
             int i = 0;
@@ -334,7 +356,7 @@ namespace MetaUi
                 {
                     break;
                 }
-                _trainDataPresenter.ActionToView(trainAction, _elemsData[i], _unitsController);
+                _trainDataPresenter.ActionToView(trainAction, _elemsData[i]);
                 i++;
             }
 
@@ -350,72 +372,5 @@ namespace MetaUi
                 }
             }
         }
-        
-        
-        private void FillTrainElemView(MetaActionConfig actionConfig, TrainElemData elemData)
-        {
-            elemData.ActionConfig = actionConfig;
-            //первая, мучительная процедура распаковки)) экшена.  Далее - либо, буду делать типизированные (классов что ли жалко)
-            //либо спец адаптеры.
-            
-            //если захочется тутор, то кондишен оборачивается доп-но в тутор логику
-            elemData.ButtonEnabled = _conditions.Check(actionConfig.Require);
-
-
-            // я знаю, что в списке действий - должно быть действие по добавлению юнита
-            var unitAction = actionConfig.Actions.GetAll().FirstOrDefault(s => s.ActionGroup == TypeActionGroup.Units) as IUnitAction;
-            Assert.IsNotNull(unitAction);
-
-            throw new NotImplementedException();
-
-            /*elemData.Title = "UnitType: " + unitAction.TypeUnit;
-            elemData.Description = "Description: ";
-            elemData.Icon = _spriteHolder.GetSprite(unitAction.TypeUnit);
-
-            var unitCount = 0;
-            var unitLimit = int.MaxValue;
-            
-            if(_unitsController.TryGetUnit(unitAction.TypeUnit, unitAction.Progression, out var unit))
-            {
-                unitCount = unit.Count;
-            }
-            
-            // actionConfig.Actions.GetEnumerator()  тут  мне надо обойти список действий, отобрать только те, что снимают ресурс
-            // попробовать вывести это в представление.  Так же проверить, есть ли данный ресурс в нужном колве. Если нет - покрасить интерфейс, залочить кнопку
-            //такие вещи будут происходить достаточно часто. 
-
-
-            Assert.IsTrue(actionConfig.Actions.Items.Count <= elemData.ItemsData.Count);
-            foreach (var data in elemData.ItemsData)
-            {
-                data.IsEnable = false;
-            }
-            int i = 0;
-            foreach (var actionsItem in actionConfig.Actions.Items)
-            {
-                var priceData = elemData.ItemsData[i];
-                priceData.Icon = _spriteHolder.GetSprite(actionsItem.TypeItem);
-                priceData.Text = actionsItem.Count.ToString();
-                priceData.IsEnable = true;
-                i++;
-            }
-            
-
-
-
-
-            //ищу условие на лимит юнитов
-            foreach (var condition in actionConfig.Require.GetConditions())
-            {
-                if (condition.TypeCondition == TypeCondition.UnitsCount)
-                {
-                    //подумать, как убрать кастинг
-                    unitLimit = ((CountConditionConfig) condition).Value;
-                }
-            }
-            elemData.CountAndLimit = $"{unitCount}/{unitLimit}";*/
-        }
-
-
     }
 }

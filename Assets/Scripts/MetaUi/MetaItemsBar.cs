@@ -54,7 +54,11 @@ namespace MetaUi
         {
             for (var i = 0; i < _showList.Count && i < _viewElems.Count; i++)
             {
-                _viewElems[i].SetText(_inventory.GetCount(_showList[i].Id()).ToString());
+                var viewElem = _viewElems[i];
+                var itemId = _showList[i].Id();
+                
+                viewElem.SetText(_inventory.GetCount(itemId).ToString());
+                viewElem.SetWarning(_inventory.GetCount(itemId) >= _inventory.GetLimit(itemId));
             }
         }
     }
@@ -65,6 +69,8 @@ namespace MetaUi
         public GameObject Elem;
         public TextMeshProUGUI Text;
         public Image Icon;
+        public Image Warning;
+        
         public ItemViewElem SetIcon(Sprite icon)
         {
             Icon.sprite = icon;
@@ -80,6 +86,11 @@ namespace MetaUi
         public ItemViewElem SetEnable(bool isEnable)
         {
             Elem.SetActive(isEnable);
+            return this;
+        }
+        public ItemViewElem SetWarning(bool isEnable)
+        {
+            Warning.enabled = isEnable;
             return this;
         }
     }
