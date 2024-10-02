@@ -1,3 +1,6 @@
+using Meta.Configs.Actions;
+
+
 namespace Meta.Configs
 {
     //вместо энама можно строки разместить
@@ -13,5 +16,12 @@ namespace Meta.Configs
     public interface IActionConfig
     {
         string ActionGroup { get; }
+        void Visit(IActionVisitor visitor);
+    }
+
+    public interface IActionVisitor
+    {
+        void Visit(IInventoryAction inventoryActionConfig);
+        void Visit (IUnitAction unitActionConfig);
     }
 }

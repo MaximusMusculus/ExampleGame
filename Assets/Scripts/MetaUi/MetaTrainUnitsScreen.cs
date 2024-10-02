@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Meta;
 using Meta.Configs;
 using Meta.Controllers;
@@ -22,8 +23,25 @@ namespace MetaUi
             _actionsGroup = actions;
             _conditionProcessor = metaModel.ConditionProcessor;
             _metaItemsBar.Setup(metaModel.Inventory, spriteHolder);
-            _metaTrainUnits.Setup(metaModel, actions.Actions, spriteHolder);
+            _metaTrainUnits.OneTimeSetup(metaModel, SelectTrainActions(actions), spriteHolder);
             return this;
+        }
+        
+        private IEnumerable<MetaActionConfig> SelectTrainActions(MetaActionsGroupConfig actions)
+        {
+            //отбираем только те действия, которые добавляют юнитов
+            //если будет такое часто - передать фильтр
+            foreach (var trainAction in actions.Actions)
+            {
+                foreach (var action in trainAction.Actions.GetAll())
+                {
+                    //меня интересует конкретная группа действий
+                    if (action.ActionGroup == TypeActionGroup.Units)
+                    {
+                        yield return trainAction;
+                    }
+                }
+            }
         }
         
         public void UpdateView()

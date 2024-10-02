@@ -18,7 +18,7 @@ namespace Meta.Configs
     {
         //id?
         public ConditionCollectionConfig Require;
-        public ActionCollectionConfig Actions;
+        public IActionCollectionConfig Actions;
     }
 
     //как можно представить игровые действия?

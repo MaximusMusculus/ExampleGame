@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AppRen;
 using Meta.Configs;
+using Meta.Configs.Actions;
 using Meta.Models;
 using UnityEngine.Assertions;
 
@@ -92,12 +93,17 @@ namespace Meta.Controllers.Imp
         {
             foreach (var questController in _metaQuestControllers)
             {
+                //actionConfig.Visit(_processorWrapper);
+                //actionConfig.Visit(questController);
                 if (questController.ActionGroup.Equals(actionConfig.ActionGroup))
                 {
                     questController.Process(actionConfig);
                 }
             }
         }
+
+        
+
 
         public void ProcessBattleEvent()
         {
@@ -111,5 +117,6 @@ namespace Meta.Controllers.Imp
         {
             return _questData.GetAll();
         }
+        
     }
 }

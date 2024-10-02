@@ -81,7 +81,7 @@ namespace Meta.Controllers.Imp
             return config.TypeQuestGroup switch
             {
                 TypeQuestGroup.CountBased => CreateQuestController((QuestCountBasedConfig) config, (QuestCounterDto) data),
-                TypeQuestGroup.Conditional => new QuestConditionalProcessor((QuestConditionalConfig) config, data, _conditionProcessor),
+                //TypeQuestGroup.Conditional => new QuestConditionalProcessor((QuestConditionalConfig) config, data, _conditionProcessor),
                 _ => throw new ArgumentException("Unknown quest type:" + config.TypeQuestGroup)
             };
         }
@@ -152,34 +152,6 @@ namespace Meta.Controllers.Imp
         public void ItemExpandLimit(Id itemId, int count)
         {
             ProcessQuest(TypeQuest.InventoryItemExpandLimit, itemId, count);
-        }
-    }
-
-
-    public class QuestConditionalProcessor : IQuestProcessor
-    {
-        private readonly QuestConditionalConfig _config;
-        private readonly QuestDto _data;
-        private readonly IConditionProcessor _conditionProcessor;
-
-        public string ActionGroup => throw new NotImplementedException();
-
-        public QuestConditionalProcessor(QuestConditionalConfig config, QuestDto data, IConditionProcessor conditionProcessor)
-        {
-            _config = config;
-            _data = data;
-            _conditionProcessor = conditionProcessor;
-        }
-
-        public void Process(IActionConfig actionConfig)
-        {
-            throw new NotImplementedException();
-            /*
-            if (_config.Triggers.Contains(actionConfig.TypeMetaAction))
-            {
-                var isCompleted = _conditionProcessor.Check(_config.Condition);
-                _data.IsCompleted = isCompleted;
-            }*/
         }
     }
 }

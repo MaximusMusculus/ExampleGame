@@ -1,37 +1,48 @@
 using System;
 using System.Collections.Generic;
 using AppRen;
-using Meta.Controllers;
 using Meta.Models;
 
 namespace Meta.Configs.Actions
 {
-
     public interface IInventoryAction
     {
         public void Visit(IInventoryActionVisitor visitor);
     }
-
-    /// Этот интерфейс будет юзаться в
-    /// 1. ExecuteProcessor
-    /// 2. QuestProcessor
-    /// 3. CounterProcessor
-    /// 4. ViewProcessor?
-    ///
-    /// Из минусов - если что то одно хочу потрекать (например в квесте, то надо будет хендлить ВСЕ методы)
-    /// Из плюсов - не потеряется, если что то добавлю. Но нужно ли это все?
-    /// Можно попробовать оба варианта 
     public interface IInventoryActionVisitor
     {
         void ItemAdd(Id itemId, int count);
         void ItemSpend(Id itemId, int count);
         void ItemExpandLimit(Id itemId, int count);
     }
+    
+    public interface IUnitAction
+    {
+        void Visit(IUnitActionVisitor visitor);
+    }
+    public interface IUnitActionVisitor
+    {
+        void UnitAdd(Id typeUnit, UnitProgressionDto progression, int count);
+        void UnitSpend(Id typeUnit, UnitProgressionDto progression, int count);
+    }
+
+    public interface IActionCollectionConfig : IActionConfig
+    {
+        IActionConfig[] GetAll();
+    }
+}
 
 
+//-- implement
+namespace Meta.Configs.Actions.Imp
+{
     public class InventoryActionConfig : IActionConfig, IInventoryAction
     {
         public string ActionGroup => TypeActionGroup.Inventory;
+        public void Visit(IActionVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
 
         public TypeInventoryAction Action;
         public Id TypeItem;
@@ -73,28 +84,15 @@ namespace Meta.Configs.Actions
             ItemExpandLimit
         }
     }
-
-
-    public interface IUnitActionVisitor
-    {
-        void UnitAdd(Id typeUnit, UnitProgressionDto progression, int count);
-        void UnitSpend(Id typeUnit, UnitProgressionDto progression, int count);
-    }
-
-    public interface IUnitAction
-    {
-        void Visit(IUnitActionVisitor visitor);
-    }
-
-    //-- implement
+    
     public class UnitActionConfig : IActionConfig, IUnitAction
     {
         public string ActionGroup => TypeActionGroup.Units;
-
-        public void Visit(IActionProcessor processor)
+        public void Visit(IActionVisitor visitor)
         {
-            throw new NotImplementedException();
+            visitor.Visit(this);
         }
+        
 
         public TypeUnitAction TypeAction;
 
@@ -134,19 +132,41 @@ namespace Meta.Configs.Actions
             UnitSpend,
         }
     }
-
-    //-- implement
-    public class ActionCollectionConfig : IActionConfig
+    
+    public class ActionCollectionConfig : IActionCollectionConfig
     {
         public string ActionGroup => TypeActionGroup.Collection;
 
+        public void Visit(IActionVisitor visitor)
+        {
+            foreach (var actionConfig in GetAll())
+            {
+                actionConfig.Visit(visitor);
+            }
+        }
+
         //хранение набора коллекции в типизированном виде
         //для удобной читаемости и сериализации/десериализации
-        public readonly List<UnitActionConfig> Untis = new List<UnitActionConfig>();
-        public readonly List<InventoryActionConfig> Items = new List<InventoryActionConfig>();
+        public List<UnitActionConfig> Untis = new List<UnitActionConfig>();
+        public List<InventoryActionConfig> Items = new List<InventoryActionConfig>();
 
         //схож с ConditionCollectionConfig, там тестирую массив
         private IActionConfig[] _actionsHash;
+
+        public void Add(IActionConfig actionConfig)
+        {
+            switch (actionConfig)
+            {
+                case InventoryActionConfig inventoryActionConfig:
+                    Items.Add(inventoryActionConfig);
+                    break;
+                case UnitActionConfig unitActionConfig:
+                    Untis.Add(unitActionConfig);
+                    break;
+                default:
+                    throw new ArgumentException("Unknown action type " + actionConfig);
+            }
+        }
 
         private void CreateHash()
         {
@@ -177,4 +197,5 @@ namespace Meta.Configs.Actions
             return _actionsHash;
         }
     }
+    
 }

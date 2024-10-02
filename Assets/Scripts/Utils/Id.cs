@@ -3,6 +3,7 @@ using System;
 
 public static class ConstDefaultCapacity
 {
+    public const int Nano = 4;
     public const int Micro = 8;
     public const int Small = 16;
     public const int Medium = 32;
@@ -17,6 +18,7 @@ namespace AppRen
     {
         private ushort _value;
         public ushort Value => _value;
+        public static Id Empty = 0;
 
         public Id(ushort value)
         {

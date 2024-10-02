@@ -63,7 +63,7 @@ namespace Meta.Controllers.Actions
         }
     }
 
-    public class ActionCollectionProcessor : ActionProcessorAbstract<ActionCollectionConfig>
+    public class ActionCollectionProcessor : ActionProcessorAbstract<IActionCollectionConfig>
     {
         private readonly IActionProcessor _actionProcessor;
 
@@ -72,7 +72,7 @@ namespace Meta.Controllers.Actions
             _actionProcessor = actionProcessor;
         }
 
-        protected override void Process(ActionCollectionConfig action)
+        protected override void Process(IActionCollectionConfig action)
         {
             foreach (var anyAction in action.GetAll())
             {

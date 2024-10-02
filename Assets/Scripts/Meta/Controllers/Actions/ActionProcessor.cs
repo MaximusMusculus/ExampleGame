@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Meta.Configs;
+using Meta.Configs.Actions;
 
 
 namespace Meta.Controllers.Actions
 {
+    /*
     public class ActionExecuteProcessor : IActionProcessor
     {
         private readonly Dictionary<string, IActionProcessor> _actions = new Dictionary<string, IActionProcessor>(ConstDefaultCapacity.Micro);
@@ -40,6 +42,7 @@ namespace Meta.Controllers.Actions
             }
         }
     }
+    */
     
     
     
@@ -52,14 +55,12 @@ namespace Meta.Controllers.Actions
     public class ActionProcessor : IActionProcessor
     {
         private readonly Dictionary<string, IActionProcessor> _actions = new Dictionary<string, IActionProcessor>();
-
+        
         public ActionProcessor(IInventoryController inventoryController, IUnitsController unitController)
         {
-            var inventoryProcessor = new InventoryActionsProcessor(inventoryController); //create from factory?
-            var unitsProcessor = new UnitActionProcessor(unitController);
             _actions.Add(TypeActionGroup.Collection, new ActionCollectionProcessor(this));
-            _actions.Add(TypeActionGroup.Inventory, inventoryProcessor);
-            _actions.Add(TypeActionGroup.Units, unitsProcessor);
+            _actions.Add(TypeActionGroup.Inventory, new InventoryActionsProcessor(inventoryController));
+            _actions.Add(TypeActionGroup.Units, new UnitActionProcessor(unitController));
         }
         
         public void Process(IActionConfig actionConfig)
@@ -70,5 +71,8 @@ namespace Meta.Controllers.Actions
             }
             action.Process(actionConfig);
         }
+
+
+  
     }
 }
