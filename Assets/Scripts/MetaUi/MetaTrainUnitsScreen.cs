@@ -8,7 +8,6 @@ using UnityEngine;
 
 namespace MetaUi
 {
-
     public static class ActionCollectionExtension
     {
         private static readonly UnitActionCollection UnitActionCollection = new UnitActionCollection(5);
@@ -58,7 +57,7 @@ namespace MetaUi
         
         public void UpdateView()
         {
-            _metaItemsBar.UpdateItems();
+            _metaItemsBar.UpdateView();
             _metaTrainUnits.UpdateUnits();
         }
 
@@ -71,7 +70,7 @@ namespace MetaUi
                 //знаем какого юнита трерируем - знаем его стоимость и тд. Знаем позицию иконки юнита, знаем бар ресурсов и бар армии. 
                 //можем выполнить красивую анимацию с синхронизацией, естественно этого тут нет ;)
                 _metaTrainUnits.UpdateUnits();
-                _metaItemsBar.UpdateItems();
+                _metaItemsBar.UpdateView();
             }
             else
             {

@@ -44,7 +44,7 @@ namespace Meta
             _quests = controllersFactory.CreateQuestsController(config.Quests, data.Quests, fact, _executeActionProcessor);
             _questActionProcessor = _quests;
             
-            //_quests.AddNewQuest(MapTestId.QuestAddUnitGunner.Id());
+            _quests.AddNewQuest(MapTestId.QuestAddUnitGunner.Id());
             _quests.AddNewQuest(MapTestId.QuestSpendRecruts.Id());
         }
 

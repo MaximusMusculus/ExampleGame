@@ -28,7 +28,7 @@ namespace MetaUi
             _spriteHolder = spriteHolder;
             HideAllView();
             ShowEnabledViews();
-            UpdateItems();
+            UpdateView();
         }
         
 
@@ -50,7 +50,7 @@ namespace MetaUi
                 view.SetText(_inventory.GetCount(typeItem.Id()).ToString());
             }
         }
-        public void UpdateItems()
+        public void UpdateView()
         {
             for (var i = 0; i < _showList.Count && i < _viewElems.Count; i++)
             {

@@ -40,7 +40,7 @@ namespace Meta.TestConfiguration
 
 
                 .AddQuestConfig(_questBuilder
-                    .NewCountQuest(MapTestId.QuestAddUnitGunner.Id(), MapTestId.UnitGunner.Id(), 20)
+                    .NewCountQuest(MapTestId.QuestAddUnitGunner.Id(), MapTestId.UnitGunner.Id(), 10)
                     .SetTrigger(TypeQuest.UnitAdd)
                     .SetItemReward(MapTestId.Hard.Id(), 50)
                     .Build())
@@ -54,7 +54,7 @@ namespace Meta.TestConfiguration
                 .AddQuestConfig(_questBuilder.NewConditionalQuest(MapTestId.QuestCollectGunners.Id(), 
                         _condition
                             .NewCollection(TypeCollection.And)
-                            .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.GreaterOrEqual, 10)
+                            .UnitCountCondition(MapTestId.UnitGunner.Id(), TypeCompare.GreaterOrEqual, 5)
                             .Build())
                     .SetTrigger(TypeQuest.UnitAdd)
                     .SetItemReward(MapTestId.Recruts.Id(), 100)
