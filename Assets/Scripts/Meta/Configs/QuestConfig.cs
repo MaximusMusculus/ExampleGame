@@ -8,26 +8,39 @@ namespace Meta.Configs
 {
     public interface IQuestCollectionConfig
     {
-        IEnumerable<IQuestConfig> GetAll();
+        IQuestConfig[] GetAll();
     }
     
     public class QuestCollectionConfig : IQuestCollectionConfig
     {
         public List<QuestCountBasedConfig> CountBased = new List<QuestCountBasedConfig>();
         public List<QuestConditionalConfig> ConditionBased = new List<QuestConditionalConfig>();
-        
-        public IEnumerable<IQuestConfig> GetAll()
-        {
-            foreach (var quest in CountBased)
-            {
-                yield return quest;
-            }
-            foreach (var quest in ConditionBased)
-            {
-                yield return quest;
-            }
-        }
+        //......
+        //......
+        //......
 
+        private IQuestConfig[] _quests;
+        public IQuestConfig[] GetAll()
+        {
+            if (_quests != null)
+            {
+                return _quests;
+            }
+            
+            _quests = new IQuestConfig[CountBased.Count + ConditionBased.Count];
+            for (var i = 0; i < CountBased.Count; i++)
+            {
+                _quests[i] = CountBased[i];
+            }
+            
+            var offset = CountBased.Count;
+            for (var i = 0; i < ConditionBased.Count; i++)
+            {
+                _quests[i + offset] = ConditionBased[i];
+            }
+            return _quests;
+        }
+        
         public void Add(IQuestConfig questConfig)
         {
             if (questConfig is QuestCountBasedConfig countBasedConfig)
@@ -51,15 +64,20 @@ namespace Meta.Configs
         CountBased,
         Conditional
     }
+
+
+    
     
     public interface IQuestConfig
     {
         public Id QuestId { get; }
-        public TypeQuestGroup TypeQuestGroup { get; }
         public IEnumerable<TypeQuest> GetTriggers();
-        
         IActionConfig Reward { get; set; }
+        
+        
+        public TypeQuestGroup TypeQuestGroup { get; }
     }
+    
     
     
     
@@ -85,7 +103,6 @@ namespace Meta.Configs
         public TypeQuestGroup TypeQuestGroup => TypeQuestGroup.CountBased;
         public TypeQuest TriggerAction;
         
-        
         public Id QuestId { get; set; }
         public Id TargetEntityId;
         public int TargetValue;
@@ -97,6 +114,12 @@ namespace Meta.Configs
 
         public IActionConfig Reward { get; set; }
     }
+    
+    
+    
+
+
+    
 
 
     //Квест использующий счетчик игрока (инвентарь, юнитов)

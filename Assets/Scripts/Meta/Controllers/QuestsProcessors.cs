@@ -2,6 +2,7 @@
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
+using Meta.Controllers.Actions;
 using Meta.Models;
 
 namespace Meta.Controllers
@@ -17,13 +18,14 @@ namespace Meta.Controllers
     {
         string ActionGroup { get; }
     }
+    
 
     public abstract class QuestCountBasedProcessor<TAction> : ActionProcessorAbstract<TAction>, IQuestProcessor
     {
         private readonly QuestCountBasedConfig _config;
         private readonly QuestCounterDto _data;
         public abstract string ActionGroup { get; }
-
+        
         protected QuestCountBasedProcessor(QuestCountBasedConfig config, QuestCounterDto data)
         {
             _config = config;
@@ -51,6 +53,7 @@ namespace Meta.Controllers
         {
             return _config.TargetEntityId.Equals(target);
         }
+        
     }
 
 }
@@ -103,27 +106,24 @@ namespace Meta.Controllers.Imp
     public class QuestCountUnitsController : QuestCountBasedProcessor<IUnitAction>, IUnitActionVisitor
     {
         public override string ActionGroup => TypeActionGroup.Units;
-        public QuestCountUnitsController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data)
-        {
-        }
+
+        public QuestCountUnitsController(QuestCountBasedConfig config, QuestCounterDto data) : base(config, data) { }
 
         protected override void Process(IUnitAction action)
         {
             action.Visit(this);
         }
 
-
         public void UnitAdd(Id typeUnit, UnitProgressionDto progression, int count)
         {
             ProcessQuest(TypeQuest.UnitAdd, typeUnit, count);
         }
-
+        
         public void UnitSpend(Id typeUnit, UnitProgressionDto progression, int count)
         {
             ProcessQuest(TypeQuest.UnitSpend, typeUnit, count);
         }
-
-
+        
     }
 
     public class QuestCountInventoryItemController : QuestCountBasedProcessor<IInventoryAction>, IInventoryActionVisitor

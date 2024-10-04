@@ -51,8 +51,6 @@ namespace Meta.Models
             }
         }
 
-        //Спрячу реализацию внутри, это сделано для оптимизации
-        //и никто не будет знать ^_^
         public void Add(IQuest questDto)
         {
             if (questDto is QuestCounterDto counter)
@@ -64,7 +62,6 @@ namespace Meta.Models
                 ConditionalQuest.Add(conditional);
             }
         }
-
         public void Remove(IQuest questDto)
         {
             if (questDto is QuestCounterDto counter)

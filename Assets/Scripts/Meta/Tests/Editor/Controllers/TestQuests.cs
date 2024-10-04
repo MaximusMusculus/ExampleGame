@@ -54,7 +54,7 @@ namespace Meta.Tests.Editor.Controllers
             var actionProcessor = new ActionProcessor(_inventory, _units);
             var fact = new QuestProcessorsProcessorsFactory(new ConditionProcessor(_inventory, _units));
             _questsController = new QuestsController(questsConfig,_questsData, fact, actionProcessor);
-            var autoComplete = new QuestAutoCompleteProcessorForFact(_questsData, _questsController);
+            var autoComplete = new QuestAutoCompleteProcessorForFact(_questsData, _questsController, _questsController);
             _actionProcessor = new ActionProcessorFacade(actionProcessor, _questsController, autoComplete);
         }
         
@@ -99,11 +99,13 @@ namespace Meta.Tests.Editor.Controllers
     {
         private readonly QuestCollectionDto _questsData;
         private readonly IQuestsController _questController;
+        private readonly IQuestClaimReward _questClaimReward;
 
-        public QuestAutoCompleteProcessorForFact(QuestCollectionDto questsData, IQuestsController questController)
+        public QuestAutoCompleteProcessorForFact(QuestCollectionDto questsData, IQuestsController questController, IQuestClaimReward questClaimReward)
         {
             _questsData = questsData;
             _questController = questController;
+            _questClaimReward = questClaimReward;
         }
 
         public void Process(IActionConfig actionConfig)
@@ -112,7 +114,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 if (quest.IsCompleted && quest.IsRewarded == false)
                 {
-                    _questController.ClaimReward(quest);
+                    _questClaimReward.ClaimReward(quest);
                 }
             }
 
@@ -120,7 +122,7 @@ namespace Meta.Tests.Editor.Controllers
             {
                 if (quest.IsCompleted && quest.IsRewarded == false)
                 {
-                    _questController.ClaimReward(quest);
+                    _questClaimReward.ClaimReward(quest);
                 }
             }
         }

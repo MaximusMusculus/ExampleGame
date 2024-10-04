@@ -145,19 +145,6 @@ namespace Meta.Configs.Actions.Imp
             }
         }
         
-    
-        public IEnumerable<IActionConfig> GetForGroup(string groupName)
-        {
-            var collection = GetAll();
-            for (int i = 0; i < collection.Length; i++)
-            {
-                if (collection[i].ActionGroup == groupName)
-                {
-                    yield return collection[i];
-                }
-            }
-        }
-
         //хранение набора коллекции в типизированном виде
         //для удобной читаемости и сериализации/десериализации
         public List<UnitActionConfig> Untis = new List<UnitActionConfig>();

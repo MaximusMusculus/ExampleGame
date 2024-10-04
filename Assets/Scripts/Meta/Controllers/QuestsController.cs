@@ -4,6 +4,7 @@ using System.Linq;
 using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
+using Meta.Controllers.Actions;
 using Meta.Models;
 using UnityEngine.Assertions;
 
@@ -14,64 +15,38 @@ namespace Meta.Controllers
         public IEnumerable<IQuest> GetAll();
     }
 
-    public interface IQuestsController : IQuests
+    public interface IQuestsController 
     {
         void AddNewQuest(Id configId);
-        void ClaimReward(IQuest quest);
         void Remove(IQuest quest);
-    } 
+    }
+
+    public interface IQuestClaimReward
+    {
+        void ClaimReward(IQuest quest);
+    }
+
+    
+    
 }
 
 namespace Meta.Controllers.Imp
 {
-    /// <summary>
-    /// процессит все квесты на количества инвентаря
-    /// </summary>
-    public class InventoryQuestsProcessor : ActionProcessorAbstract<IInventoryAction>, IInventoryActionVisitor
-    {
-        private QuestCollectionConfig _questConfig;
-        private QuestCollectionDto _questData;
-
-        public InventoryQuestsProcessor(QuestCollectionConfig questConfig, QuestCollectionDto questData)
-        {
-            _questConfig = questConfig;
-            _questData = questData;
-        }
-
-        protected override void Process(IInventoryAction action)
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public void ItemAdd(Id itemId, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ItemSpend(Id itemId, int count)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ItemExpandLimit(Id itemId, int count)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    
-    public class QuestsController : IActionProcessor, IQuestsController, IQuests, IActionVisitor
+    public class QuestsController : IActionProcessor, IQuestsController, IQuests, IQuestClaimReward
     {
         private readonly List<IQuestProcessor> _metaQuestControllers = new List<IQuestProcessor>(ConstDefaultCapacity.Small);
-
+        
         private readonly IQuestProcessorsFactory _questsProcessorsFactory;
         private readonly Dictionary<Id, IQuestConfig> _configs;
         private readonly QuestCollectionDto _questData;
         private readonly IActionProcessor _rewardProcessor;
+        private readonly IActionProcessor _actionCollectionProcessor;
 
         public QuestsController(QuestCollectionConfig questConfig, QuestCollectionDto questData,
             IQuestProcessorsFactory questsProcessorsFactory, IActionProcessor rewardProcessor)
         {
+            _actionCollectionProcessor = new ActionCollectionProcessor(this);
+            
             _questData = questData;
             _rewardProcessor = rewardProcessor;
             _questsProcessorsFactory = questsProcessorsFactory;
@@ -99,8 +74,6 @@ namespace Meta.Controllers.Imp
             var questActionController = _questsProcessorsFactory.CreateController(questConfig, questDto);
             _metaQuestControllers.Add(questActionController);
         }
-
-
         public void ClaimReward(IQuest quest)
         {
             ClaimReward(quest.ConfigId);
@@ -126,33 +99,20 @@ namespace Meta.Controllers.Imp
         //это должно быть не здесь. 
         public void Process(IActionConfig actionConfig)
         {
-            actionConfig.Accept(this);
-        }
-        
-        public void Visit(IInventoryAction inventoryActionConfig)
-        {
-            foreach (var questController in _metaQuestControllers)
+            if (actionConfig.ActionGroup.Equals(TypeActionGroup.Collection))
             {
-                if (questController is IInventoryActionVisitor)
+                _actionCollectionProcessor.Process(actionConfig);
+            }
+            
+            foreach (var questProcessor in _metaQuestControllers)
+            {
+                if (questProcessor.ActionGroup == actionConfig.ActionGroup)
                 {
-                    inventoryActionConfig.Visit((IInventoryActionVisitor)questController);
+                    questProcessor.Process(actionConfig);
                 }
             }
         }
-        public void Visit(IUnitAction unitActionConfig)
-        {
-            foreach (var questController in _metaQuestControllers)
-            {
-                if (questController is IUnitActionVisitor)
-                {
-                    unitActionConfig.Visit((IUnitActionVisitor)questController);
-                }
-            }
-        }
-
         
-
-
         public void ProcessBattleEvent()
         {
             /*foreach (var questController in _battleQuestControllers)
