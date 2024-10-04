@@ -16,7 +16,7 @@ namespace Meta
         private int _trainUnit;
         private int _costUnit;
 
-        protected void Awake()
+        protected void Start()
         {
             var config = new MetaConfigProviderTestBig().GetConfig();
             //new MetaConfigDevelopProvider().GetConfig();

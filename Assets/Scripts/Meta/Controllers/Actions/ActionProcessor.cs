@@ -43,8 +43,33 @@ namespace Meta.Controllers.Actions
         }
     }
     */
-    
-    
+
+
+    public class ActionProcessorVisitor : IActionProcessor, IActionVisitor
+    {
+        private readonly IInventoryActionVisitor _inventoryActionsProcessor;
+        private readonly IUnitActionVisitor _unitActionVisitor;
+        
+        public ActionProcessorVisitor(IInventoryController inventoryController, IUnitsController unitController)
+        {
+            _inventoryActionsProcessor = new InventoryActionsProcessor(inventoryController);
+            _unitActionVisitor = new UnitActionProcessor(unitController);
+        }
+        
+        public void Process(IActionConfig actionConfig)
+        {
+            actionConfig.Accept(this);
+        }
+        
+        public void Visit(IInventoryAction inventoryActionConfig)
+        {
+            inventoryActionConfig.Visit(_inventoryActionsProcessor);
+        }
+        public void Visit(IUnitAction unitActionConfig)
+        {
+            unitActionConfig.Visit(_unitActionVisitor);
+        }
+    }
     
     /// <summary>
     /// Большой плюс - не надо создавать кучу мелких классов. Нужен только конфиг.
@@ -65,14 +90,11 @@ namespace Meta.Controllers.Actions
         
         public void Process(IActionConfig actionConfig)
         {
-            if (_actions.TryGetValue(actionConfig.ActionGroup, out var action) == false)
+            if (_actions.TryGetValue(actionConfig.ActionGroup, out var actionProcessor) == false)
             {
                 throw new ArgumentException($"Action {actionConfig.ActionGroup} not found");
             }
-            action.Process(actionConfig);
+            actionProcessor.Process(actionConfig);
         }
-
-
-  
     }
 }

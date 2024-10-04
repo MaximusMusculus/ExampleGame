@@ -86,6 +86,11 @@ namespace Meta.Tests.Editor.Controllers
             {
                 throw new System.NotImplementedException();
             }
+
+            public IEnumerable<IQuest> GetAll()
+            {
+                throw new System.NotImplementedException();
+            }
         }
 
     }

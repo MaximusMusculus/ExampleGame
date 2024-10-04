@@ -39,7 +39,7 @@ namespace Meta.Configs.Actions.Imp
     public class InventoryActionConfig : IActionConfig, IInventoryAction
     {
         public string ActionGroup => TypeActionGroup.Inventory;
-        public void Visit(IActionVisitor visitor)
+        public void Accept(IActionVisitor visitor)
         {
             visitor.Visit(this);
         }
@@ -88,7 +88,7 @@ namespace Meta.Configs.Actions.Imp
     public class UnitActionConfig : IActionConfig, IUnitAction
     {
         public string ActionGroup => TypeActionGroup.Units;
-        public void Visit(IActionVisitor visitor)
+        public void Accept(IActionVisitor visitor)
         {
             visitor.Visit(this);
         }
@@ -137,11 +137,24 @@ namespace Meta.Configs.Actions.Imp
     {
         public string ActionGroup => TypeActionGroup.Collection;
 
-        public void Visit(IActionVisitor visitor)
+        public void Accept(IActionVisitor visitor)
         {
             foreach (var actionConfig in GetAll())
             {
-                actionConfig.Visit(visitor);
+                actionConfig.Accept(visitor);
+            }
+        }
+        
+    
+        public IEnumerable<IActionConfig> GetForGroup(string groupName)
+        {
+            var collection = GetAll();
+            for (int i = 0; i < collection.Length; i++)
+            {
+                if (collection[i].ActionGroup == groupName)
+                {
+                    yield return collection[i];
+                }
             }
         }
 
@@ -196,6 +209,7 @@ namespace Meta.Configs.Actions.Imp
 
             return _actionsHash;
         }
+        
     }
     
 }

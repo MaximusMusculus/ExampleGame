@@ -1,11 +1,34 @@
 using System.Collections.Generic;
+using System.Linq;
 using Meta;
 using Meta.Configs;
+using Meta.Configs.Actions;
 using Meta.Controllers;
 using UnityEngine;
 
 namespace MetaUi
 {
+
+    public static class ActionCollectionExtension
+    {
+        private static readonly UnitActionCollection UnitActionCollection = new UnitActionCollection(5);
+        private static readonly InventoryActionItemCollection InventoryActionItemCollection = new InventoryActionItemCollection(10);
+        private static readonly ActionSplitProcessor ActionSplitProcessor = new ActionSplitProcessor();
+
+        public static bool HasUnitAction(this IActionCollectionConfig actionCollection)
+        {
+            ActionSplitProcessor.Reset().Set(UnitActionCollection).Fill(actionCollection);
+            return UnitActionCollection.Units.Length > 0;
+        }
+        public static bool HasItemAction(this IActionCollectionConfig actionCollection)
+        {
+            ActionSplitProcessor.Reset().Set(InventoryActionItemCollection).Fill(actionCollection);
+            return InventoryActionItemCollection.Items.Count > 0;
+        }
+
+    }
+    
+    
     /// <summary>
     /// Тут нужны юниты, ресурсы, действия и кондишены.  
     /// </summary>
@@ -30,18 +53,7 @@ namespace MetaUi
         private IEnumerable<MetaActionConfig> SelectTrainActions(MetaActionsGroupConfig actions)
         {
             //отбираем только те действия, которые добавляют юнитов
-            //если будет такое часто - передать фильтр
-            foreach (var trainAction in actions.Actions)
-            {
-                foreach (var action in trainAction.Actions.GetAll())
-                {
-                    //меня интересует конкретная группа действий
-                    if (action.ActionGroup == TypeActionGroup.Units)
-                    {
-                        yield return trainAction;
-                    }
-                }
-            }
+            return actions.Actions.Where(trainAction => trainAction.Actions.HasUnitAction());
         }
         
         public void UpdateView()

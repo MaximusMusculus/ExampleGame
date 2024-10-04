@@ -79,7 +79,6 @@ namespace MetaUi
             Count = 0;
         }
     }
-
     public class InventoryActionItemCollection : IInventoryActionVisitor
     {
         private int _index;
@@ -138,7 +137,6 @@ namespace MetaUi
         public UnitProgressionDto Progression;
         public TypeAction Action;
     }
-
     public class UnitActionCollection : IUnitActionVisitor
     {
         private int _index;
@@ -219,23 +217,29 @@ namespace MetaUi
 
         public void Fill(IActionCollectionConfig actionConfig)
         {
-            _items.Reset();
-            _units.Reset();
+            _items?.Reset();
+            _units?.Reset();
 
             foreach (var action in actionConfig.GetAll())
             {
-                action.Visit(this);
+                action.Accept(this);
             }
         }
 
         public void Visit(IInventoryAction inventoryActionConfig)
         {
-            inventoryActionConfig?.Visit(_items);
+            if (_items != null)
+            {
+                inventoryActionConfig.Visit(_items);
+            }
         }
 
         public void Visit(IUnitAction unitActionConfig)
         {
-            unitActionConfig?.Visit(_units);
+            if (_units != null)
+            {
+                unitActionConfig?.Visit(_units);
+            }
         }
     }
 
@@ -365,17 +369,6 @@ namespace MetaUi
 
                 viewData.CountAndLimit = $"{existCount}/{unitLimit}";
                 viewData.ButtonEnabled = _conditionProcessor.Check(actionConfig.Require) && allInventoryItemsExist;
-            }
-
-
-            public void Visit(IInventoryAction inventoryActionConfig)
-            {
-                inventoryActionConfig.Visit(_price);
-            }
-
-            public void Visit(IUnitAction unitActionConfig)
-            {
-                unitActionConfig.Visit(_unitsCollection);
             }
         }
     }

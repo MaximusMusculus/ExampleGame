@@ -16,7 +16,7 @@ namespace Meta.Configs
     public interface IActionConfig
     {
         string ActionGroup { get; }
-        void Visit(IActionVisitor visitor);
+        void Accept(IActionVisitor visitor);
     }
 
     public interface IActionVisitor

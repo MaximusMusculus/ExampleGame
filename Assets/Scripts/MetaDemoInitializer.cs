@@ -22,6 +22,9 @@ namespace MetaUi
             var emptyGameData = new MetaDto();
             var metaControllersFactory = new MetaControllersFactory(gameConfig); 
             _metaModel = new MetaModel(gameConfig, emptyGameData, metaControllersFactory);
+            
+          
+            
             _metaUi.Setup(_metaModel, this);
         }
         
@@ -29,7 +32,7 @@ namespace MetaUi
         {
             try
             {
-                _metaModel.ActionProcessor.Process(command.ActionConfig.Actions);
+                _metaModel.Process(command.ActionConfig.Actions);
             }
             catch (Exception e)
             {

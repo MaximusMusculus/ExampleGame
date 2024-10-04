@@ -3,6 +3,7 @@ using AppRen;
 using Meta.Configs;
 using Meta.Configs.Actions;
 using Meta.Models;
+using UnityEngine;
 
 namespace Meta.Controllers
 {
@@ -40,6 +41,10 @@ namespace Meta.Controllers
             var sumValue = _data.Value + count;
             _data.Value = Math.Clamp(sumValue, 0, _config.TargetValue);
             _data.IsCompleted = _data.Value >= _config.TargetValue;
+            if (_data.IsCompleted)
+            {
+                Debug.Log("Quest completed:" + _config.QuestId);
+            }
         }
 
         private bool CheckTrigger(TypeQuest triggerAction)
